@@ -29,24 +29,24 @@ use IEEE.STD_LOGIC_1164.ALL;
 --library UNISIM;
 --use UNISIM.VComponents.all;
 
-entity uart_demux is
+entity demux4 is
     Port (
-        i : in  STD_LOGIC;
-        o : out  STD_LOGIC_VECTOR (3 downto 0);
-        sel : in  STD_LOGIC_VECTOR (1 downto 0)
+        i : in STD_LOGIC;
+        o : out STD_LOGIC_VECTOR (3 downto 0);
+        sel : in STD_LOGIC_VECTOR (1 downto 0)
     );
-end demux;
+end demux4;
 
-architecture rtl of uart_demux is
+architecture rtl of demux4 is
 begin
 	process(sel, i)
 	begin
 		o <= "1111";
 		case sel is
-			when "00"	=> o(0) <= i;
-			when "01"	=> o(1) <= i;
-			when "10"	=> o(2) <= i;
-			when "11"	=> o(3) <= i;
+			when "00" => o(0) <= i;
+			when "01" => o(1) <= i;
+			when "10" => o(2) <= i;
+			when "11" => o(3) <= i;
 			when others => report "unreachable" severity failure;
 		end case;
 	end process;

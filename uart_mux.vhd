@@ -29,15 +29,15 @@ use IEEE.STD_LOGIC_1164.ALL;
 --library UNISIM;
 --use UNISIM.VComponents.all;
 
-entity uart_mux is
+entity mux4 is
     Port (
-        i : in  STD_LOGIC_VECTOR (3 downto 0);
+        i : in STD_LOGIC_VECTOR (3 downto 0);
 		o : out STD_LOGIC;
-        sel : in  STD_LOGIC_VECTOR (1 downto 0)
+        sel : in STD_LOGIC_VECTOR (1 downto 0)
     );
-end uart_mux;
+end mux4;
 
-architecture rtl of uart_mux is
+architecture rtl of mux4 is
 begin
 	process(sel, i)
 	begin

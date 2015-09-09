@@ -9,6 +9,7 @@ xst
 *.lso
 *.ngc
 *.ngr
+*.origin
 *.prj
 *.stx
 *.syr
