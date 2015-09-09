@@ -1,0 +1,12 @@
+tmp
+*.cgc
+*.log
+*.lock
+*.vhd
+*.vho
+*.asy
+*.sym
+*.cgp
+*.tcl
+*.txt
+bram_fsmc/
