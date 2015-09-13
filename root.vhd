@@ -29,9 +29,12 @@ use IEEE.STD_LOGIC_1164.ALL;
 --library UNISIM;
 --use UNISIM.VComponents.all;
 
+-- Non standard library from synopsis (for dev_null functions)
+use ieee.std_logic_misc.all;
+
 entity root is
     port ( 
-		CLK_IN_27MHZ : in std_logic; -- 27MHz
+		CLK_IN_27MHZ : in std_logic;
         
 		STM_UART2_RX : out std_logic;
 		STM_UART2_TX : in std_logic;
@@ -50,7 +53,6 @@ entity root is
 		  
 		STM_IO_GNSS_SELECT : in std_logic_vector (1 downto 0);
 		STM_IO_FPGA_READY : out std_logic;
-		STM_IO6 : out std_logic;
 		  
 		FSMC_A : in std_logic_vector (22 downto 0);
 		FSMC_D : inout std_logic_vector (15 downto 0);
@@ -58,13 +60,13 @@ entity root is
 		FSMC_NOE : in std_logic;
 		FSMC_NWE : in std_logic;
 		FSMC_NCE : in std_logic;
-		FSMC_CLK : in std_logic;
-		FSMC_NWAIT : out std_logic;
-		  
-		SPI1_NSS : in std_logic;
-		SPI1_SCK : in std_logic;
-		SPI1_MISO : out std_logic;
-		SPI1_MOSI : in std_logic;
+		--FSMC_CLK : in std_logic;
+		--FSMC_NWAIT : out std_logic;
+
+--		SPI1_MISO : out std_logic;
+--		SPI1_MOSI : in std_logic;		  
+--		SPI1_NSS : in std_logic;
+--		SPI1_SCK : in std_logic;
 		  
 		DEV_NULL_B1 : out std_logic -- warning suppressor
 	);
@@ -92,6 +94,7 @@ begin
 		LOCKED   => clk_locked
 	);
 
+    -- connect GNSS router
     gnss_router : entity work.gnss_router port map (
         sel => STM_IO_GNSS_SELECT,
         
@@ -110,6 +113,19 @@ begin
         
         ubx_nrst => UBLOX_NRST
     );
+
+    -- connect FSMC
+	fsmc : entity work.fsmc port map (
+		hclk => clk_391MHz, 
+		A => FSMC_A(16 downto 0),
+		D => FSMC_D,
+		NCE => FSMC_NCE,
+		NOE => FSMC_NOE,
+		NWE => FSMC_NWE,
+		NBL => FSMC_NBL,
+		dbg => LED_LINE
+	);
+	DEV_NULL_B1 <= or_reduce(FSMC_A(22 downto 17));
 
 	-- raize ready flag
 	STM_IO_FPGA_READY <= not clk_locked;

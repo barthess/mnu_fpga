@@ -6,7 +6,6 @@ tmp/
 *.cgc
 *.cgp
 *.lock
-*.log
 *.ncf
 *.sym
 *.tcl

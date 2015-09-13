@@ -29,20 +29,21 @@ use IEEE.NUMERIC_STD.ALL;
 --library UNISIM;
 --use UNISIM.VComponents.all;
 
-entity fsmc_bridge is
-    Port ( A : in  STD_LOGIC_VECTOR (15 downto 0);
-           D : inout  STD_LOGIC_VECTOR (15 downto 0);
-           NWE : in  STD_LOGIC;
-           NOE : in  STD_LOGIC;
-           NCE : in  STD_LOGIC;
-			  NBL : in std_logic_vector (1 downto 0);
-			  hclk : in std_logic;
-			  dbg : out std_logic_vector (5 downto 0)
-			 );
-end fsmc_bridge;
+entity fsmc is
+    Port (
+        A : in  STD_LOGIC_VECTOR (16 downto 0);
+        D : inout  STD_LOGIC_VECTOR (15 downto 0);
+        NWE : in  STD_LOGIC;
+        NOE : in  STD_LOGIC;
+        NCE : in  STD_LOGIC;
+        NBL : in std_logic_vector (1 downto 0);
+        hclk : in std_logic;
+        dbg : out std_logic_vector (5 downto 0)
+     );
+end fsmc;
 
 -------------------------
-architecture A_fsmc_bridge of fsmc_bridge is
+architecture a_fsmc of fsmc is
 
 type state_t is (IDLE, WRITE1, WRITE2, WRITE3, READ1, READ2);
 signal state : state_t := IDLE;
@@ -59,7 +60,7 @@ begin
 	dbg(4) <= mem_do(0);
 	dbg(5) <= mem_clk;
 	
-	bram : entity work.blk_mem_fsmc port map (
+	bram : entity work.bram_fsmc port map (
 		clka  => mem_clk,
 		wea   => mem_we,
 		addra => A,
@@ -104,7 +105,7 @@ begin
 			end if;
 		end if;
 	end process;
-end A_fsmc_bridge;
+end a_fsmc;
 
 
 
