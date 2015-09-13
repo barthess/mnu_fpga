@@ -1,5 +1,6 @@
 bram_fsmc/
 clk_src/
+coregen_lock/
 tmp/
 *.asy
 *.cgc
