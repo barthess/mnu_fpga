@@ -1,4 +1,5 @@
 bram_fsmc/
+clk_src/
 tmp/
 *.asy
 *.cgc
@@ -9,5 +10,6 @@ tmp/
 *.sym
 *.tcl
 *.txt
+*.ucf
 *.vhd
 *.vho

@@ -31,7 +31,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 
 entity root is
     port ( 
-		CLK_IN1 : in std_logic; -- 27MHz
+		CLK_IN_27MHZ : in std_logic; -- 27MHz
         
 		STM_UART2_RX : out std_logic;
 		STM_UART2_TX : in std_logic;
@@ -75,7 +75,22 @@ end root;
 
 architecture Behavioral of root is
 
+signal clk_391mhz : std_logic;
+signal clk_98mhz : std_logic;
+signal clk_196mhz : std_logic;
+signal clk_261mhz : std_logic;
+signal clk_locked : std_logic;
+
 begin
+
+	clk_src : entity work.clk_src port map (
+		CLK_IN1  => CLK_IN_27MHZ,
+		CLK_OUT1 => clk_391mhz,
+		CLK_OUT2 => clk_261mhz,
+		CLK_OUT3 => clk_196mhz,
+		CLK_OUT4 => clk_98mhz,
+		LOCKED   => clk_locked
+	);
 
     gnss_router : entity work.gnss_router port map (
         sel => STM_IO_GNSS_SELECT,
@@ -97,8 +112,7 @@ begin
     );
 
 	-- raize ready flag
-	--STM_IO_FPGA_READY <= not clk_locked;
-    STM_IO_FPGA_READY <= '0';
+	STM_IO_FPGA_READY <= not clk_locked;
 
 end Behavioral;
 
