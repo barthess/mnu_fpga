@@ -31,7 +31,7 @@ use IEEE.NUMERIC_STD.ALL;
 
 entity fsmc is
     Port (
-        A : in  STD_LOGIC_VECTOR (16 downto 0);
+        A : in  STD_LOGIC_VECTOR (15 downto 0);
         D : inout  STD_LOGIC_VECTOR (15 downto 0);
         NWE : in  STD_LOGIC;
         NOE : in  STD_LOGIC;

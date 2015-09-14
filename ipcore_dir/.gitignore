@@ -1,14 +1,14 @@
 bram_fsmc/
+bram_mul/
 clk_src/
 coregen_lock/
+double_mul/
 tmp/
 *.asy
 *.cgc
 *.cgp
-*.lock
 *.ncf
 *.sym
-*.tcl
 *.txt
 *.ucf
 *.vhd

@@ -68,7 +68,8 @@ entity root is
 --		SPI1_NSS : in std_logic;
 --		SPI1_SCK : in std_logic;
 		  
-		DEV_NULL_B1 : out std_logic -- warning suppressor
+		DEV_NULL_B1 : out std_logic; -- warning suppressor
+        DEV_NULL_B0 : out std_logic -- warning suppressor
 	);
 end root;
 
@@ -117,7 +118,7 @@ begin
     -- connect FSMC
 	fsmc : entity work.fsmc port map (
 		hclk => clk_391MHz, 
-		A => FSMC_A(16 downto 0),
+		A => FSMC_A(15 downto 0),
 		D => FSMC_D,
 		NCE => FSMC_NCE,
 		NOE => FSMC_NOE,
@@ -125,7 +126,13 @@ begin
 		NBL => FSMC_NBL,
 		dbg => LED_LINE
 	);
-	DEV_NULL_B1 <= or_reduce(FSMC_A(22 downto 17));
+	DEV_NULL_B1 <= or_reduce(FSMC_A(22 downto 16));
+
+    -- double multiplier test
+	mul_test : entity work.mul_test port map (
+		clk => clk_391mhz,
+        fake_out => DEV_NULL_B0
+	);
 
 	-- raize ready flag
 	STM_IO_FPGA_READY <= not clk_locked;
