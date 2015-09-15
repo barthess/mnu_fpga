@@ -6,6 +6,8 @@ xlnx_auto*/
 *.bgn
 *.bit
 *.bld
+*.cfi
+*.cmd
 *.cmd_log
 *.csv
 *.drc
@@ -20,14 +22,17 @@ xlnx_auto*/
 *.ngm
 *.ngr
 *.map
+*.mcs
 *.mrp
 *.origin
 *.pad
 *.par
 *.pcf
 *.prj
+*.prm
 *.ptwx
 *.pwr
+*.sig
 *.stx
 *.syr
 *.tcl
@@ -40,6 +45,7 @@ xlnx_auto*/
 *.xml
 *.xpi
 *.xrpt
+*.xsl
 *.xst
 *.xwbt
 
