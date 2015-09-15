@@ -68,8 +68,8 @@ entity root is
 --		SPI1_NSS : in std_logic;
 --		SPI1_SCK : in std_logic;
 		  
-		DEV_NULL_B1 : out std_logic; -- warning suppressor
-    DEV_NULL_B0 : out std_logic -- warning suppressor
+		DEV_NULL_B1 : out std_logic -- warning suppressor
+    --DEV_NULL_B0 : out std_logic -- warning suppressor
 	);
 end root;
 
@@ -84,12 +84,6 @@ signal clk_261mhz : std_logic;
 signal clk_391mhz : std_logic;
 signal clk_locked : std_logic;
 
-signal mem_do : std_logic_vector (15 downto 0);
-signal mem_di : std_logic_vector (15 downto 0);
-signal mem_a  : std_logic_vector (15 downto 0);
-signal mem_we : std_logic_vector (1 downto 0);
-signal mem_en : std_logic;
-
 begin
 
 	clk_src : entity work.clk_src port map (
@@ -102,44 +96,24 @@ begin
 	);
 
     -- connect GNSS router
-    gnss_router : entity work.gnss_router port map (
-        sel => STM_IO_GNSS_SELECT,
-        
-        from_gnss(0) => Navi_RX,
-        from_gnss(1) => NaviNMEA_RX,
-		from_gnss(2) => UBLOX_TX,
-		from_gnss(3) => MOD_TX1,
-        
-        to_gnss(0) => Navi_TX,
-		to_gnss(1) => NaviNMEA_TX,
-		to_gnss(2) => UBLOX_RX,
-		to_gnss(3) => MOD_RX1,
-        
-        to_stm => STM_UART2_RX,
-        from_stm => STM_UART2_TX,
-        
-        ubx_nrst => UBLOX_NRST
-    );
+  gnss_router : entity work.gnss_router port map (
+    sel => STM_IO_GNSS_SELECT,
 
+    from_gnss(0) => Navi_RX,
+    from_gnss(1) => NaviNMEA_RX,
+    from_gnss(2) => UBLOX_TX,
+    from_gnss(3) => MOD_TX1,
 
-  -- connect bram
-  bram : entity work.bram_fsmc PORT MAP (
-    clka => clk_391MHz,
-    ena => mem_en,
-    wea => mem_we,
-    addra => mem_a,
-    dina => mem_di,
-    douta => mem_do,
-    
-    clkb => clk_391MHz,
-    enb => '1',
-    web => (others => '0'),
-    addrb => (others => '0'),
-    dinb => (others => '0'),
-    doutb => open
+    to_gnss(0) => Navi_TX,
+    to_gnss(1) => NaviNMEA_TX,
+    to_gnss(2) => UBLOX_RX,
+    to_gnss(3) => MOD_RX1,
+
+    to_stm => STM_UART2_RX,
+    from_stm => STM_UART2_TX,
+
+    ubx_nrst => UBLOX_NRST
   );
-  DEV_NULL_B0 <= or_reduce(mem_di);
-
 
   -- connect FSMC
 	fsmc : entity work.fsmc port map (
@@ -149,13 +123,7 @@ begin
 		NCE => FSMC_NCE,
 		NOE => FSMC_NOE,
 		NWE => FSMC_NWE,
-		NBL => FSMC_NBL,
-    
-    mem_do => mem_do,
-    mem_di => mem_di,
-    mem_a  => mem_a,
-    mem_we => mem_we,
-    mem_en => mem_en
+		NBL => FSMC_NBL
 	);
 	DEV_NULL_B1 <= or_reduce(FSMC_A(22 downto 16));
 
@@ -165,7 +133,7 @@ begin
 --        fake_out => DEV_NULL_B0
 --	);
 
-    LED_LINE <= (others => '0');
+  LED_LINE <= (others => '0');
     
 	-- raize ready flag
 	STM_IO_FPGA_READY <= not clk_locked;

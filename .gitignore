@@ -1,6 +1,7 @@
 _ngo/
 _xmsgs/
 iseconfig/
+isim/
 xst/
 xlnx_auto*/
 *.bgn
@@ -11,8 +12,10 @@ xlnx_auto*/
 *.cmd_log
 *.csv
 *.drc
+*.exe
 *.gise
 *.html
+*.ini
 *.lock
 *.log
 *.lso
@@ -41,8 +44,11 @@ xlnx_auto*/
 *.txt
 *.unroutes
 *.ut
+*.wcfg
+*.wdb
 *.xdc
 *.xml
+*.xmsgs
 *.xpi
 *.xrpt
 *.xsl
