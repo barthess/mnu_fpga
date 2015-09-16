@@ -43,8 +43,11 @@ end fsmc_stimuly;
 architecture Beh of fsmc_stimuly is
 
 constant T : TIME := 5.95 ns;
-constant D_lat : TIME := 3 ns;
+constant D_lat   : TIME := 3 ns; -- Data to FSMC_NEx low to Data valid
+constant NOE_lat : TIME := 3 ns; -- FSMC_NEx low to FSMC_NOE low
+constant A_lat   : TIME := 4.5 ns; -- FSMC_NEx low to FSMC_A valid
 constant clk_dT : TIME := 2.54 ns;
+signal shift : TIME := 0 ns;
 signal clk_int : std_logic := '0';
 
 begin
@@ -57,7 +60,7 @@ begin
        x"1111" after D_lat + 7*T;
   
   NCE <= '1',
-         '0' after T,
+         '0' after 1*T,
          '1' after 3*T,
          '0' after 4*T,
          '1' after 6*T,
@@ -67,22 +70,13 @@ begin
   NBL <= "00";
          
   NWE <= '1',
-         '0' after T,
+         '0' after 1*T,
          '1' after 2*T,
          '0' after 4*T,
          '1' after 5*T,
          '0' after 7*T,
          '1' after 8*T;
 
-  
---  A <= x"0000",
---       x"ABCD" after 3*T,
---       x"EFFA" after 6*T;
---
---  NCE <= '1',
---         '0' after T,
---         '1' after 3*T;
---  
 --  NOE <= '1',
 --         '0' after T,
 --         '1' after 2*T;

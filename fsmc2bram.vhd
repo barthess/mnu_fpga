@@ -75,6 +75,7 @@ begin
     if falling_edge(hclk) then
       if (NCE = '1') then
         state <= IDLE;
+        bram_we <= "00";
       else
         case state is
         when IDLE =>
