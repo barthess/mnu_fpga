@@ -15,16 +15,16 @@
   <version xil_pn:ise_version="14.3" xil_pn:schema_version="2"/>
 
   <files>
-    <file xil_pn:name="bram_fsmc.ngc" xil_pn:type="FILE_NGC">
+    <file xil_pn:name="bram.ngc" xil_pn:type="FILE_NGC">
       <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="2"/>
-      <association xil_pn:name="Implementation" xil_pn:seqID="0"/>
+      <association xil_pn:name="Implementation" xil_pn:seqID="2"/>
     </file>
-    <file xil_pn:name="bram_fsmc.vhd" xil_pn:type="FILE_VHDL">
-      <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="1"/>
-      <association xil_pn:name="Implementation" xil_pn:seqID="1"/>
-      <association xil_pn:name="PostMapSimulation" xil_pn:seqID="3"/>
-      <association xil_pn:name="PostRouteSimulation" xil_pn:seqID="3"/>
-      <association xil_pn:name="PostTranslateSimulation" xil_pn:seqID="3"/>
+    <file xil_pn:name="bram.vhd" xil_pn:type="FILE_VHDL">
+      <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="4"/>
+      <association xil_pn:name="Implementation" xil_pn:seqID="4"/>
+      <association xil_pn:name="PostMapSimulation" xil_pn:seqID="4"/>
+      <association xil_pn:name="PostRouteSimulation" xil_pn:seqID="4"/>
+      <association xil_pn:name="PostTranslateSimulation" xil_pn:seqID="4"/>
     </file>
   </files>
 
@@ -34,9 +34,9 @@
     <property xil_pn:name="Device Family" xil_pn:value="Spartan6" xil_pn:valueState="non-default"/>
     <property xil_pn:name="Enable Internal Done Pipe" xil_pn:value="true" xil_pn:valueState="non-default"/>
     <property xil_pn:name="Implementation Stop View" xil_pn:value="PreSynthesis" xil_pn:valueState="non-default"/>
-    <property xil_pn:name="Implementation Top" xil_pn:value="Architecture|bram_fsmc|bram_fsmc_a" xil_pn:valueState="non-default"/>
-    <property xil_pn:name="Implementation Top File" xil_pn:value="bram_fsmc.vhd" xil_pn:valueState="non-default"/>
-    <property xil_pn:name="Implementation Top Instance Path" xil_pn:value="/bram_fsmc" xil_pn:valueState="non-default"/>
+    <property xil_pn:name="Implementation Top" xil_pn:value="Architecture|bram|bram_a" xil_pn:valueState="non-default"/>
+    <property xil_pn:name="Implementation Top File" xil_pn:value="bram.vhd" xil_pn:valueState="non-default"/>
+    <property xil_pn:name="Implementation Top Instance Path" xil_pn:value="/bram" xil_pn:valueState="non-default"/>
     <property xil_pn:name="Package" xil_pn:value="csg484" xil_pn:valueState="non-default"/>
     <property xil_pn:name="Preferred Language" xil_pn:value="Verilog" xil_pn:valueState="default"/>
     <property xil_pn:name="Project Generator" xil_pn:value="CoreGen" xil_pn:valueState="non-default"/>
@@ -49,10 +49,10 @@
     <!--                                                                                  -->
     <!-- The following properties are for internal use only. These should not be modified.-->
     <!--                                                                                  -->
-    <property xil_pn:name="PROP_DesignName" xil_pn:value="bram_fsmc" xil_pn:valueState="non-default"/>
+    <property xil_pn:name="PROP_DesignName" xil_pn:value="bram" xil_pn:valueState="non-default"/>
     <property xil_pn:name="PROP_DevFamilyPMName" xil_pn:value="spartan6" xil_pn:valueState="default"/>
-    <property xil_pn:name="PROP_intProjectCreationTimestamp" xil_pn:value="2015-09-15T14:23:46" xil_pn:valueState="non-default"/>
-    <property xil_pn:name="PROP_intWbtProjectID" xil_pn:value="B8414BE766A2934DCEAE11D4942F1594" xil_pn:valueState="non-default"/>
+    <property xil_pn:name="PROP_intProjectCreationTimestamp" xil_pn:value="2015-09-16T14:54:02" xil_pn:valueState="non-default"/>
+    <property xil_pn:name="PROP_intWbtProjectID" xil_pn:value="64485949906EC68A7F4EF4B5CC417DAA" xil_pn:valueState="non-default"/>
     <property xil_pn:name="PROP_intWorkingDirLocWRTProjDir" xil_pn:value="Same" xil_pn:valueState="non-default"/>
     <property xil_pn:name="PROP_intWorkingDirUsed" xil_pn:value="No" xil_pn:valueState="non-default"/>
   </properties>

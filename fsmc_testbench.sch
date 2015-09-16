@@ -50,15 +50,6 @@
             <rect width="64" x="320" y="-44" height="24" />
             <line x2="384" y1="-32" y2="-32" x1="320" />
         </blockdef>
-        <blockdef name="bram_fsmc">
-            <timestamp>2015-9-15T6:33:9</timestamp>
-            <rect width="512" x="32" y="32" height="1344" />
-            <line x2="32" y1="80" y2="80" style="linewidth:W" x1="0" />
-            <line x2="32" y1="112" y2="112" style="linewidth:W" x1="0" />
-            <line x2="32" y1="208" y2="208" style="linewidth:W" x1="0" />
-            <line x2="32" y1="272" y2="272" x1="0" />
-            <line x2="544" y1="80" y2="80" style="linewidth:W" x1="576" />
-        </blockdef>
         <block symbolname="fsmc2bram" name="glue">
             <blockpin signalname="clk_x" name="hclk" />
             <blockpin signalname="NWE_x" name="NWE" />
@@ -80,13 +71,6 @@
             <blockpin signalname="A_x(15:0)" name="A(15:0)" />
             <blockpin signalname="NBL_x(1:0)" name="NBL(1:0)" />
             <blockpin signalname="D_x(15:0)" name="D(15:0)" />
-        </block>
-        <block symbolname="bram_fsmc" name="XLXI_1">
-            <blockpin name="addra(15:0)" />
-            <blockpin name="dina(15:0)" />
-            <blockpin name="wea(1:0)" />
-            <blockpin name="clka" />
-            <blockpin name="douta(15:0)" />
         </block>
     </netlist>
     <sheet sheetnum="1" width="3520" height="2720">
@@ -135,7 +119,5 @@
             <wire x2="2288" y1="912" y2="912" x1="2256" />
         </branch>
         <iomarker fontsize="28" x="2288" y="912" name="XLXN_5" orien="R0" />
-        <instance x="2688" y="592" name="XLXI_1" orien="R0">
-        </instance>
     </sheet>
 </drawing>

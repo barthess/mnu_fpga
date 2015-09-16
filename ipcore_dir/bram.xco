@@ -1,7 +1,7 @@
 ##############################################################
 #
 # Xilinx Core Generator version 14.3
-# Date: Tue Sep 15 17:09:36 2015
+# Date: Wed Sep 16 11:51:49 2015
 #
 ##############################################################
 #
@@ -48,7 +48,7 @@ CSET axi_type=AXI4_Full
 CSET byte_size=8
 CSET coe_file=no_coe_file_loaded
 CSET collision_warnings=ALL
-CSET component_name=bram_fsmc
+CSET component_name=bram
 CSET disable_collision_warnings=false
 CSET disable_out_of_range_warnings=false
 CSET ecc=false
@@ -105,4 +105,4 @@ CSET write_width_b=16
 MISC pkg_timestamp=2012-09-17T22:14:36Z
 # END Extra information
 GENERATE
-# CRC: e9e82ea2
+# CRC: c8d7d00d
