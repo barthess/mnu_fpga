@@ -40,9 +40,9 @@ entity fsmc2bram is
         NBL : in std_logic_vector (1 downto 0);
         
         bram_a : out STD_LOGIC_VECTOR (15 downto 0);
-        --bram_do : in STD_LOGIC_VECTOR (15 downto 0);
+        bram_do : in STD_LOGIC_VECTOR (15 downto 0) := x"2222";
         bram_di : out STD_LOGIC_VECTOR (15 downto 0);
-        bram_en : out STD_LOGIC;
+        bram_en : out STD_LOGIC := '0';
         bram_we : out std_logic_vector (1 downto 0)
      );
 end fsmc2bram;
@@ -50,25 +50,23 @@ end fsmc2bram;
 -------------------------
 architecture beh of fsmc2bram is
 
-type state_t is (IDLE, WRITE1, WRITE2);
+type state_t is (IDLE, WRITE1, WRITE2, READ1, READ2);
 signal state : state_t := IDLE;
 
-signal A_buf : STD_LOGIC_VECTOR (15 downto 0);
-signal D_buf : STD_LOGIC_VECTOR (15 downto 0);
+signal d_buf : STD_LOGIC_VECTOR (15 downto 0) := (others => 'X');
 signal NWE_edge : STD_LOGIC_VECTOR (1 downto 0) := (others => '0');
-signal EN_buf : STD_LOGIC := '0';
-signal WE_buf : STD_LOGIC_VECTOR (1 downto 0) := "00";
+signal NOE_edge : STD_LOGIC_VECTOR (1 downto 0) := (others => '0');
 
 begin
 
-  bram_a  <= A_buf;
-  bram_di <= D_buf;
-  bram_en <= EN_buf;
-  bram_we <= WE_buf;
+  --D <= (others => 'Z');
+  --D <= bram_do when ((state = READ1) or (state = READ2)) else (others => 'Z');
+  D <= (others => 'Z') when ((state = IDLE) or (state = WRITE1) or (state = WRITE2)) else d_buf;
   
   process(hclk) begin
 		if falling_edge(hclk) then
       NWE_edge <= NWE_edge(0) & NWE;
+      NOE_edge <= NOE_edge(0) & NOE;
     end if;
   end process;
   
@@ -79,24 +77,38 @@ begin
       else
         case state is
         when IDLE =>
-          if (NWE_edge = "10") then -- NWE falling edge detected
+          if (NOE_edge = "10") then -- NOE falling edge detected
+            state <= READ1;
+          elsif (NWE_edge = "10") then -- NWE falling edge detected
             state <= WRITE1;
           end if;
+          
         when WRITE1 =>
           state <= WRITE2;
-          A_buf <= A;
-          D_buf <= D;
-          EN_buf <= '1';
-          WE_buf <= "11";
+          bram_a <= A;
+          bram_di <= D;
+          bram_en <= '1';
+          bram_we <= "11";
         when WRITE2 =>
-          EN_buf <= '0';
-          WE_buf <= "00";
+          bram_en <= '0';
+          bram_we <= "00";
+          
+        when READ1 =>
+          state <= READ2;
+          bram_a <= A;
+          d_buf <= bram_do;
+          bram_en <= '1';
+          bram_we <= "00";
+        when READ2 =>
+          bram_en <= '0';
+          bram_we <= "00";
+          
         end case;
       end if;
     end if;
   end process;
 
-  D <= (others => 'Z');
+  
 --	D <= mem_do when ((state = READ1) or (state = READ2)) else (others => 'Z');
 --	mem_we <= not NBL when ((state = WRITE1) or (state = WRITE2)) else (others => '0');
 

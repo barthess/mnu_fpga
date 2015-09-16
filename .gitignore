@@ -4,6 +4,7 @@ iseconfig/
 isim/
 xst/
 xlnx_auto*/
+sch2HdlBatchFile
 *.bgn
 *.bit
 *.bld
@@ -16,6 +17,7 @@ xlnx_auto*/
 *.gise
 *.html
 *.ini
+*.jhd
 *.lock
 *.log
 *.lso
@@ -35,8 +37,11 @@ xlnx_auto*/
 *.prm
 *.ptwx
 *.pwr
+*.schlog
 *.sig
+*.spl
 *.stx
+*.sym
 *.syr
 *.tcl
 *.twr
@@ -44,6 +49,8 @@ xlnx_auto*/
 *.txt
 *.unroutes
 *.ut
+*.vhf
+*.vhi
 *.wcfg
 *.wdb
 *.xdc

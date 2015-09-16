@@ -47,22 +47,34 @@ constant clk_dT : TIME := 2.54 ns;
 signal clk_int : std_logic := '0';
 
 begin
+--  A <= x"0000",
+--       x"ABCD" after 3*T,
+--       x"EFFA" after 6*T;
+--
+--  D <= x"EEEE",
+--       x"0000" after 3*T,
+--       x"1111" after 6*T;
+--  
+--  NCE <= '1',
+--         '0' after T,
+--         '1' after 3*T;
+--  
+--  NWE <= '1',
+--         '0' after T,
+--         '1' after 2*T;
+         
   A <= x"0000",
        x"ABCD" after 3*T,
        x"EFFA" after 6*T;
 
-  D <= x"EEEE",
-       x"0000" after 3*T,
-       x"1111" after 6*T;
-  
   NCE <= '1',
          '0' after T,
          '1' after 3*T;
   
-  NWE <= '1',
+  NOE <= '1',
          '0' after T,
          '1' after 2*T;
-         
+
   clk_int <= not clk_int after clk_dT/2;
   clk <= clk_int;
 
