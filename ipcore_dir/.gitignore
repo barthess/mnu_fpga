@@ -3,7 +3,6 @@
 *.cgc
 *.cgp
 *.ncf
-*.sym
 *.txt
 *.ucf
 *.vhd

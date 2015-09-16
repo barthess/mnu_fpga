@@ -41,7 +41,6 @@ sch2HdlBatchFile
 *.sig
 *.spl
 *.stx
-*.sym
 *.syr
 *.tcl
 *.twr

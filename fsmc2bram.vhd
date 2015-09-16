@@ -40,7 +40,7 @@ entity fsmc2bram is
         NBL : in std_logic_vector (1 downto 0);
         
         bram_a : out STD_LOGIC_VECTOR (15 downto 0);
-        bram_do : in STD_LOGIC_VECTOR (15 downto 0) := x"2222";
+        bram_do : in STD_LOGIC_VECTOR (15 downto 0);
         bram_di : out STD_LOGIC_VECTOR (15 downto 0);
         bram_en : out STD_LOGIC := '0';
         bram_we : out std_logic_vector (1 downto 0)
@@ -53,15 +53,17 @@ architecture beh of fsmc2bram is
 type state_t is (IDLE, WRITE1, WRITE2, READ1, READ2);
 signal state : state_t := IDLE;
 
-signal d_buf : STD_LOGIC_VECTOR (15 downto 0) := (others => 'X');
-signal NWE_edge : STD_LOGIC_VECTOR (1 downto 0) := (others => '0');
-signal NOE_edge : STD_LOGIC_VECTOR (1 downto 0) := (others => '0');
+signal d_buf    : STD_LOGIC_VECTOR (15 downto 0) := (others => 'X');
+signal NWE_edge : STD_LOGIC_VECTOR (1 downto 0)  := (others => '0');
+signal NOE_edge : STD_LOGIC_VECTOR (1 downto 0)  := (others => '0');
 
 begin
 
   --D <= (others => 'Z');
   --D <= bram_do when ((state = READ1) or (state = READ2)) else (others => 'Z');
+
   D <= (others => 'Z') when ((state = IDLE) or (state = WRITE1) or (state = WRITE2)) else d_buf;
+  bram_we <= not NBL when ((state = WRITE1) or (state = WRITE2)) else (others => '0');
   
   process(hclk) begin
 		if falling_edge(hclk) then
