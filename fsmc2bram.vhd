@@ -37,9 +37,15 @@ entity fsmc2bram is
         NWE : in  STD_LOGIC;
         NOE : in  STD_LOGIC;
         NCE : in  STD_LOGIC;
-        NBL : in std_logic_vector (1 downto 0)
+        NBL : in std_logic_vector (1 downto 0);
+        
+        bram_a : out STD_LOGIC_VECTOR (15 downto 0);
+        --bram_do : in STD_LOGIC_VECTOR (15 downto 0);
+        bram_di : out STD_LOGIC_VECTOR (15 downto 0);
+        bram_en : out STD_LOGIC;
+        bram_we : out std_logic_vector (1 downto 0)
      );
-end fsmc;
+end fsmc2bram;
 
 -------------------------
 architecture beh of fsmc2bram is
@@ -47,31 +53,19 @@ architecture beh of fsmc2bram is
 type state_t is (IDLE, WRITE1, WRITE2);
 signal state : state_t := IDLE;
 
-signal A_reg : STD_LOGIC_VECTOR (15 downto 0);
---signal DO_reg : STD_LOGIC_VECTOR (15 downto 0);
-signal DI_reg : STD_LOGIC_VECTOR (15 downto 0);
+signal A_buf : STD_LOGIC_VECTOR (15 downto 0);
+signal D_buf : STD_LOGIC_VECTOR (15 downto 0);
 signal NWE_edge : STD_LOGIC_VECTOR (1 downto 0) := (others => '0');
-signal EN_reg : STD_LOGIC := '0';
-signal WE_reg : STD_LOGIC_VECTOR (1 downto 0) := "00";
+signal EN_buf : STD_LOGIC := '0';
+signal WE_buf : STD_LOGIC_VECTOR (1 downto 0) := "00";
 
 begin
 
-  bram : entity work.bram_fsmc PORT MAP (
-    clka => hclk,
-    ena => EN_reg,
-    wea => WE_reg,
-    addra => A_reg,
-    dina => DI_reg,
-    douta => open,
-    
-    clkb => hclk,
-    enb => '0',
-    web => "11",
-    addrb => (others => '0'),
-    dinb => (others => '0'),
-    doutb => open
-  );
-
+  bram_a  <= A_buf;
+  bram_di <= D_buf;
+  bram_en <= EN_buf;
+  bram_we <= WE_buf;
+  
   process(hclk) begin
 		if falling_edge(hclk) then
       NWE_edge <= NWE_edge(0) & NWE;
@@ -90,13 +84,13 @@ begin
           end if;
         when WRITE1 =>
           state <= WRITE2;
-          A_reg <= A;
-          DI_reg <= D;
-          EN_reg <= '1';
-          WE_reg <= "11";
+          A_buf <= A;
+          D_buf <= D;
+          EN_buf <= '1';
+          WE_buf <= "11";
         when WRITE2 =>
-          EN_reg <= '0';
-          WE_reg <= "00";
+          EN_buf <= '0';
+          WE_buf <= "00";
         end case;
       end if;
     end if;
@@ -105,6 +99,22 @@ begin
   D <= (others => 'Z');
 --	D <= mem_do when ((state = READ1) or (state = READ2)) else (others => 'Z');
 --	mem_we <= not NBL when ((state = WRITE1) or (state = WRITE2)) else (others => '0');
+
+--  bram_fsmc : entity work.bram_fsmc PORT MAP (
+--    clka => hclk,
+--    ena => EN_reg,
+--    wea => WE_reg,
+--    addra => A_reg,
+--    dina => DI_reg,
+--    douta => open,
+--    
+--    clkb => hclk,
+--    enb => '0',
+--    web => "11",
+--    addrb => (others => '0'),
+--    dinb => (others => '0'),
+--    doutb => open
+--  );
 
 end beh;
 

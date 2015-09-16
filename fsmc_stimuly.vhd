@@ -30,15 +30,13 @@ use IEEE.STD_LOGIC_1164.ALL;
 --use UNISIM.VComponents.all;
 
 entity fsmc_stimuly is
-    Generic(clk_dT : TIME := 2.54 ns
-            );
-    Port ( A : out  STD_LOGIC_VECTOR (15 downto 0);
+    Port ( clk : out  STD_LOGIC; 
+           A : out  STD_LOGIC_VECTOR (15 downto 0);
            D : inout  STD_LOGIC_VECTOR (15 downto 0);
            NCE : out  STD_LOGIC;
            NWE : out  STD_LOGIC;
            NOE : out  STD_LOGIC;
-           NBL : out  STD_LOGIC_VECTOR (1 downto 0);
-           clk : out  STD_LOGIC);
+           NBL : out  STD_LOGIC_VECTOR (1 downto 0));
 end fsmc_stimuly;
 
 
@@ -50,11 +48,23 @@ signal clk_int : std_logic := '0';
 
 begin
   A <= x"0000",
-       x"ABCD" after T,
-       x"EFFA" after 2*T;
-       
+       x"ABCD" after 3*T,
+       x"EFFA" after 6*T;
+
+  D <= x"EEEE",
+       x"0000" after 3*T,
+       x"1111" after 6*T;
+  
+  NCE <= '1',
+         '0' after T,
+         '1' after 3*T;
+  
+  NWE <= '1',
+         '0' after T,
+         '1' after 2*T;
+         
   clk_int <= not clk_int after clk_dT/2;
   clk <= clk_int;
 
-end Behavioral;
+end Beh;
 
