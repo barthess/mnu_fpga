@@ -7,15 +7,12 @@
     </attr>
     <netlist>
         <signal name="XLXN_22" />
-        <signal name="XLXN_23" />
         <signal name="XLXN_24" />
         <signal name="XLXN_25" />
         <signal name="XLXN_26" />
         <signal name="XLXN_27(15:0)" />
         <signal name="XLXN_28(1:0)" />
         <signal name="XLXN_29(15:0)" />
-        <signal name="XLXN_30" />
-        <signal name="XLXN_31" />
         <signal name="XLXN_32(15:0)" />
         <signal name="XLXN_33(15:0)" />
         <signal name="XLXN_34" />
@@ -61,7 +58,7 @@
             <line x2="384" y1="-32" y2="-32" x1="320" />
         </blockdef>
         <blockdef name="bram">
-            <timestamp>2015-9-16T13:12:2</timestamp>
+            <timestamp>2015-9-16T17:11:2</timestamp>
             <rect width="512" x="32" y="32" height="1344" />
             <line x2="32" y1="80" y2="80" style="linewidth:W" x1="0" />
             <line x2="32" y1="112" y2="112" style="linewidth:W" x1="0" />

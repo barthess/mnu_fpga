@@ -50,7 +50,6 @@ sch2HdlBatchFile
 *.ut
 *.vhf
 *.vhi
-*.wcfg
 *.wdb
 *.xdc
 *.xml

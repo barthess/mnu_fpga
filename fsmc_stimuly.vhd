@@ -33,9 +33,9 @@ entity fsmc_stimuly is
     Port ( clk : out  STD_LOGIC; 
            A : out  STD_LOGIC_VECTOR (15 downto 0);
            D : inout  STD_LOGIC_VECTOR (15 downto 0);
-           NCE : out  STD_LOGIC;
-           NWE : out  STD_LOGIC;
-           NOE : out  STD_LOGIC;
+           NCE : out  STD_LOGIC := '1';
+           NWE : out  STD_LOGIC := '1';
+           NOE : out  STD_LOGIC := '1';
            NBL : out  STD_LOGIC_VECTOR (1 downto 0));
 end fsmc_stimuly;
 
@@ -43,26 +43,38 @@ end fsmc_stimuly;
 architecture Beh of fsmc_stimuly is
 
 constant T : TIME := 5.95 ns;
+constant D_lat : TIME := 3 ns;
 constant clk_dT : TIME := 2.54 ns;
 signal clk_int : std_logic := '0';
 
 begin
-  A <= x"0000",
-       x"ABCD" after 3*T,
-       x"EFFA" after 6*T;
+  A <= x"0000" after 1*T,
+       x"0001" after 4*T,
+       x"0002" after 7*T;
 
-  D <= x"EEEE",
-       x"0000" after 3*T,
-       x"1111" after 6*T;
+  D <= x"EEEE" after D_lat + 1*T,
+       x"5555" after D_lat + 4*T,
+       x"1111" after D_lat + 7*T;
   
   NCE <= '1',
          '0' after T,
-         '1' after 3*T;
-  
+         '1' after 3*T,
+         '0' after 4*T,
+         '1' after 6*T,
+         '0' after 7*T,
+         '1' after 9*T;
+
+  NBL <= "00";
+         
   NWE <= '1',
          '0' after T,
-         '1' after 2*T;
-         
+         '1' after 2*T,
+         '0' after 4*T,
+         '1' after 5*T,
+         '0' after 7*T,
+         '1' after 8*T;
+
+  
 --  A <= x"0000",
 --       x"ABCD" after 3*T,
 --       x"EFFA" after 6*T;

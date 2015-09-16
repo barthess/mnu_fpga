@@ -63,7 +63,6 @@ begin
   --D <= bram_do when ((state = READ1) or (state = READ2)) else (others => 'Z');
 
   D <= (others => 'Z') when ((state = IDLE) or (state = WRITE1) or (state = WRITE2)) else d_buf;
-  bram_we <= not NBL when ((state = WRITE1) or (state = WRITE2)) else (others => '0');
   
   process(hclk) begin
 		if falling_edge(hclk) then
@@ -81,6 +80,8 @@ begin
         when IDLE =>
           if (NOE_edge = "10") then -- NOE falling edge detected
             state <= READ1;
+          -- возможно есть смысл перейти на "01", чтобы наверняка успевать
+          -- тогда состояние WRITE2 становится нинужно
           elsif (NWE_edge = "10") then -- NWE falling edge detected
             state <= WRITE1;
           end if;
@@ -90,11 +91,11 @@ begin
           bram_a <= A;
           bram_di <= D;
           bram_en <= '1';
-          bram_we <= "11";
+          bram_we <= not NBL;
         when WRITE2 =>
           bram_en <= '0';
           bram_we <= "00";
-          
+
         when READ1 =>
           state <= READ2;
           bram_a <= A;
