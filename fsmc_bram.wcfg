@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="/home/barthess/projects/xilinx/mnu/fsmc_testbench_isim_beh.wdb" id="1" type="auto">
+         <top_modules>
+            <top_module name="fsmc_testbench" />
+            <top_module name="numeric_std" />
+            <top_module name="std_logic_1164" />
+            <top_module name="std_logic_arith" />
+            <top_module name="std_logic_textio" />
+            <top_module name="std_logic_unsigned" />
+            <top_module name="textio" />
+            <top_module name="vcomponents" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <WVObjectSize size="9" />
+   <wvobject fp_name="/fsmc_testbench/stimuly/clk" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/fsmc_testbench/stimuly/nce" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">nce</obj_property>
+      <obj_property name="ObjectShortName">nce</obj_property>
+   </wvobject>
+   <wvobject fp_name="/fsmc_testbench/stimuly/nwe" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">nwe</obj_property>
+      <obj_property name="ObjectShortName">nwe</obj_property>
+   </wvobject>
+   <wvobject fp_name="/fsmc_testbench/stimuly/a" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">a[15:0]</obj_property>
+      <obj_property name="ObjectShortName">a[15:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/fsmc_testbench/stimuly/d" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">d[15:0]</obj_property>
+      <obj_property name="ObjectShortName">d[15:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/fsmc_testbench/glue/nwe_edge" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">nwe_edge[1:0]</obj_property>
+      <obj_property name="ObjectShortName">nwe_edge[1:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/fsmc_testbench/bram_x/ena" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">ena</obj_property>
+      <obj_property name="ObjectShortName">ena</obj_property>
+   </wvobject>
+   <wvobject fp_name="/fsmc_testbench/glue/bram_we" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">bram_we[1:0]</obj_property>
+      <obj_property name="ObjectShortName">bram_we[1:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/fsmc_testbench/glue/state" type="other" db_ref_id="1">
+      <obj_property name="ElementShortName">state</obj_property>
+      <obj_property name="ObjectShortName">state</obj_property>
+   </wvobject>
+</wave_config>
