@@ -29,7 +29,7 @@ use IEEE.NUMERIC_STD.ALL;
 --library UNISIM;
 --use UNISIM.VComponents.all;
 
-entity fsmc is
+entity fsmc2bram is
     Port (
         hclk : in std_logic;
         A : in  STD_LOGIC_VECTOR (15 downto 0);
@@ -42,7 +42,7 @@ entity fsmc is
 end fsmc;
 
 -------------------------
-architecture a_fsmc of fsmc is
+architecture beh of fsmc2bram is
 
 type state_t is (IDLE, WRITE1, WRITE2);
 signal state : state_t := IDLE;
@@ -106,7 +106,7 @@ begin
 --	D <= mem_do when ((state = READ1) or (state = READ2)) else (others => 'Z');
 --	mem_we <= not NBL when ((state = WRITE1) or (state = WRITE2)) else (others => '0');
 
-end a_fsmc;
+end beh;
 
 
 

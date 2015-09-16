@@ -116,7 +116,7 @@ begin
   );
 
   -- connect FSMC
-	fsmc : entity work.fsmc port map (
+	fsmc2bram : entity work.fsmc2bram port map (
 		hclk => clk_391MHz, 
 		A => FSMC_A(15 downto 0),
 		D => FSMC_D,
