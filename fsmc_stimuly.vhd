@@ -63,14 +63,12 @@ begin
        x"0001" after 5*T + shift,
        x"0002" after 9*T + shift;
        
-  D <= x"EEEE" after D_lat + 1*T,
-       x"5555" after D_lat + 4*T,
-       x"1111" after D_lat + 7*T,
+  D <= x"1111" after D_lat + 1*T,
+       x"2222" after D_lat + 4*T,
+       x"3333" after D_lat + 7*T,
        -- read
        (others => 'Z') after 1*T + shift;
 
-  NBL <= "00";
-       
   NCE <= '1' after 0*T,
          '0' after 1*T,
          '1' after 3*T,
@@ -95,7 +93,8 @@ begin
          '0' after 7*T,
          '1' after 8*T;
          
-  NOE <= '1' after 0*T  + shift,
+  NOE <= '1' after 0*T,
+         '1' after 0*T  + shift,
          '0' after 1*T  + shift,
          '1' after 4*T  + shift,
          '0' after 5*T  + shift,
