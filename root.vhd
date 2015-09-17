@@ -84,6 +84,12 @@ signal clk_261mhz : std_logic;
 signal clk_391mhz : std_logic;
 signal clk_locked : std_logic;
 
+signal bram_a : std_logic_vector (15 downto 0); 
+signal bram_do : std_logic_vector (15 downto 0); 
+signal bram_di : std_logic_vector (15 downto 0); 
+signal bram_en : std_logic; 
+signal bram_we : std_logic_vector (1 downto 0); 
+
 begin
 
 	clk_src : entity work.clk_src port map (
@@ -117,18 +123,39 @@ begin
 
 
   -- connect FSMC
---	fsmc2bram : entity work.fsmc2bram port map (
---		hclk => clk_391MHz, 
---		A => FSMC_A(15 downto 0),
---		D => FSMC_D,
---		NCE => FSMC_NCE,
---		NOE => FSMC_NOE,
---		NWE => FSMC_NWE,
---		NBL => FSMC_NBL
---	);
---	DEV_NULL_B1 <= or_reduce(FSMC_A(22 downto 16));
+	fsmc2bram : entity work.fsmc2bram port map (
+		hclk => clk_391MHz,
+    
+		A => FSMC_A(15 downto 0),
+		D => FSMC_D,
+		NCE => FSMC_NCE,
+		NOE => FSMC_NOE,
+		NWE => FSMC_NWE,
+		NBL => FSMC_NBL,
+    
+    bram_a  => bram_a,
+    bram_do => bram_do,
+    bram_di => bram_di,
+    bram_en => bram_en,
+    bram_we => bram_we
+	);
+	DEV_NULL_B1 <= or_reduce(FSMC_A(22 downto 16));
 
+  bram : entity work.bram PORT MAP (
+    clka => clk_391MHz,
+    addra => bram_a,
+    dina => bram_di,
+    douta => bram_do,
+    ena => bram_en,
+    wea => bram_we,
 
+    clkb => clk_391MHz,
+    enb => '0',
+    web => "11",
+    addrb => (others => '0'),
+    dinb => (others => '0'),
+    doutb => open
+  );
 
     -- double multiplier test
 --	mul_test : entity work.mul_test port map (

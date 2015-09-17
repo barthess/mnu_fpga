@@ -58,7 +58,10 @@ signal NWE_edge : STD_LOGIC_VECTOR (1 downto 0)  := (others => '0');
 signal NOE_edge : STD_LOGIC_VECTOR (1 downto 0)  := (others => '0');
 
 begin
-
+  
+  --D <= bram_do when ((state = READ1) or (state = READ2)) else (others => 'Z');
+  --D <= (others => 'Z') when ((NWE = '0') or (state = WRITE1) or (state = WRITE2)) else bram_do;
+  --D <= bram_do when (NOE = '0') else (others => 'Z');
   D <= bram_do when ((NOE = '0') and (NCE = '0')) else (others => 'Z');
   
   process(hclk) begin
