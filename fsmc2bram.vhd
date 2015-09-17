@@ -50,7 +50,7 @@ end fsmc2bram;
 -------------------------
 architecture beh of fsmc2bram is
 
-type state_t is (IDLE, WRITE1, WRITE2, READ1, READ2);
+type state_t is (IDLE, WRITE1, WRITE2, WRITE3, READ1, READ2);
 signal state : state_t := IDLE;
 
 --signal d_buf    : STD_LOGIC_VECTOR (15 downto 0) := (others => 'Z');
@@ -61,8 +61,8 @@ begin
   
   --D <= bram_do when ((state = READ1) or (state = READ2)) else (others => 'Z');
   --D <= (others => 'Z') when ((NWE = '0') or (state = WRITE1) or (state = WRITE2)) else bram_do;
-  --D <= bram_do when (NOE = '0') else (others => 'Z');
-  D <= bram_do when ((NOE = '0') and (NCE = '0')) else (others => 'Z');
+  D <= bram_do when (NOE = '0') else (others => 'Z');
+  --D <= bram_do when ((NOE = '0') and (NCE = '0')) else (others => 'Z');
   
   process(hclk) begin
 		if falling_edge(hclk) then
@@ -81,21 +81,33 @@ begin
         when IDLE =>
           if (NOE_edge = "10") then -- NOE falling edge detected
             state <= READ1;
-          -- возможно есть смысл перейти на "01", чтобы наверняка успевать
-          -- тогда состояние WRITE2 становится нинужно
           elsif (NWE_edge = "10") then -- NWE falling edge detected
+            -- возможно есть смысл перейти на "01", чтобы наверняка успевать
+            -- тогда состояние WRITE2 становится нинужно
             state <= WRITE1;
           end if;
-          
+
         when WRITE1 =>
           state <= WRITE2;
+        when WRITE2 =>
+          state <= WRITE3;
           bram_a <= A;
           bram_di <= D;
           bram_en <= '1';
           bram_we <= not NBL;
-        when WRITE2 =>
+        when WRITE3 =>
           bram_en <= '0';
           bram_we <= "00";
+          
+--        when WRITE1 =>
+--          state <= WRITE2;
+--          bram_a <= A;
+--          bram_di <= D;
+--          bram_en <= '1';
+--          bram_we <= not NBL;
+--        when WRITE2 =>
+--          bram_en <= '0';
+--          bram_we <= "00";
 
         when READ1 =>
           state <= READ2;
