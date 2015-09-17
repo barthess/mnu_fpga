@@ -26,8 +26,8 @@ use IEEE.STD_LOGIC_1164.ALL;
 
 -- Uncomment the following library declaration if instantiating
 -- any Xilinx primitives in this code.
---library UNISIM;
---use UNISIM.VComponents.all;
+library UNISIM;
+use UNISIM.VComponents.all;
 
 -- Non standard library from synopsis (for dev_null functions)
 use ieee.std_logic_misc.all;
@@ -115,17 +115,20 @@ begin
     ubx_nrst => UBLOX_NRST
   );
 
+
   -- connect FSMC
-	fsmc2bram : entity work.fsmc2bram port map (
-		hclk => clk_391MHz, 
-		A => FSMC_A(15 downto 0),
-		D => FSMC_D,
-		NCE => FSMC_NCE,
-		NOE => FSMC_NOE,
-		NWE => FSMC_NWE,
-		NBL => FSMC_NBL
-	);
-	DEV_NULL_B1 <= or_reduce(FSMC_A(22 downto 16));
+--	fsmc2bram : entity work.fsmc2bram port map (
+--		hclk => clk_391MHz, 
+--		A => FSMC_A(15 downto 0),
+--		D => FSMC_D,
+--		NCE => FSMC_NCE,
+--		NOE => FSMC_NOE,
+--		NWE => FSMC_NWE,
+--		NBL => FSMC_NBL
+--	);
+--	DEV_NULL_B1 <= or_reduce(FSMC_A(22 downto 16));
+
+
 
     -- double multiplier test
 --	mul_test : entity work.mul_test port map (

@@ -53,16 +53,13 @@ architecture beh of fsmc2bram is
 type state_t is (IDLE, WRITE1, WRITE2, READ1, READ2);
 signal state : state_t := IDLE;
 
-signal d_buf    : STD_LOGIC_VECTOR (15 downto 0) := (others => 'X');
+--signal d_buf    : STD_LOGIC_VECTOR (15 downto 0) := (others => 'Z');
 signal NWE_edge : STD_LOGIC_VECTOR (1 downto 0)  := (others => '0');
 signal NOE_edge : STD_LOGIC_VECTOR (1 downto 0)  := (others => '0');
 
 begin
 
-  --D <= (others => 'Z');
-  --D <= bram_do when ((state = READ1) or (state = READ2)) else (others => 'Z');
-
-  D <= (others => 'Z') when ((state = IDLE) or (state = WRITE1) or (state = WRITE2)) else d_buf;
+  D <= bram_do when ((NOE = '0') and (NCE = '0')) else (others => 'Z');
   
   process(hclk) begin
 		if falling_edge(hclk) then
@@ -100,7 +97,6 @@ begin
         when READ1 =>
           state <= READ2;
           bram_a <= A;
-          d_buf <= bram_do;
           bram_en <= '1';
           bram_we <= "00";
         when READ2 =>

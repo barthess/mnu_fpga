@@ -47,42 +47,64 @@ constant D_lat   : TIME := 3 ns; -- Data to FSMC_NEx low to Data valid
 constant NOE_lat : TIME := 3 ns; -- FSMC_NEx low to FSMC_NOE low
 constant A_lat   : TIME := 4.5 ns; -- FSMC_NEx low to FSMC_A valid
 constant clk_dT : TIME := 2.54 ns;
-signal shift : TIME := 0 ns;
+signal shift : TIME := 59.5 ns;
 signal clk_int : std_logic := '0';
 
 begin
+  
+  NBL <= "00";
+         
   A <= x"0000" after 1*T,
        x"0001" after 4*T,
-       x"0002" after 7*T;
-
+       x"0002" after 7*T,
+       -- read
+       x"0000" after 1*T + shift,
+       x"0001" after 5*T + shift,
+       x"0002" after 9*T + shift;
+       
   D <= x"EEEE" after D_lat + 1*T,
        x"5555" after D_lat + 4*T,
-       x"1111" after D_lat + 7*T;
-  
-  NCE <= '1',
+       x"1111" after D_lat + 7*T,
+       -- read
+       (others => 'Z') after 1*T + shift;
+
+  NBL <= "00";
+       
+  NCE <= '1' after 0*T,
          '0' after 1*T,
          '1' after 3*T,
          '0' after 4*T,
          '1' after 6*T,
          '0' after 7*T,
-         '1' after 9*T;
-
-  NBL <= "00";
-         
-  NWE <= '1',
+         '1' after 9*T,
+         -- read
+         '1' after 0*T  + shift,
+         '0' after 1*T  + shift,
+         '1' after 4*T  + shift,
+         '0' after 5*T  + shift,
+         '1' after 8*T  + shift,
+         '0' after 9*T  + shift,
+         '1' after 12*T + shift;
+ 
+  NWE <= '1' after 0*T,
          '0' after 1*T,
          '1' after 2*T,
          '0' after 4*T,
          '1' after 5*T,
          '0' after 7*T,
          '1' after 8*T;
+         
+  NOE <= '1' after 0*T  + shift,
+         '0' after 1*T  + shift,
+         '1' after 4*T  + shift,
+         '0' after 5*T  + shift,
+         '1' after 8*T  + shift,
+         '0' after 9*T  + shift,
+         '1' after 12*T + shift;
 
---  NOE <= '1',
---         '0' after T,
---         '1' after 2*T;
 
   clk_int <= not clk_int after clk_dT/2;
   clk <= clk_int;
-  
+
 end Beh;
 
