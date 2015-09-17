@@ -2,6 +2,7 @@ _ngo/
 _xmsgs/
 iseconfig/
 isim/
+planAhead_run*/
 xst/
 xlnx_auto*/
 sch2HdlBatchFile
@@ -52,6 +53,7 @@ sch2HdlBatchFile
 *.vhi
 *.wdb
 *.xdc
+*.xdl
 *.xml
 *.xmsgs
 *.xpi
@@ -59,5 +61,3 @@ sch2HdlBatchFile
 *.xsl
 *.xst
 *.xwbt
-
-

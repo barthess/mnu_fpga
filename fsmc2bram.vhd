@@ -50,19 +50,21 @@ end fsmc2bram;
 -------------------------
 architecture beh of fsmc2bram is
 
-type state_t is (IDLE, WRITE1, WRITE2, WRITE3, READ1, READ2);
+type state_t is (IDLE, WRITE1, WRITE2, READ1, READ2);
 signal state : state_t := IDLE;
 
---signal d_buf    : STD_LOGIC_VECTOR (15 downto 0) := (others => 'Z');
-signal NWE_edge : STD_LOGIC_VECTOR (1 downto 0)  := (others => '0');
-signal NOE_edge : STD_LOGIC_VECTOR (1 downto 0)  := (others => '0');
+--signal d_proxy  : STD_LOGIC_VECTOR (15 downto 0) := (others => 'Z');
+signal NWE_edge : STD_LOGIC_VECTOR (1 downto 0)  := (others => '1');
+signal NOE_edge : STD_LOGIC_VECTOR (1 downto 0)  := (others => '1');
 
 begin
   
   --D <= bram_do when ((state = READ1) or (state = READ2)) else (others => 'Z');
   --D <= (others => 'Z') when ((NWE = '0') or (state = WRITE1) or (state = WRITE2)) else bram_do;
-  D <= bram_do when (NOE = '0') else (others => 'Z');
-  --D <= bram_do when ((NOE = '0') and (NCE = '0')) else (others => 'Z');
+  --D <= bram_do when (NOE = '0') else (others => 'Z');
+  D <= bram_do when ((NOE = '0') and (NCE = '0')) else (others => 'Z');
+  bram_we <= not NBL when ((state = WRITE1) or (state = WRITE2) or (NWE = '0')) else "00";
+  bram_a <= A;
   
   process(hclk) begin
 		if falling_edge(hclk) then
@@ -73,53 +75,31 @@ begin
   
   process(hclk) begin
     if falling_edge(hclk) then
-      if (NCE = '1') then
-        state <= IDLE;
-        bram_we <= "00";
-      else
-        case state is
-        when IDLE =>
-          if (NOE_edge = "10") then -- NOE falling edge detected
-            state <= READ1;
-          elsif (NWE_edge = "10") then -- NWE falling edge detected
-            -- возможно есть смысл перейти на "01", чтобы наверняка успевать
-            -- тогда состояние WRITE2 становится нинужно
-            state <= WRITE1;
-          end if;
-
-        when WRITE1 =>
-          state <= WRITE2;
-        when WRITE2 =>
-          state <= WRITE3;
-          bram_a <= A;
+      case state is
+      when IDLE =>
+        if (NOE_edge = "10") then -- NOE falling edge detected
+          state <= READ1;
+        elsif (NWE_edge = "10") then -- NWE falling edge detected
+          -- возможно есть смысл перейти на "01", чтобы наверняка успевать
+          state <= WRITE1;
           bram_di <= D;
-          bram_en <= '1';
-          bram_we <= not NBL;
-        when WRITE3 =>
-          bram_en <= '0';
-          bram_we <= "00";
-          
---        when WRITE1 =>
---          state <= WRITE2;
---          bram_a <= A;
---          bram_di <= D;
---          bram_en <= '1';
---          bram_we <= not NBL;
---        when WRITE2 =>
---          bram_en <= '0';
---          bram_we <= "00";
+        end if;
 
-        when READ1 =>
-          state <= READ2;
-          bram_a <= A;
-          bram_en <= '1';
-          bram_we <= "00";
-        when READ2 =>
-          bram_en <= '0';
-          bram_we <= "00";
-          
-        end case;
-      end if;
+      when WRITE1 =>
+        state <= WRITE2;
+        bram_en <= '1';
+      when WRITE2 =>
+        state <= IDLE;
+        bram_en <= '0';
+
+      when READ1 =>
+        state <= READ2;
+        bram_en <= '1';
+      when READ2 =>
+        state <= IDLE;
+        bram_en <= '0';
+        
+      end case;
     end if;
   end process;
 

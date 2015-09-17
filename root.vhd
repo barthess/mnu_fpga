@@ -124,7 +124,7 @@ begin
 
   -- connect FSMC
 	fsmc2bram : entity work.fsmc2bram port map (
-		hclk => clk_391MHz,
+		hclk => clk_261MHz,
     
 		A => FSMC_A(15 downto 0),
 		D => FSMC_D,
@@ -142,14 +142,14 @@ begin
 	DEV_NULL_B1 <= or_reduce(FSMC_A(22 downto 16));
 
   bram : entity work.bram PORT MAP (
-    clka => clk_391MHz,
+    clka => clk_261MHz,
     addra => bram_a,
     dina => bram_di,
     douta => bram_do,
     ena => bram_en,
     wea => bram_we,
 
-    clkb => clk_391MHz,
+    clkb => clk_261MHz,
     enb => '0',
     web => "11",
     addrb => (others => '0'),

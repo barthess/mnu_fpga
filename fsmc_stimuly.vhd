@@ -46,7 +46,8 @@ constant T : TIME := 5.95 ns;
 constant D_lat   : TIME := 3 ns; -- Data to FSMC_NEx low to Data valid
 constant NOE_lat : TIME := 3 ns; -- FSMC_NEx low to FSMC_NOE low
 constant A_lat   : TIME := 4.5 ns; -- FSMC_NEx low to FSMC_A valid
-constant clk_dT : TIME := 2.54 ns;
+--constant clk_dT : TIME := 2.54 ns;
+constant clk_dT : TIME := 3.8 ns;
 signal shift : TIME := 59.5 ns;
 signal clk_int : std_logic := '0';
 

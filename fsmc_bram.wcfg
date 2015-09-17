@@ -43,17 +43,19 @@
       <obj_property name="ObjectShortName">d[15:0]</obj_property>
       <obj_property name="Radix">HEXRADIX</obj_property>
    </wvobject>
-   <wvobject fp_name="/fsmc_testbench/glue/nwe_edge" type="array" db_ref_id="1">
-      <obj_property name="ElementShortName">nwe_edge[1:0]</obj_property>
-      <obj_property name="ObjectShortName">nwe_edge[1:0]</obj_property>
+   <wvobject fp_name="/fsmc_testbench/bram_sym/dina" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">dina[15:0]</obj_property>
+      <obj_property name="ObjectShortName">dina[15:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
    </wvobject>
-   <wvobject fp_name="/fsmc_testbench/glue/noe_edge" type="array" db_ref_id="1">
-      <obj_property name="ElementShortName">noe_edge[1:0]</obj_property>
-      <obj_property name="ObjectShortName">noe_edge[1:0]</obj_property>
+   <wvobject fp_name="/fsmc_testbench/bram_sym/addra" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">addra[15:0]</obj_property>
+      <obj_property name="ObjectShortName">addra[15:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
    </wvobject>
-   <wvobject fp_name="/fsmc_testbench/glue/bram_we" type="array" db_ref_id="1">
-      <obj_property name="ElementShortName">bram_we[1:0]</obj_property>
-      <obj_property name="ObjectShortName">bram_we[1:0]</obj_property>
+   <wvobject fp_name="/fsmc_testbench/bram_sym/wea" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">wea[1:0]</obj_property>
+      <obj_property name="ObjectShortName">wea[1:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/fsmc_testbench/glue/bram_en" type="logic" db_ref_id="1">
       <obj_property name="ElementShortName">bram_en</obj_property>
