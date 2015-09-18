@@ -63,10 +63,10 @@ entity root is
     --FSMC_CLK : in std_logic;
     --FSMC_NWAIT : out std_logic;
 
-    SPI1_MISO : out std_logic;
-    SPI1_MOSI : in std_logic;		  
-    SPI1_NSS : in std_logic;
-    SPI1_SCK : in std_logic;
+--    SPI1_MISO : out std_logic;
+--    SPI1_MOSI : in std_logic;		  
+--    SPI1_NSS : in std_logic;
+--    SPI1_SCK : in std_logic;
 
     DEV_NULL_B1 : out std_logic -- warning suppressor
     --DEV_NULL_B0 : out std_logic -- warning suppressor
