@@ -31,10 +31,11 @@ use IEEE.STD_LOGIC_1164.ALL;
 
 entity spi2bram is
     Port ( hclk : in  STD_LOGIC;
+    
            ssel_i : in  STD_LOGIC;
            mosi_i : in  STD_LOGIC;
            miso_o : out  STD_LOGIC;
-           sck_i : in  STD_LOGIC
+           sck_i : in  STD_LOGIC;
            
            bram_a  : out STD_LOGIC_VECTOR (15 downto 0);
            bram_do : in STD_LOGIC_VECTOR (15 downto 0);
@@ -53,9 +54,9 @@ signal A : STD_LOGIC_VECTOR (15 downto 0) := x"0000";
 begin
 
 
-  spi_slave : entity work.spi_slave port map (
-    
-  );
+--  spi_slave : entity work.spi_slave port map (
+--    
+--  );
 
 
 
