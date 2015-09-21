@@ -30,16 +30,18 @@ use IEEE.STD_LOGIC_1164.ALL;
 --use UNISIM.VComponents.all;
 
 entity fsmc_stimuly is
-    Generic (
-      T : TIME := 17.85 ns
-    );
-    Port ( fsmc_clk : out  STD_LOGIC; 
-           A : out  STD_LOGIC_VECTOR (15 downto 0);
-           D : inout  STD_LOGIC_VECTOR (15 downto 0);
-           NCE : out  STD_LOGIC := '1';
-           NWE : out  STD_LOGIC := '1';
-           NOE : out  STD_LOGIC := '1';
-           NBL : out  STD_LOGIC_VECTOR (1 downto 0));
+  Generic (
+    T : TIME := 17.85 ns
+  );
+  Port ( 
+    clk : out  STD_LOGIC; 
+    A : out  STD_LOGIC_VECTOR (15 downto 0);
+    D : inout  STD_LOGIC_VECTOR (15 downto 0);
+    NCE : out  STD_LOGIC := '1';
+    NWE : out  STD_LOGIC := '1';
+    NOE : out  STD_LOGIC := '1';
+    NBL : out  STD_LOGIC_VECTOR (1 downto 0)
+  );
 end fsmc_stimuly;
 
 architecture Beh of fsmc_stimuly is
@@ -57,7 +59,9 @@ signal clk_int : std_logic := '0';
 begin
          
   A <= x"0000" after 0*T,
-       x"0002" after cycle + 0*T;
+       x"0002" after cycle + 0*T,
+       x"0000" after 2*cycle + 0*T,
+       x"0002" after 3*cycle + 0*T;
        
   D <= x"1111" after D_lat + 0*T,
        x"2222" after D_lat + 1*T,
@@ -69,16 +73,26 @@ begin
   NCE <= '0' after 0*T,
          '1' after 6*T,
          '0' after cycle + 0*T,
-         '1' after cycle + 6*T;
+         '1' after cycle + 6*T,
+         -- read back
+         '0' after 2*cycle + 0*T,
+         '1' after 2*cycle + 6*T,
+         '0' after 3*cycle + 0*T,
+         '1' after 3*cycle + 6*T;
  
   NWE <= '0' after 0*T,
          '1' after 6*T,
          '0' after cycle + 0*T,
          '1' after cycle + 6*T;
 
+  NOE <= '0' after 2*cycle + 2*T,
+         '1' after 2*cycle + 6*T,
+         '0' after 3*cycle + 2*T,
+         '1' after 3*cycle + 6*T;
+
 
   clk_int <= not clk_int after T/2;
-  fsmc_clk <= clk_int;
+  clk <= clk_int;
   
   NBL <= "00";
   

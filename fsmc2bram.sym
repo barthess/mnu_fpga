@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <symbol version="7" name="fsmc2bram">
     <symboltype>BLOCK</symboltype>
-    <timestamp>2015-9-21T13:46:35</timestamp>
+    <timestamp>2015-9-21T18:37:40</timestamp>
     <pin polarity="Input" x="0" y="-352" name="NWE" />
     <pin polarity="Input" x="0" y="-288" name="NOE" />
     <pin polarity="Input" x="0" y="-224" name="NCE" />
@@ -13,7 +13,7 @@
     <pin polarity="Output" x="448" y="-320" name="bram_a(15:0)" />
     <pin polarity="Output" x="448" y="-224" name="bram_di(15:0)" />
     <pin polarity="Output" x="448" y="-128" name="bram_we(1:0)" />
-    <pin polarity="Input" x="0" y="-416" name="fsmc_clk" />
+    <pin polarity="Input" x="0" y="-416" name="clk" />
     <graph>
         <attrtext style="alignment:BCENTER;fontsize:56;fontname:Arial" attrname="SymbolName" x="224" y="-456" type="symbol" />
         <attrtext style="fontsize:24;fontname:Arial" attrname="PinName" x="72" y="-352" type="pin NWE" />
@@ -47,6 +47,6 @@
         <rect width="64" x="0" y="-44" height="24" />
         <rect width="320" x="64" y="-448" height="504" />
         <line x2="0" y1="-416" y2="-416" x1="64" />
-        <attrtext style="fontsize:24;fontname:Arial" attrname="PinName" x="68" y="-416" type="pin fsmc_clk" />
+        <attrtext style="fontsize:24;fontname:Arial" attrname="PinName" x="68" y="-416" type="pin clk" />
     </graph>
 </symbol>

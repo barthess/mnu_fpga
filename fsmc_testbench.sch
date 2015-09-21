@@ -21,7 +21,7 @@
         <signal name="XLXN_70" />
         <port polarity="Input" name="XLXN_22" />
         <blockdef name="fsmc2bram">
-            <timestamp>2015-9-21T13:46:35</timestamp>
+            <timestamp>2015-9-21T18:37:40</timestamp>
             <line x2="0" y1="-352" y2="-352" x1="64" />
             <line x2="0" y1="-288" y2="-288" x1="64" />
             <line x2="0" y1="-224" y2="-224" x1="64" />
@@ -44,7 +44,7 @@
             <line x2="0" y1="-416" y2="-416" x1="64" />
         </blockdef>
         <blockdef name="fsmc_stimuly">
-            <timestamp>2015-9-16T13:4:27</timestamp>
+            <timestamp>2015-9-21T18:38:51</timestamp>
             <rect width="256" x="64" y="-448" height="448" />
             <line x2="384" y1="-416" y2="-416" x1="320" />
             <line x2="384" y1="-352" y2="-352" x1="320" />
@@ -94,7 +94,7 @@
             <blockpin signalname="XLXN_32(15:0)" name="bram_a(15:0)" />
             <blockpin signalname="XLXN_33(15:0)" name="bram_di(15:0)" />
             <blockpin signalname="XLXN_35(1:0)" name="bram_we(1:0)" />
-            <blockpin signalname="XLXN_70" name="fsmc_clk" />
+            <blockpin signalname="XLXN_70" name="clk" />
         </block>
         <block symbolname="bram" name="bram_sym">
             <blockpin signalname="XLXN_32(15:0)" name="addra(15:0)" />
