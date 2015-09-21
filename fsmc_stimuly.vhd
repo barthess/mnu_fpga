@@ -30,7 +30,10 @@ use IEEE.STD_LOGIC_1164.ALL;
 --use UNISIM.VComponents.all;
 
 entity fsmc_stimuly is
-    Port ( clk : out  STD_LOGIC; 
+    Generic (
+      T : TIME := 17.85 ns
+    );
+    Port ( fsmc_clk : out  STD_LOGIC; 
            A : out  STD_LOGIC_VECTOR (15 downto 0);
            D : inout  STD_LOGIC_VECTOR (15 downto 0);
            NCE : out  STD_LOGIC := '1';
@@ -39,72 +42,45 @@ entity fsmc_stimuly is
            NBL : out  STD_LOGIC_VECTOR (1 downto 0));
 end fsmc_stimuly;
 
-
 architecture Beh of fsmc_stimuly is
 
-constant T : TIME := 5.95 ns;
-constant D_lat   : TIME := 3 ns; -- Data to FSMC_NEx low to Data valid
-constant NOE_lat : TIME := 3 ns; -- FSMC_NEx low to FSMC_NOE low
-constant A_lat   : TIME := 4.5 ns; -- FSMC_NEx low to FSMC_A valid
+constant D_lat : TIME := 3 * T;
+constant cycle : TIME := 7 * T;
+
+--constant NOE_lat : TIME := 3 ns; -- FSMC_NEx low to FSMC_NOE low
+--constant A_lat   : TIME := 4.5 ns; -- FSMC_NEx low to FSMC_A valid
 --constant clk_dT : TIME := 2.54 ns;
-constant clk_dT : TIME := 3.8 ns;
-signal shift : TIME := 59.5 ns;
+--constant clk_dT : TIME := 3.8 ns;
+
 signal clk_int : std_logic := '0';
 
 begin
+         
+  A <= x"0000" after 0*T,
+       x"0002" after cycle + 0*T;
+       
+  D <= x"1111" after D_lat + 0*T,
+       x"2222" after D_lat + 1*T,
+       (others => 'Z') after D_lat + 2*T,
+       x"3333" after cycle + D_lat + 0*T,
+       x"4444" after cycle + D_lat + 1*T,
+       (others => 'Z') after cycle + D_lat + 2*T;
+
+  NCE <= '0' after 0*T,
+         '1' after 6*T,
+         '0' after cycle + 0*T,
+         '1' after cycle + 6*T;
+ 
+  NWE <= '0' after 0*T,
+         '1' after 6*T,
+         '0' after cycle + 0*T,
+         '1' after cycle + 6*T;
+
+
+  clk_int <= not clk_int after T/2;
+  fsmc_clk <= clk_int;
   
   NBL <= "00";
-         
-  A <= x"0000" after 1*T,
-       x"0001" after 4*T,
-       x"0002" after 7*T,
-       -- read
-       x"0000" after 1*T + shift,
-       x"0001" after 5*T + shift,
-       x"0002" after 9*T + shift;
-       
-  D <= x"1111" after D_lat + 1*T,
-       x"2222" after D_lat + 4*T,
-       x"3333" after D_lat + 7*T,
-       -- read
-       (others => 'Z') after 1*T + shift;
-
-  NCE <= '1' after 0*T,
-         '0' after 1*T,
-         '1' after 3*T,
-         '0' after 4*T,
-         '1' after 6*T,
-         '0' after 7*T,
-         '1' after 9*T,
-         -- read
-         '1' after 0*T  + shift,
-         '0' after 1*T  + shift,
-         '1' after 4*T  + shift,
-         '0' after 5*T  + shift,
-         '1' after 8*T  + shift,
-         '0' after 9*T  + shift,
-         '1' after 12*T + shift;
- 
-  NWE <= '1' after 0*T,
-         '0' after 1*T,
-         '1' after 2*T,
-         '0' after 4*T,
-         '1' after 5*T,
-         '0' after 7*T,
-         '1' after 8*T;
-         
-  NOE <= '1' after 0*T,
-         '1' after 0*T  + shift,
-         '0' after 1*T  + shift,
-         '1' after 4*T  + shift,
-         '0' after 5*T  + shift,
-         '1' after 8*T  + shift,
-         '0' after 9*T  + shift,
-         '1' after 12*T + shift;
-
-
-  clk_int <= not clk_int after clk_dT/2;
-  clk <= clk_int;
-
+  
 end Beh;
 
