@@ -3,6 +3,7 @@ _xmsgs/
 iseconfig/
 isim/
 planAhead_run*/
+.Xil/
 xst/
 xlnx_auto*/
 sch2HdlBatchFile

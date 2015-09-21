@@ -1,7 +1,7 @@
 ##############################################################
 #
 # Xilinx Core Generator version 14.3
-# Date: Fri Sep 18 11:02:06 2015
+# Date: Mon Sep 21 12:28:05 2015
 #
 ##############################################################
 #
@@ -64,8 +64,8 @@ CSET clkfb_out_n_port=CLKFB_OUT_N
 CSET clkfb_out_p_port=CLKFB_OUT_P
 CSET clkfb_out_port=CLKFB_OUT
 CSET clkfb_stopped_port=CLKFB_STOPPED
-CSET clkin1_jitter_ps=370.37
-CSET clkin1_ui_jitter=0.01
+CSET clkin1_jitter_ps=74.074
+CSET clkin1_ui_jitter=0.002
 CSET clkin2_jitter_ps=100.0
 CSET clkin2_ui_jitter=0.010
 CSET clkout1_drives=BUFG
@@ -197,19 +197,19 @@ CSET override_pll=false
 CSET platform=lin64
 CSET pll_bandwidth=OPTIMIZED
 CSET pll_clk_feedback=CLKFBOUT
-CSET pll_clkfbout_mult=29
+CSET pll_clkfbout_mult=37
 CSET pll_clkfbout_phase=0.000
 CSET pll_clkin_period=37.037
-CSET pll_clkout0_divide=2
+CSET pll_clkout0_divide=10
 CSET pll_clkout0_duty_cycle=0.500
 CSET pll_clkout0_phase=0.000
-CSET pll_clkout1_divide=3
+CSET pll_clkout1_divide=10
 CSET pll_clkout1_duty_cycle=0.500
 CSET pll_clkout1_phase=0.000
-CSET pll_clkout2_divide=4
+CSET pll_clkout2_divide=10
 CSET pll_clkout2_duty_cycle=0.500
 CSET pll_clkout2_phase=0.000
-CSET pll_clkout3_divide=8
+CSET pll_clkout3_divide=10
 CSET pll_clkout3_duty_cycle=0.500
 CSET pll_clkout3_phase=0.000
 CSET pll_clkout4_divide=1
@@ -221,10 +221,10 @@ CSET pll_clkout5_phase=0.000
 CSET pll_compensation=SYSTEM_SYNCHRONOUS
 CSET pll_divclk_divide=1
 CSET pll_notes=None
-CSET pll_ref_jitter=0.010
+CSET pll_ref_jitter=0.002
 CSET power_down_port=POWER_DOWN
 CSET prim_in_freq=27
-CSET prim_in_jitter=0.01
+CSET prim_in_jitter=0.002
 CSET prim_source=Single_ended_clock_capable_pin
 CSET primary_port=CLK_IN1
 CSET primitive=MMCM
@@ -266,4 +266,4 @@ CSET use_status=false
 MISC pkg_timestamp=2012-05-10T12:44:55Z
 # END Extra information
 GENERATE
-# CRC: e597b67e
+# CRC: 1c65b6f4
