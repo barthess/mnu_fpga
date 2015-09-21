@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="/home/barthess/projects/xilinx/mnu/fsmc_testbench_isim_beh.wdb" id="1" type="auto">
+         <top_modules>
+            <top_module name="fsmc_testbench" />
+            <top_module name="numeric_std" />
+            <top_module name="std_logic_1164" />
+            <top_module name="std_logic_arith" />
+            <top_module name="std_logic_textio" />
+            <top_module name="std_logic_unsigned" />
+            <top_module name="textio" />
+            <top_module name="vcomponents" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <WVObjectSize size="12" />
+   <wvobject fp_name="/fsmc_testbench/glue/fsmc_clk" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">fsmc_clk</obj_property>
+      <obj_property name="ObjectShortName">fsmc_clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/fsmc_testbench/glue/nce" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">nce</obj_property>
+      <obj_property name="ObjectShortName">nce</obj_property>
+   </wvobject>
+   <wvobject fp_name="/fsmc_testbench/glue/noe" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">noe</obj_property>
+      <obj_property name="ObjectShortName">noe</obj_property>
+   </wvobject>
+   <wvobject fp_name="/fsmc_testbench/glue/a" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">a[15:0]</obj_property>
+      <obj_property name="ObjectShortName">a[15:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/fsmc_testbench/glue/d" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">d[15:0]</obj_property>
+      <obj_property name="ObjectShortName">d[15:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/fsmc_testbench/bram_sym/douta" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">douta[15:0]</obj_property>
+      <obj_property name="ObjectShortName">douta[15:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/fsmc_testbench/glue/a_buf" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">a_buf[15:0]</obj_property>
+      <obj_property name="ObjectShortName">a_buf[15:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/fsmc_testbench/bram_sym/addra" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">addra[15:0]</obj_property>
+      <obj_property name="ObjectShortName">addra[15:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/fsmc_testbench/glue/bram_en" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">bram_en</obj_property>
+      <obj_property name="ObjectShortName">bram_en</obj_property>
+   </wvobject>
+   <wvobject fp_name="/fsmc_testbench/glue/nbl" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">nbl[1:0]</obj_property>
+      <obj_property name="ObjectShortName">nbl[1:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/fsmc_testbench/bram_sym/wea" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">wea[1:0]</obj_property>
+      <obj_property name="ObjectShortName">wea[1:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/fsmc_testbench/glue/state" type="other" db_ref_id="1">
+      <obj_property name="ElementShortName">state</obj_property>
+      <obj_property name="ObjectShortName">state</obj_property>
+   </wvobject>
+</wave_config>
