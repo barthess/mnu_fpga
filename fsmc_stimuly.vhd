@@ -47,7 +47,8 @@ end fsmc_stimuly;
 architecture Beh of fsmc_stimuly is
 
 constant D_lat : TIME := 3 * T;
-constant cycle : TIME := 7 * T;
+constant wt : TIME := 6 * T;
+constant rt : TIME := 7 * T;
 
 --constant NOE_lat : TIME := 3 ns; -- FSMC_NEx low to FSMC_NOE low
 --constant A_lat   : TIME := 4.5 ns; -- FSMC_NEx low to FSMC_A valid
@@ -58,43 +59,43 @@ signal clk_int : std_logic := '0';
 
 begin
          
-  A <= x"0000" after 0*T,
-       x"0002" after cycle + 0*T,
-       x"0000" after 2*cycle + 0*T,
-       x"0002" after 3*cycle + 0*T;
+  A <= x"0000" after 0*wt,
+       x"0002" after 1*wt,
+       x"0000" after 2*wt + 0*rt,
+       x"0002" after 2*wt + 1*rt;
        
   D <= x"1111" after D_lat + 0*T,
        x"2222" after D_lat + 1*T,
        (others => 'Z') after D_lat + 2*T,
-       x"3333" after cycle + D_lat + 0*T,
-       x"4444" after cycle + D_lat + 1*T,
-       (others => 'Z') after cycle + D_lat + 2*T;
+       x"3333" after wt + D_lat + 0*T,
+       x"4444" after wt + D_lat + 1*T,
+       (others => 'Z') after wt + D_lat + 2*T;
 
   NCE <= '0' after 0*T,
-         '1' after 6*T,
-         '0' after cycle + 0*T,
-         '1' after cycle + 6*T,
+         '1' after wt - 1*T,
+         '0' after wt,
+         '1' after 2*wt - 1*T,
          -- read back
-         '0' after 2*cycle + 0*T,
-         '1' after 2*cycle + 6*T,
-         '0' after 3*cycle + 0*T,
-         '1' after 3*cycle + 6*T;
+         '0' after 2*wt + 0*T,
+         '1' after 2*wt + rt - 1*T,
+         '0' after 2*wt + rt,
+         '1' after 2*wt + 2*rt;
  
   NWE <= '0' after 0*T,
-         '1' after 6*T,
-         '0' after cycle + 0*T,
-         '1' after cycle + 6*T;
+         '1' after wt - 1*T,
+         '0' after wt,
+         '1' after 2*wt - 1*T;
 
-  NOE <= '0' after 2*cycle + 2*T,
-         '1' after 2*cycle + 6*T,
-         '0' after 3*cycle + 2*T,
-         '1' after 3*cycle + 6*T;
+  NOE <= '0' after 2*wt + 3*T,
+         '1' after 2*wt + rt - 1*T,
+         '0' after 2*wt + 1*rt + 3*T,
+         '1' after 2*wt + 2*rt;
 
 
   clk_int <= not clk_int after T/2;
   clk <= clk_int;
   
-  NBL <= "00";
+  --NBL <= "00" after 0*T,
   
 end Beh;
 
