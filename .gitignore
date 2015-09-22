@@ -9,10 +9,12 @@ xlnx_auto*/
 sch2HdlBatchFile
 *.bgn
 *.bit
+*.blc
 *.bld
 *.cfi
 *.cmd
 *.cmd_log
+*.cpj
 *.csv
 *.drc
 *.exe

@@ -61,6 +61,7 @@ entity root is
     FSMC_NWE : in std_logic;
     FSMC_NCE : in std_logic;
     FSMC_CLK : in std_logic;
+    FSMC_CLK_FAKE : in std_logic;
     --FSMC_NWAIT : out std_logic;
 
 --    SPI1_MISO : out std_logic;
@@ -68,8 +69,8 @@ entity root is
 --    SPI1_NSS : in std_logic;
 --    SPI1_SCK : in std_logic;
 
-    DEV_NULL_B1 : out std_logic -- warning suppressor
-    --DEV_NULL_B0 : out std_logic -- warning suppressor
+    DEV_NULL_B1 : out std_logic; -- warning suppressor
+    DEV_NULL_B0 : out std_logic -- warning suppressor
 	);
 end root;
 
@@ -128,6 +129,7 @@ begin
     
 		A => FSMC_A(15 downto 0),
 		D => FSMC_D,
+
 		NCE => FSMC_NCE,
 		NOE => FSMC_NOE,
 		NWE => FSMC_NWE,
@@ -162,11 +164,17 @@ begin
 --		clk => clk_391mhz,
 --        fake_out => DEV_NULL_B0
 --	);
-
-  LED_LINE <= (others => '0');
-    
+  LED_LINE(0) <= 'Z';
+  LED_LINE(1) <= 'Z';
+  LED_LINE(2) <= 'Z';
+  LED_LINE(3) <= 'Z';
+  LED_LINE(4) <= 'Z';
+  LED_LINE(5) <= 'Z';
+  
 	-- raize ready flag
 	STM_IO_FPGA_READY <= not clk_locked;
 
+  DEV_NULL_B0 <= not (not FSMC_CLK_FAKE);
+  
 end Behavioral;
 

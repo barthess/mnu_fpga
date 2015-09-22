@@ -16,10 +16,10 @@
          </top_modules>
       </db_ref>
    </db_ref_list>
-   <WVObjectSize size="13" />
-   <wvobject fp_name="/fsmc_testbench/glue/fsmc_clk" type="logic" db_ref_id="1">
-      <obj_property name="ElementShortName">fsmc_clk</obj_property>
-      <obj_property name="ObjectShortName">fsmc_clk</obj_property>
+   <WVObjectSize size="14" />
+   <wvobject fp_name="/fsmc_testbench/glue/clk" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
    </wvobject>
    <wvobject fp_name="/fsmc_testbench/glue/nce" type="logic" db_ref_id="1">
       <obj_property name="ElementShortName">nce</obj_property>
@@ -42,6 +42,11 @@
    <wvobject fp_name="/fsmc_testbench/glue/di_buf" type="array" db_ref_id="1">
       <obj_property name="ElementShortName">di_buf[15:0]</obj_property>
       <obj_property name="ObjectShortName">di_buf[15:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/fsmc_testbench/glue/bram_di" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">bram_di[15:0]</obj_property>
+      <obj_property name="ObjectShortName">bram_di[15:0]</obj_property>
       <obj_property name="Radix">HEXRADIX</obj_property>
    </wvobject>
    <wvobject fp_name="/fsmc_testbench/glue/a_buf" type="array" db_ref_id="1">

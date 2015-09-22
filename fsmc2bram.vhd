@@ -32,7 +32,7 @@ use IEEE.NUMERIC_STD.ALL;
 
 entity fsmc2bram is
 	generic(
-		datlat_N : positive := 2
+		datlat_N : positive := 3
 	);
 
   Port (
@@ -55,72 +55,53 @@ end fsmc2bram;
 -------------------------
 architecture beh of fsmc2bram is
 
-type state_t is (IDLE, WRITE1, WRITE2, READ1, READ2);
+type state_t is (IDLE, WRITE1, WRITE2, READ1);
 signal state : state_t := IDLE;
 
 signal a_buf : STD_LOGIC_VECTOR (15 downto 0) := (others => '0');
-signal di_buf : STD_LOGIC_VECTOR (15 downto 0) := (others => '0');
+--signal di_buf : STD_LOGIC_VECTOR (15 downto 0) := (others => '0');
 signal datlat : integer range 0 to datlat_N := 0;
 
 begin
 
   D <= bram_do when (NCE = '0' and NOE = '0') else (others => 'Z');
-  --bram_we <= not NBL when ((state = WRITE1) or (state = WRITE2) or (state = WRITE3) or (NWE = '0')) else "00";
+  bram_di <= D;
+  
+  --bram_we <= not NBL when (state = WRITE1 or state = WRITE2) else "00";
+  bram_we <= "11" when (state = WRITE1 or state = WRITE2) else "00";
 
-  process(clk) begin
-    if rising_edge(clk) then
+  process(clk, NCE) begin
+    if (NCE = '1') then
+      datlat <= 0;
+      bram_en <= '0';
+      state <= IDLE;
+    elsif rising_edge(clk) then
       case state is
       when IDLE =>
-        datlat <= 0;
-        bram_en <= '0';
-        bram_we <= "00";
         if (NCE = '0') then 
           a_buf <= A;
           if (NWE = '0') then
             state <= WRITE1;
-          else
+          elsif (NOE = '0') then
             state <= READ1;
           end if;
         end if;
 
       when WRITE1 =>
         datlat <= datlat + 1;
-        if (datlat = datlat_N) then
+        if (datlat = datlat_N - 2) then
+          bram_en <= '1';
           state <= WRITE2;
-          di_buf <= D;
-          bram_we <= not NBL;
         end if;
 
       when WRITE2 =>
-        bram_en <= '1';
-        di_buf <= D;
         a_buf  <= a_buf + 1;
-        bram_di <= di_buf; 
         bram_a  <= a_buf;
-        bram_we <= not NBL;
-        if (NCE = '1' and NWE = '1') then
-          state <= IDLE;
-          bram_en <= '0';
-          bram_we <= "00";
-        end if;
-
 
       when READ1 =>
-        datlat <= datlat + 1;
-        if (datlat = datlat_N - 2) then
-          state <= READ2;
-          bram_en <= '1';
-          a_buf   <= a_buf + 1;
-          bram_a  <= a_buf; 
-        end if;
-
-      when READ2 =>
+        bram_en <= '1';
         a_buf  <= a_buf + 1;
         bram_a <= a_buf; 
-        if (NCE = '1' and NOE = '1') then
-          state <= IDLE;
-          bram_en <= '0';
-        end if;
 
       end case;
     end if;

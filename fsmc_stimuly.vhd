@@ -86,9 +86,9 @@ begin
          '0' after wt,
          '1' after 2*wt - 1*T;
 
-  NOE <= '0' after 2*wt + 3*T,
+  NOE <= '0' after 2*wt + 2.5*T,
          '1' after 2*wt + rt - 1*T,
-         '0' after 2*wt + 1*rt + 3*T,
+         '0' after 2*wt + 1*rt + 2.5*T,
          '1' after 2*wt + 2*rt;
 
 
