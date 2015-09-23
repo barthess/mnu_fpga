@@ -17,6 +17,7 @@ sch2HdlBatchFile
 *.cpj
 *.csv
 *.drc
+*.en
 *.exe
 *.gise
 *.html
@@ -39,6 +40,7 @@ sch2HdlBatchFile
 *.pcf
 *.prj
 *.prm
+*.psr
 *.ptwx
 *.pwr
 *.schlog

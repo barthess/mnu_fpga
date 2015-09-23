@@ -95,7 +95,7 @@ begin
   clk_int <= not clk_int after T/2;
   clk <= clk_int;
   
-  --NBL <= "00" after 0*T,
+  NBL <= "00" after 0*T;
   
 end Beh;
 
