@@ -1,5 +1,5 @@
 #ChipScope Core Inserter Project File Version 3.0
-#Tue Sep 22 16:54:24 EEST 2015
+#Wed Sep 23 11:47:01 EEST 2015
 Project.device.designInputFile=/home/barthess/projects/xilinx/mnu/root_cs.ngc
 Project.device.designOutputFile=/home/barthess/projects/xilinx/mnu/root_cs.ngc
 Project.device.deviceFamily=18
@@ -26,9 +26,13 @@ Project.unit<0>.dataChannel<1>=FSMC_NWE_IBUF
 Project.unit<0>.dataChannel<2>=FSMC_NCE_IBUF
 Project.unit<0>.dataChannel<3>=DEV_NULL_B0_OBUF
 Project.unit<0>.dataChannel<4>=FSMC_A_0_IBUF
+Project.unit<0>.dataChannel<5>=bram_do<0>
+Project.unit<0>.dataChannel<6>=fsmc2bram/bram_en
+Project.unit<0>.dataChannel<7>=fsmc2bram/bram_we<0>
+Project.unit<0>.dataChannel<8>=
 Project.unit<0>.dataDepth=1024
 Project.unit<0>.dataEqualsTrigger=true
-Project.unit<0>.dataPortWidth=6
+Project.unit<0>.dataPortWidth=9
 Project.unit<0>.enableGaps=false
 Project.unit<0>.enableStorageQualification=false
 Project.unit<0>.enableTimestamps=false
@@ -40,13 +44,16 @@ Project.unit<0>.triggerChannel<0><2>=FSMC_NCE_IBUF
 Project.unit<0>.triggerChannel<0><3>=DEV_NULL_B0_OBUF
 Project.unit<0>.triggerChannel<0><4>=FSMC_A_0_IBUF
 Project.unit<0>.triggerChannel<0><5>=bram_do<0>
+Project.unit<0>.triggerChannel<0><6>=fsmc2bram/bram_en
+Project.unit<0>.triggerChannel<0><7>=fsmc2bram/bram_we<0>
+Project.unit<0>.triggerChannel<0><8>=fsmc2bram/bram_we<1>
 Project.unit<0>.triggerConditionCountWidth=0
 Project.unit<0>.triggerMatchCount<0>=1
 Project.unit<0>.triggerMatchCountWidth<0><0>=0
 Project.unit<0>.triggerMatchType<0><0>=1
 Project.unit<0>.triggerPortCount=1
 Project.unit<0>.triggerPortIsData<0>=true
-Project.unit<0>.triggerPortWidth<0>=6
+Project.unit<0>.triggerPortWidth<0>=9
 Project.unit<0>.triggerSequencerLevels=16
 Project.unit<0>.triggerSequencerType=0
 Project.unit<0>.type=ilapro

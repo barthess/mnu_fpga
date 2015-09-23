@@ -46,7 +46,7 @@ end fsmc_stimuly;
 
 architecture Beh of fsmc_stimuly is
 
-constant D_lat : TIME := 3 * T;
+constant D_lat : TIME := 2.6 * T;
 constant wt : TIME := 6 * T;
 constant rt : TIME := 7 * T;
 
@@ -77,19 +77,19 @@ begin
          '1' after 2*wt - 1*T,
          -- read back
          '0' after 2*wt + 0*T,
-         '1' after 2*wt + rt - 1*T,
+         '1' after 2*wt + rt   - 1*T,
          '0' after 2*wt + rt,
-         '1' after 2*wt + 2*rt;
+         '1' after 2*wt + 2*rt - 1*T;
  
   NWE <= '0' after 0*T,
          '1' after wt - 1*T,
          '0' after wt,
          '1' after 2*wt - 1*T;
 
-  NOE <= '0' after 2*wt + 2.5*T,
-         '1' after 2*wt + rt - 1*T,
-         '0' after 2*wt + 1*rt + 2.5*T,
-         '1' after 2*wt + 2*rt;
+  NOE <= '0' after 2*wt + 2*T,
+         '1' after 2*wt + rt   - 1*T,
+         '0' after 2*wt + 1*rt + 2*T,
+         '1' after 2*wt + 2*rt - 1*T;
 
 
   clk_int <= not clk_int after T/2;

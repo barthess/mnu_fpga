@@ -55,10 +55,10 @@ end fsmc2bram;
 -------------------------
 architecture beh of fsmc2bram is
 
-type state_t is (IDLE, WRITE1, WRITE2, READ1);
+type state_t is (IDLE, ADDR, WRITE1, WRITE2, READ1);
 signal state : state_t := IDLE;
 
-signal a_buf : STD_LOGIC_VECTOR (15 downto 0) := (others => '0');
+signal a_buf : STD_LOGIC_VECTOR (15 downto 0) := (others => 'U');
 --signal di_buf : STD_LOGIC_VECTOR (15 downto 0) := (others => '0');
 signal datlat : integer range 0 to datlat_N := 0;
 
@@ -68,35 +68,44 @@ begin
   bram_di <= D;
   
   --bram_we <= not NBL when (state = WRITE1 or state = WRITE2) else "00";
-  bram_we <= "11" when (state = WRITE1 or state = WRITE2) else "00";
-
+  --bram_we <= "11" when (state = WRITE1 or state = WRITE2) else "00";
+  
   process(clk, NCE) begin
     if (NCE = '1') then
       datlat <= 0;
       bram_en <= '0';
+      bram_we <= "00";
       state <= IDLE;
     elsif rising_edge(clk) then
       case state is
       when IDLE =>
         if (NCE = '0') then 
           a_buf <= A;
-          if (NWE = '0') then
-            state <= WRITE1;
-          elsif (NOE = '0') then
-            state <= READ1;
-          end if;
+          state <= ADDR;
+        end if;
+        
+      when ADDR =>
+        if (NWE = '0') then
+          state <= WRITE1;
+        else
+          state <= READ1;
+          bram_en <= '1';
+          a_buf  <= a_buf + 1;
+          bram_a <= a_buf; 
         end if;
 
       when WRITE1 =>
-        datlat <= datlat + 1;
-        if (datlat = datlat_N - 2) then
-          bram_en <= '1';
-          state <= WRITE2;
-        end if;
+        bram_en <= '1';
+        bram_we <= not NBL;
+        --bram_we <= "11";
+        state <= WRITE2;
+        a_buf  <= a_buf + 1;
+        bram_a  <= a_buf;
 
       when WRITE2 =>
         a_buf  <= a_buf + 1;
         bram_a  <= a_buf;
+
 
       when READ1 =>
         bram_en <= '1';
@@ -106,7 +115,6 @@ begin
       end case;
     end if;
   end process;
-
 end beh;
 
 
