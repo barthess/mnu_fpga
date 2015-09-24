@@ -152,23 +152,15 @@ begin
 
     clkb => clk_98mhz,
     enb => '0',
-    web => "11",
+    web => "00",
     addrb => (others => '0'),
     dinb => (others => '0'),
     doutb => open
   );
 
-    -- double multiplier test
---	mul_test : entity work.mul_test port map (
---		clk => clk_391mhz,
---        fake_out => DEV_NULL_B0
---	);
-  LED_LINE(0) <= '0';
-  LED_LINE(1) <= '0';
-  LED_LINE(2) <= '0';
-  LED_LINE(3) <= '0';
-  LED_LINE(4) <= '0';
-  LED_LINE(5) <= '0';
+
+
+  LED_LINE <= (others => '0');
   
 	-- raize ready flag
 	STM_IO_FPGA_READY <= not clk_locked;
