@@ -30,11 +30,11 @@ use IEEE.STD_LOGIC_1164.ALL;
 --use UNISIM.VComponents.all;
 
 entity demux4 is
-    Port (
-        i : in STD_LOGIC;
-        o : out STD_LOGIC_VECTOR (3 downto 0);
-        sel : in STD_LOGIC_VECTOR (1 downto 0)
-    );
+  Port (
+    i   : in STD_LOGIC;
+    o   : out STD_LOGIC_VECTOR (3 downto 0);
+    sel : in STD_LOGIC_VECTOR (1 downto 0)
+  );
 end demux4;
 
 architecture rtl of demux4 is

@@ -30,28 +30,30 @@ use IEEE.STD_LOGIC_1164.ALL;
 --use UNISIM.VComponents.all;
 
 entity gnss_router is
-    Port ( to_gnss : out  STD_LOGIC_VECTOR (3 downto 0);
-           from_gnss : in  STD_LOGIC_VECTOR (3 downto 0);
-           sel : in  STD_LOGIC_VECTOR (1 downto 0);
-           ubx_nrst : out  STD_LOGIC;
-           to_stm : out  STD_LOGIC;
-           from_stm : in  STD_LOGIC);
+  Port (
+    to_gnss   : out  STD_LOGIC_VECTOR (3 downto 0);
+    from_gnss : in  STD_LOGIC_VECTOR (3 downto 0);
+    sel       : in  STD_LOGIC_VECTOR (1 downto 0);
+    ubx_nrst  : out  STD_LOGIC;
+    to_stm    : out  STD_LOGIC;
+    from_stm  : in  STD_LOGIC
+  );
 end gnss_router;
 
 
 architecture Behavioral of gnss_router is
 
 begin
-    uart_mux : entity work.mux4 port map (
-		sel => sel,
-        i   => from_gnss,
-		o   => to_stm
+  uart_mux : entity work.mux4 port map (
+    sel => sel,
+    i   => from_gnss,
+    o   => to_stm
 	);
 	
 	uart_demux : entity work.demux4 port map (
-		sel => sel,
-        o   => to_gnss,
-		i   => from_stm
+    sel => sel,
+    o   => to_gnss,
+    i   => from_stm
 	);
     
     -- release reset on ublox when selected

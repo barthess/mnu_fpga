@@ -42,14 +42,14 @@ entity bram2mul is
     mul_en   : out  STD_LOGIC;
     mul_in1  : in  STD_LOGIC_VECTOR (63 downto 0);
     mul_in2  : in  STD_LOGIC_VECTOR (63 downto 0);
-    mul_result : out  STD_LOGIC_VECTOR (63 downto 0)
+    mul_res  : out  STD_LOGIC_VECTOR (63 downto 0)
   );
 end bram2mul;
 
 
 architecture Behavioral of bram2mul is
 
-signal cycle    : std_logic_vector (7 downto 0)  := (others => 'U');      -- multiply cycle counter
+signal cycle    : std_logic_vector (7 downto 0)  := (others => 'U'); -- multiply cycle counter
 signal op_a_buf : std_logic_vector (63 downto 0) := (others => 'U');
 signal op_b_buf : std_logic_vector (63 downto 0) := (others => 'U');
 signal ctrl_buf : std_logic_vector (63 downto 0) := (others => 'U');
@@ -58,8 +58,5 @@ begin
 
 
 end Behavioral;
-
-
-
 
 
