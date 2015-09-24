@@ -1,7 +1,7 @@
 ##############################################################
 #
 # Xilinx Core Generator version 14.3
-# Date: Wed Sep 16 13:06:29 2015
+# Date: Thu Sep 24 20:46:35 2015
 #
 ##############################################################
 #
@@ -61,7 +61,7 @@ CSET c_result_exponent_width=11
 CSET c_result_fraction_width=53
 CSET c_speed=Maximum_speed
 CSET component_name=double_mul
-CSET maximum_latency=true
+CSET maximum_latency=false
 CSET operation_type=Multiply
 CSET result_precision_type=Double
 # END Parameters
@@ -69,4 +69,4 @@ CSET result_precision_type=Double
 MISC pkg_timestamp=2012-07-02T11:22:24Z
 # END Extra information
 GENERATE
-# CRC:  1df6286
+# CRC: aead0ebd

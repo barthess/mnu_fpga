@@ -98,10 +98,7 @@ signal mul2bram_d : STD_LOGIC_VECTOR (63 downto 0);
 signal bram2mul_d : STD_LOGIC_VECTOR (63 downto 0);
 signal mul2bram_a : STD_LOGIC_VECTOR (11 downto 0);
 signal mul2bram_we : STD_LOGIC_VECTOR (7 downto 0);
-signal mul_in2 : STD_LOGIC_VECTOR(63 DOWNTO 0);
-signal mul_in1 : STD_LOGIC_VECTOR(63 DOWNTO 0);
-signal mul_en : STD_LOGIC;
-signal mul_result : STD_LOGIC_VECTOR(63 DOWNTO 0);
+
 
 begin
 
@@ -161,30 +158,15 @@ begin
 	DEV_NULL_B1 <= or_reduce(FSMC_A(22 downto 14));
 
     
-  bram2mul : entity work.bram2mul
+  multiplier_test : entity work.multiplier_test
   port map (
     clk => clk_360mhz,
     
     bram_do => mul2bram_d,
     bram_di => bram2mul_d,
     bram_a  => mul2bram_a,
-    bram_we => mul2bram_we,
-
-    mul_en => mul_en,
-    mul_in1 => mul_in1,
-    mul_in2 => mul_in2,
-    mul_result => mul_result
+    bram_we => mul2bram_we
   );
-
-  double_mul : entity work.double_mul
-  PORT MAP (
-    a   => mul_in1,
-    b   => mul_in2,
-    clk => clk_360mhz,
-    ce  => mul_en,
-    result => mul_result
-  );
-
 
   -- connect BRAM to all
   bram : entity work.bram 
