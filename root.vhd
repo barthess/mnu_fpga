@@ -33,6 +33,11 @@ use UNISIM.VComponents.all;
 use ieee.std_logic_misc.all;
 
 entity root is
+  generic (
+    FSMC_A_WIDTH_TOTAL : positive := 23;
+    FSMC_A_WIDTH : positive := 16;
+    FSMC_D_WIDTH : positive := 16
+  );
   port ( 
     CLK_IN_27MHZ : in std_logic;
 
@@ -123,10 +128,15 @@ begin
 
 
   -- connect FSMC
-	fsmc2bram : entity work.fsmc2bram port map (
+	fsmc2bram : entity work.fsmc2bram 
+  generic map (
+    WA => 16,
+    WD => 16
+  )
+  port map (
 		clk => FSMC_CLK,
     
-		A => FSMC_A(15 downto 0),
+		A => FSMC_A (15 downto 0),
 		D => FSMC_D,
 
 		NCE => FSMC_NCE,

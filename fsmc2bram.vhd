@@ -31,18 +31,22 @@ use IEEE.NUMERIC_STD.ALL;
 --use UNISIM.VComponents.all;
 
 entity fsmc2bram is
+  Generic (
+    WA : positive := 16;
+    WD : positive := 16
+  );
 	Port (
     clk : in std_logic;
-    A : in  STD_LOGIC_VECTOR (15 downto 0);
-    D : inout  STD_LOGIC_VECTOR (15 downto 0);
+    A : in  STD_LOGIC_VECTOR (WA-1 downto 0);
+    D : inout  STD_LOGIC_VECTOR (WD-1 downto 0);
     NWE : in  STD_LOGIC;
     NOE : in  STD_LOGIC;
     NCE : in  STD_LOGIC;
     NBL : in std_logic_vector (1 downto 0);
 
-    bram_a : out STD_LOGIC_VECTOR (15 downto 0);
-    bram_do : in STD_LOGIC_VECTOR (15 downto 0);
-    bram_di : out STD_LOGIC_VECTOR (15 downto 0);
+    bram_a : out STD_LOGIC_VECTOR (WA-1 downto 0);
+    bram_do : in STD_LOGIC_VECTOR (WD-1 downto 0);
+    bram_di : out STD_LOGIC_VECTOR (WD-1 downto 0);
     bram_en : out STD_LOGIC := '0';
     bram_we : out std_logic_vector (1 downto 0)
   );
@@ -54,7 +58,7 @@ architecture beh of fsmc2bram is
 type state_t is (IDLE, ADDR, WRITE1, READ1);
 signal state : state_t := IDLE;
 
-signal a_buf : STD_LOGIC_VECTOR (15 downto 0) := (others => 'U');
+signal a_buf : STD_LOGIC_VECTOR (WA-1 downto 0) := (others => 'U');
 
 begin
 
