@@ -66,7 +66,6 @@ entity root is
     FSMC_NWE : in std_logic;
     FSMC_NCE : in std_logic;
     FSMC_CLK : in std_logic;
-    --FSMC_NWAIT : out std_logic;
 
 --    SPI1_MISO : out std_logic;
 --    SPI1_MOSI : in std_logic;		  
@@ -83,26 +82,31 @@ end root;
 
 architecture Behavioral of root is
 
-signal clk_98mhz  : std_logic;
-signal clk_196mhz : std_logic;
-signal clk_261mhz : std_logic;
-signal clk_391mhz : std_logic;
+signal clk_45mhz  : std_logic;
+signal clk_90mhz : std_logic;
+signal clk_180mhz : std_logic;
+signal clk_360mhz : std_logic;
 signal clk_locked : std_logic;
 
-signal bram_a : std_logic_vector (15 downto 0); 
-signal bram_do : std_logic_vector (15 downto 0); 
-signal bram_di : std_logic_vector (15 downto 0); 
-signal bram_en : std_logic; 
-signal bram_we : std_logic_vector (1 downto 0); 
+signal fsmc_bram_a  : std_logic_vector (13 downto 0); 
+signal fsmc_bram_do : std_logic_vector (15 downto 0); 
+signal fsmc_bram_di : std_logic_vector (15 downto 0); 
+signal fsmc_bram_en : std_logic; 
+signal fsmc_bram_we : std_logic_vector (1 downto 0); 
+
+--signal mul_bram_a  : std_logic_vector (11 downto 0);
+--signal mul_bram_do : std_logic_vector (63 downto 0);
+--signal mul_bram_di : std_logic_vector (63 downto 0);
+--signal mul_bram_we : std_logic_vector (7 downto 0);
 
 begin
 
 	clk_src : entity work.clk_src port map (
 		CLK_IN1  => CLK_IN_27MHZ,
-		CLK_OUT1 => clk_391mhz,
-		CLK_OUT2 => clk_261mhz,
-		CLK_OUT3 => clk_196mhz,
-		CLK_OUT4 => clk_98mhz,
+		CLK_OUT1 => clk_45mhz,
+		CLK_OUT2 => clk_90mhz,
+		CLK_OUT3 => clk_180mhz,
+		CLK_OUT4 => clk_360mhz,
 		LOCKED   => clk_locked
 	);
 
@@ -127,16 +131,16 @@ begin
   );
 
 
-  -- connect FSMC
+  -- connect FSMC<->BRAM
 	fsmc2bram : entity work.fsmc2bram 
   generic map (
-    WA => 16,
+    WA => 14,
     WD => 16
   )
   port map (
 		clk => FSMC_CLK,
     
-		A => FSMC_A (15 downto 0),
+		A => FSMC_A (13 downto 0),
 		D => FSMC_D,
 
 		NCE => FSMC_NCE,
@@ -144,31 +148,47 @@ begin
 		NWE => FSMC_NWE,
 		NBL => FSMC_NBL,
     
-    bram_a  => bram_a,
-    bram_do => bram_do,
-    bram_di => bram_di,
-    bram_en => bram_en,
-    bram_we => bram_we
+    bram_a  => fsmc_bram_a,
+    bram_do => fsmc_bram_do,
+    bram_di => fsmc_bram_di,
+    bram_en => fsmc_bram_en,
+    bram_we => fsmc_bram_we
 	);
-	DEV_NULL_B1 <= or_reduce(FSMC_A(22 downto 16));
+	DEV_NULL_B1 <= or_reduce(FSMC_A(22 downto 14));
 
+--
+--signal mul_bram_a  : std_logic_vector (11 downto 0);
+--signal mul_bram_do : std_logic_vector (63 downto 0);
+--signal mul_bram_di : std_logic_vector (63 downto 0);
+--signal mul_bram_we : std_logic_vector (7 downto 0);
+--
+--  bram2mul : entity work.bram2mul
+--  port map (
+--    clk => clk_360mhz,
+--    
+--    bram_di  : in  STD_LOGIC_VECTOR (63 downto 0);
+--    bram_do  : out  STD_LOGIC_VECTOR (63 downto 0);
+--    bram_a   : out  STD_LOGIC_VECTOR (11 downto 0);
+--    bram_we  : out  STD_LOGIC_VECTOR (7 downto 0);
+--  );
+--
+--
+
+  -- connect BRAM to all
   bram : entity work.bram PORT MAP (
-    clka => FSMC_CLK,
-    addra => bram_a,
-    dina => bram_di,
-    douta => bram_do,
-    ena => bram_en,
-    wea => bram_we,
+    clka  => FSMC_CLK,
+    addra => fsmc_bram_a,
+    dina  => fsmc_bram_di,
+    douta => fsmc_bram_do,
+    ena   => fsmc_bram_en,
+    wea   => fsmc_bram_we,
 
-    clkb => clk_98mhz,
-    enb => '0',
-    web => "00",
+    clkb  => clk_360mhz,
+    web   => x"FF",
     addrb => (others => '0'),
-    dinb => (others => '0'),
+    dinb  => (others => '0'),
     doutb => open
   );
-
-
 
   LED_LINE <= (others => '0');
   
