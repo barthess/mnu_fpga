@@ -94,10 +94,14 @@ signal fsmc_bram_di : std_logic_vector (15 downto 0);
 signal fsmc_bram_en : std_logic; 
 signal fsmc_bram_we : std_logic_vector (1 downto 0); 
 
---signal mul_bram_a  : std_logic_vector (11 downto 0);
---signal mul_bram_do : std_logic_vector (63 downto 0);
---signal mul_bram_di : std_logic_vector (63 downto 0);
---signal mul_bram_we : std_logic_vector (7 downto 0);
+signal mul2bram_d : STD_LOGIC_VECTOR (63 downto 0);
+signal bram2mul_d : STD_LOGIC_VECTOR (63 downto 0);
+signal mul2bram_a : STD_LOGIC_VECTOR (11 downto 0);
+signal mul2bram_we : STD_LOGIC_VECTOR (7 downto 0);
+signal mul_in2 : STD_LOGIC_VECTOR(63 DOWNTO 0);
+signal mul_in1 : STD_LOGIC_VECTOR(63 DOWNTO 0);
+signal mul_en : STD_LOGIC;
+signal mul_result : STD_LOGIC_VECTOR(63 DOWNTO 0);
 
 begin
 
@@ -156,26 +160,35 @@ begin
 	);
 	DEV_NULL_B1 <= or_reduce(FSMC_A(22 downto 14));
 
---
---signal mul_bram_a  : std_logic_vector (11 downto 0);
---signal mul_bram_do : std_logic_vector (63 downto 0);
---signal mul_bram_di : std_logic_vector (63 downto 0);
---signal mul_bram_we : std_logic_vector (7 downto 0);
---
---  bram2mul : entity work.bram2mul
---  port map (
---    clk => clk_360mhz,
---    
---    bram_di  : in  STD_LOGIC_VECTOR (63 downto 0);
---    bram_do  : out  STD_LOGIC_VECTOR (63 downto 0);
---    bram_a   : out  STD_LOGIC_VECTOR (11 downto 0);
---    bram_we  : out  STD_LOGIC_VECTOR (7 downto 0);
---  );
---
---
+    
+  bram2mul : entity work.bram2mul
+  port map (
+    clk => clk_360mhz,
+    
+    bram_do => mul2bram_d,
+    bram_di => bram2mul_d,
+    bram_a  => mul2bram_a,
+    bram_we => mul2bram_we,
+
+    mul_en => mul_en,
+    mul_in1 => mul_in1,
+    mul_in2 => mul_in2,
+    mul_result => mul_result
+  );
+
+  double_mul : entity work.double_mul
+  PORT MAP (
+    a   => mul_in1,
+    b   => mul_in2,
+    clk => clk_360mhz,
+    ce  => mul_en,
+    result => mul_result
+  );
+
 
   -- connect BRAM to all
-  bram : entity work.bram PORT MAP (
+  bram : entity work.bram 
+  PORT MAP (
     clka  => FSMC_CLK,
     addra => fsmc_bram_a,
     dina  => fsmc_bram_di,
@@ -184,10 +197,10 @@ begin
     wea   => fsmc_bram_we,
 
     clkb  => clk_360mhz,
-    web   => x"FF",
-    addrb => (others => '0'),
-    dinb  => (others => '0'),
-    doutb => open
+    web   => mul2bram_we,
+    addrb => mul2bram_a,
+    dinb  => mul2bram_d,
+    doutb => bram2mul_d
   );
 
   LED_LINE <= (others => '0');

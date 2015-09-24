@@ -21,7 +21,9 @@
         <signal name="XLXN_70" />
         <port polarity="Input" name="XLXN_22" />
         <blockdef name="fsmc2bram">
-            <timestamp>2015-9-21T18:37:40</timestamp>
+            <timestamp>2015-9-24T13:50:22</timestamp>
+            <rect width="320" x="64" y="-448" height="448" />
+            <line x2="0" y1="-416" y2="-416" x1="64" />
             <line x2="0" y1="-352" y2="-352" x1="64" />
             <line x2="0" y1="-288" y2="-288" x1="64" />
             <line x2="0" y1="-224" y2="-224" x1="64" />
@@ -29,6 +31,8 @@
             <line x2="0" y1="-160" y2="-160" x1="64" />
             <rect width="64" x="0" y="-108" height="24" />
             <line x2="0" y1="-96" y2="-96" x1="64" />
+            <rect width="64" x="0" y="-44" height="24" />
+            <line x2="0" y1="-32" y2="-32" x1="64" />
             <line x2="448" y1="-416" y2="-416" x1="384" />
             <rect width="64" x="384" y="-332" height="24" />
             <line x2="448" y1="-320" y2="-320" x1="384" />
@@ -36,12 +40,8 @@
             <line x2="448" y1="-224" y2="-224" x1="384" />
             <rect width="64" x="384" y="-140" height="24" />
             <line x2="448" y1="-128" y2="-128" x1="384" />
-            <rect width="64" x="384" y="-76" height="24" />
-            <line x2="384" y1="-64" y2="-64" x1="448" />
-            <line x2="64" y1="-32" y2="-32" x1="0" />
-            <rect width="64" x="0" y="-44" height="24" />
-            <rect width="320" x="64" y="-448" height="504" />
-            <line x2="0" y1="-416" y2="-416" x1="64" />
+            <rect width="64" x="384" y="-44" height="24" />
+            <line x2="448" y1="-32" y2="-32" x1="384" />
         </blockdef>
         <blockdef name="fsmc_stimuly">
             <timestamp>2015-9-21T18:38:51</timestamp>
@@ -83,18 +83,18 @@
             <blockpin signalname="XLXN_29(15:0)" name="D(15:0)" />
         </block>
         <block symbolname="fsmc2bram" name="glue">
+            <blockpin signalname="XLXN_70" name="clk" />
             <blockpin signalname="XLXN_26" name="NWE" />
             <blockpin signalname="XLXN_25" name="NOE" />
             <blockpin signalname="XLXN_24" name="NCE" />
             <blockpin signalname="XLXN_27(15:0)" name="A(15:0)" />
             <blockpin signalname="XLXN_28(1:0)" name="NBL(1:0)" />
-            <blockpin signalname="XLXN_38(15:0)" name="bram_do(15:0)" />
-            <blockpin signalname="XLXN_29(15:0)" name="D(15:0)" />
+            <blockpin signalname="XLXN_29(15:0)" name="bram_do(15:0)" />
             <blockpin signalname="XLXN_34" name="bram_en" />
             <blockpin signalname="XLXN_32(15:0)" name="bram_a(15:0)" />
             <blockpin signalname="XLXN_33(15:0)" name="bram_di(15:0)" />
             <blockpin signalname="XLXN_35(1:0)" name="bram_we(1:0)" />
-            <blockpin signalname="XLXN_70" name="clk" />
+            <blockpin signalname="XLXN_38(15:0)" name="D(15:0)" />
         </block>
         <block symbolname="bram" name="bram_sym">
             <blockpin signalname="XLXN_32(15:0)" name="addra(15:0)" />
@@ -160,8 +160,8 @@
         <instance x="1632" y="416" name="bram_sym" orien="R0">
         </instance>
         <branch name="XLXN_38(15:0)">
-            <wire x2="1344" y1="944" y2="944" x1="1296" />
-            <wire x2="1344" y1="944" y2="1152" x1="1344" />
+            <wire x2="1344" y1="976" y2="976" x1="1296" />
+            <wire x2="1344" y1="976" y2="1152" x1="1344" />
             <wire x2="2000" y1="1152" y2="1152" x1="1344" />
             <wire x2="2000" y1="496" y2="496" x1="1984" />
             <wire x2="2000" y1="496" y2="1152" x1="2000" />

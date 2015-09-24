@@ -47,9 +47,6 @@ entity bram2mul is
 end bram2mul;
 
 
-
-
-
 architecture Behavioral of bram2mul is
 
 signal cycle    : std_logic_vector (7 downto 0)  := (others => 'U');      -- multiply cycle counter
