@@ -160,7 +160,7 @@ begin
     
   multiplier_test : entity work.multiplier_test
   port map (
-    clk => clk_360mhz,
+    clk => clk_180mhz,
     
     bram_do => mul2bram_d,
     bram_di => bram2mul_d,
@@ -178,7 +178,7 @@ begin
     ena   => fsmc_bram_en,
     wea   => fsmc_bram_we,
 
-    clkb  => clk_360mhz,
+    clkb  => clk_180mhz,
     web   => mul2bram_we,
     addrb => mul2bram_a,
     dinb  => mul2bram_d,
