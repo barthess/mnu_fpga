@@ -88,7 +88,7 @@ signal clk_180mhz : std_logic;
 signal clk_360mhz : std_logic;
 signal clk_locked : std_logic;
 
-signal fsmc_bram_a  : std_logic_vector (13 downto 0); 
+signal fsmc_bram_a  : std_logic_vector (FSMC_A_WIDTH-1 downto 0); 
 signal fsmc_bram_do : std_logic_vector (15 downto 0); 
 signal fsmc_bram_di : std_logic_vector (15 downto 0); 
 signal fsmc_bram_en : std_logic; 
@@ -96,7 +96,7 @@ signal fsmc_bram_we : std_logic_vector (1 downto 0);
 
 signal mul2bram_d : STD_LOGIC_VECTOR (63 downto 0);
 signal bram2mul_d : STD_LOGIC_VECTOR (63 downto 0);
-signal mul2bram_a : STD_LOGIC_VECTOR (11 downto 0);
+signal mul2bram_a : STD_LOGIC_VECTOR (13 downto 0);
 signal mul2bram_we : STD_LOGIC_VECTOR (7 downto 0);
 
 
@@ -135,13 +135,13 @@ begin
   -- connect FSMC<->BRAM
 	fsmc2bram : entity work.fsmc2bram 
   generic map (
-    WA => 14,
+    WA => FSMC_A_WIDTH,
     WD => 16
   )
   port map (
 		clk => FSMC_CLK,
     
-		A => FSMC_A (13 downto 0),
+		A => FSMC_A (FSMC_A_WIDTH-1 downto 0),
 		D => FSMC_D,
 
 		NCE => FSMC_NCE,
@@ -155,7 +155,7 @@ begin
     bram_en => fsmc_bram_en,
     bram_we => fsmc_bram_we
 	);
-	DEV_NULL_B1 <= or_reduce(FSMC_A(22 downto 14));
+	DEV_NULL_B1 <= or_reduce (FSMC_A (FSMC_A_WIDTH_TOTAL-1 downto FSMC_A_WIDTH));
 
     
   multiplier_test : entity work.multiplier_test

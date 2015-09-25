@@ -36,7 +36,7 @@ entity multiplier_test is
     clk  : in  STD_LOGIC;
     bram_do : out std_logic_vector (63 downto 0) := (others => '0');
     bram_di : in std_logic_vector (63 downto 0);
-    bram_a : out std_logic_vector (11 downto 0) := (others => '0');
+    bram_a : out std_logic_vector (13 downto 0) := (others => '0');
     bram_we : out STD_LOGIC_VECTOR(7 DOWNTO 0) := x"00"
   );
 end multiplier_test;
@@ -75,13 +75,13 @@ begin
         bram_a <= (others => '0');
         ctrl_buf <= bram_di(0);
         if (ctrl_buf = '1') then
-          bram_a  <= std_logic_vector(to_unsigned(4, 12));
+          bram_a  <= std_logic_vector(to_unsigned(4, 14));
           state <= LOAD1;
         end if;
         
       when LOAD1 =>
         in1_buf <= bram_di;
-        bram_a <= std_logic_vector(to_unsigned(5, 12));
+        bram_a <= std_logic_vector(to_unsigned(5, 14));
         state <= LOAD2;
         
       when LOAD2 =>
@@ -95,13 +95,13 @@ begin
           state <= RET;
           bram_we <= x"FF";
           bram_do <= result;
-          bram_a <= std_logic_vector(to_unsigned(5, 12));
+          bram_a <= std_logic_vector(to_unsigned(5, 14));
         end if;
 
       when RET =>
         state <= NOTIFY;
         mul_ce <= '0';
-        bram_a <= std_logic_vector(to_unsigned(3, 12));
+        bram_a <= std_logic_vector(to_unsigned(3, 14));
         bram_do <= std_logic_vector(to_unsigned(1, 64));
       
       when NOTIFY =>
