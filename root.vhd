@@ -160,12 +160,14 @@ begin
     
   multiplier_test : entity work.multiplier_test
   port map (
-    clk => clk_180mhz,
+    clk => clk_45mhz,
     
     bram_do => mul2bram_d,
     bram_di => bram2mul_d,
     bram_a  => mul2bram_a,
-    bram_we => mul2bram_we
+    bram_we => mul2bram_we,
+    
+    dbg_led => LED_LINE(0)
   );
 
   -- connect BRAM to all
@@ -178,14 +180,14 @@ begin
     ena   => fsmc_bram_en,
     wea   => fsmc_bram_we,
 
-    clkb  => clk_180mhz,
+    clkb  => clk_45mhz,
     web   => mul2bram_we,
     addrb => mul2bram_a,
     dinb  => mul2bram_d,
     doutb => bram2mul_d
   );
 
-  LED_LINE <= (others => '0');
+  LED_LINE(5 downto 1) <= (others => '0');
   
 	-- raize ready flag
 	STM_IO_FPGA_READY <= not clk_locked;

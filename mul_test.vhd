@@ -37,7 +37,9 @@ entity multiplier_test is
     bram_do : out std_logic_vector (63 downto 0) := (others => '0');
     bram_di : in std_logic_vector (63 downto 0);
     bram_a : out std_logic_vector (13 downto 0) := (others => '0');
-    bram_we : out STD_LOGIC_VECTOR(7 DOWNTO 0) := x"00"
+    bram_we : out STD_LOGIC_VECTOR(7 DOWNTO 0) := x"00";
+    -- debug
+    dbg_led : out std_logic
   );
 end multiplier_test;
 
@@ -74,7 +76,9 @@ begin
         mul_ce <= '0';
         bram_a <= (others => '0');
         ctrl_buf <= bram_di(0);
+        dbg_led <= '0';
         if (ctrl_buf = '1') then
+          dbg_led <= '1';
           bram_a  <= std_logic_vector(to_unsigned(4, 14));
           state <= LOAD1;
         end if;
