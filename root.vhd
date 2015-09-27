@@ -35,7 +35,7 @@ use ieee.std_logic_misc.all;
 entity root is
   generic (
     FSMC_A_WIDTH_TOTAL : positive := 23;
-    FSMC_A_WIDTH : positive := 16;
+    FSMC_A_WIDTH : positive := 4;
     FSMC_D_WIDTH : positive := 16
   );
   port ( 
@@ -96,7 +96,7 @@ signal fsmc_bram_we : std_logic_vector (1 downto 0);
 
 signal mul2bram_d : STD_LOGIC_VECTOR (63 downto 0);
 signal bram2mul_d : STD_LOGIC_VECTOR (63 downto 0);
-signal mul2bram_a : STD_LOGIC_VECTOR (13 downto 0);
+signal mul2bram_a : STD_LOGIC_VECTOR (FSMC_A_WIDTH-1-2 downto 0);
 signal mul2bram_we : STD_LOGIC_VECTOR (7 downto 0);
 
 
@@ -165,9 +165,7 @@ begin
     bram_do => mul2bram_d,
     bram_di => bram2mul_d,
     bram_a  => mul2bram_a,
-    bram_we => mul2bram_we,
-    
-    dbg_led => LED_LINE(0)
+    bram_we => mul2bram_we
   );
 
   -- connect BRAM to all
@@ -187,7 +185,7 @@ begin
     doutb => bram2mul_d
   );
 
-  LED_LINE(5 downto 1) <= (others => '0');
+  LED_LINE(5 downto 0) <= (others => '0');
   
 	-- raize ready flag
 	STM_IO_FPGA_READY <= not clk_locked;

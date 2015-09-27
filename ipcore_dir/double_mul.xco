@@ -1,7 +1,7 @@
 ##############################################################
 #
 # Xilinx Core Generator version 14.3
-# Date: Thu Sep 24 20:46:35 2015
+# Date: Sun Sep 27 12:43:38 2015
 #
 ##############################################################
 #
@@ -44,13 +44,13 @@ CSET add_sub_value=Both
 CSET c_a_exponent_width=11
 CSET c_a_fraction_width=53
 CSET c_compare_operation=Programmable
-CSET c_has_ce=true
+CSET c_has_ce=false
 CSET c_has_divide_by_zero=false
 CSET c_has_invalid_op=false
-CSET c_has_operation_nd=false
+CSET c_has_operation_nd=true
 CSET c_has_operation_rfd=false
 CSET c_has_overflow=false
-CSET c_has_rdy=false
+CSET c_has_rdy=true
 CSET c_has_sclr=false
 CSET c_has_underflow=false
 CSET c_latency=27
@@ -69,4 +69,4 @@ CSET result_precision_type=Double
 MISC pkg_timestamp=2012-07-02T11:22:24Z
 # END Extra information
 GENERATE
-# CRC: aead0ebd
+# CRC: fb7773fc
