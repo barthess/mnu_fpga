@@ -82,8 +82,10 @@ end root;
 
 architecture Behavioral of root is
 
+signal clk_10mhz  : std_logic;
+signal clk_20mhz  : std_logic;
 signal clk_45mhz  : std_logic;
-signal clk_90mhz : std_logic;
+signal clk_90mhz  : std_logic;
 signal clk_180mhz : std_logic;
 signal clk_360mhz : std_logic;
 signal clk_locked : std_logic;
@@ -104,10 +106,14 @@ begin
 
 	clk_src : entity work.clk_src port map (
 		CLK_IN1  => CLK_IN_27MHZ,
-		CLK_OUT1 => clk_45mhz,
-		CLK_OUT2 => clk_90mhz,
-		CLK_OUT3 => clk_180mhz,
-		CLK_OUT4 => clk_360mhz,
+    
+    CLK_OUT1 => clk_10mhz,
+    CLK_OUT2 => clk_20mhz,
+		CLK_OUT3 => clk_45mhz,
+		CLK_OUT4 => clk_90mhz,
+		CLK_OUT5 => clk_180mhz,
+		CLK_OUT6 => clk_360mhz,
+    
 		LOCKED   => clk_locked
 	);
 
@@ -160,7 +166,7 @@ begin
     
   multiplier_test : entity work.multiplier_test
   port map (
-    clk => clk_45mhz,
+    clk => clk_10mhz,
     
     bram_do => mul2bram_d,
     bram_di => bram2mul_d,
@@ -178,7 +184,7 @@ begin
     ena   => fsmc_bram_en,
     wea   => fsmc_bram_we,
 
-    clkb  => clk_45mhz,
+    clkb  => clk_10mhz,
     web   => mul2bram_we,
     addrb => mul2bram_a,
     dinb  => mul2bram_d,
