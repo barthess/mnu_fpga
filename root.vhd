@@ -66,14 +66,26 @@ entity root is
     FSMC_NWE : in std_logic;
     FSMC_NCE : in std_logic;
     FSMC_CLK : in std_logic;
-
+    
+    STM_IO_MUL_RDY : out std_logic;
+    STM_IO_MUL_DV : in std_logic;
+    
+    STM_IO_OLD_FSMC_CLK : in std_logic;
+    STM_IO_7  : in std_logic;
+    STM_IO_8  : in std_logic;
+    STM_IO_9  : in std_logic;
+    STM_IO_10 : in std_logic;
+    STM_IO_11 : in std_logic;
+    STM_IO_12 : in std_logic;
+    STM_IO_13 : in std_logic;
+    
 --    SPI1_MISO : out std_logic;
 --    SPI1_MOSI : in std_logic;		  
 --    SPI1_NSS : in std_logic;
 --    SPI1_SCK : in std_logic;
 
-    DEV_NULL_B1 : out std_logic -- warning suppressor
-    --DEV_NULL_B0 : out std_logic -- warning suppressor
+    DEV_NULL_BANK1 : out std_logic -- warning suppressor
+    --DEV_NULL_BANK0 : out std_logic -- warning suppressor
 	);
 end root;
 
@@ -101,6 +113,7 @@ signal bram2mul_d : STD_LOGIC_VECTOR (63 downto 0);
 signal mul2bram_a : STD_LOGIC_VECTOR (FSMC_A_WIDTH-1-2 downto 0);
 signal mul2bram_we : STD_LOGIC_VECTOR (7 downto 0);
 
+signal fsmc_a_unused : std_logic;
 
 begin
 
@@ -161,12 +174,11 @@ begin
     bram_en => fsmc_bram_en,
     bram_we => fsmc_bram_we
 	);
-	DEV_NULL_B1 <= or_reduce (FSMC_A (FSMC_A_WIDTH_TOTAL-1 downto FSMC_A_WIDTH));
-
+  fsmc_a_unused <= or_reduce (FSMC_A (FSMC_A_WIDTH_TOTAL-1 downto FSMC_A_WIDTH));
     
   multiplier_test : entity work.multiplier_test
   port map (
-    clk => clk_10mhz,
+    clk => clk_180mhz,
     
     bram_do => mul2bram_d,
     bram_di => bram2mul_d,
@@ -184,17 +196,31 @@ begin
     ena   => fsmc_bram_en,
     wea   => fsmc_bram_we,
 
-    clkb  => clk_10mhz,
+    clkb  => clk_180mhz,
     web   => mul2bram_we,
     addrb => mul2bram_a,
     dinb  => mul2bram_d,
     doutb => bram2mul_d
   );
-
+  STM_IO_MUL_RDY <= '0';
+  
   LED_LINE(5 downto 0) <= (others => '0');
   
 	-- raize ready flag
 	STM_IO_FPGA_READY <= not clk_locked;
   
+  -- warning suppressor
+  DEV_NULL_BANK1 <= (
+    fsmc_a_unused or 
+    STM_IO_OLD_FSMC_CLK or
+    STM_IO_MUL_DV or
+    STM_IO_7 or
+    STM_IO_8 or
+    STM_IO_9 or
+    STM_IO_10 or 
+    STM_IO_11 or
+    STM_IO_12 or
+    STM_IO_13);
+
 end Behavioral;
 
