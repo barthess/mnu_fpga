@@ -34,33 +34,31 @@ use IEEE.STD_LOGIC_UNSIGNED.ALL;
 entity multiplier_test is
   Port (
     clk  : in  STD_LOGIC;
+    
     bram_do : out std_logic_vector (63 downto 0) := (others => '0');
     bram_di : in std_logic_vector (63 downto 0);
-    bram_a : out std_logic_vector (1 downto 0) := (others => '0');
-    bram_we : out STD_LOGIC_VECTOR(7 DOWNTO 0) := x"00"
+    bram_a : out std_logic_vector (13 downto 0) := (others => '0');
+    bram_we : out STD_LOGIC_VECTOR(7 DOWNTO 0) := x"00";
+    
+    pin_rdy : out std_logic := '0';
+    pin_dv : in std_logic
   );
 end multiplier_test;
 
 
 architecture Behavioral of multiplier_test is
 
-type state_t is (IDLE, LOAD0, LOAD1, LOAD2, MUL, RET, NOTIFY);
+type state_t is (IDLE, LOAD0, LOAD1, LOAD2, LOAD3, MUL, RET);
 signal state : state_t := IDLE;
 
---constant MUL_CYCLE : natural := 9;
---signal cycle : natural range 0 to MUL_CYCLE;
---signal cycle : std_logic_vector (7 downto 0) := x"00";
---signal dbg_cnt : std_logic_vector (63 downto 0) := (others => '0');
-
-constant ctrl_addr : std_logic_vector (1 downto 0) := std_logic_vector(to_unsigned(0, 2));
-constant in1_addr : std_logic_vector (1 downto 0) := std_logic_vector(to_unsigned(1, 2));
-constant in2_addr : std_logic_vector (1 downto 0) := std_logic_vector(to_unsigned(2, 2));
-constant result_addr : std_logic_vector (1 downto 0) := std_logic_vector(to_unsigned(3, 2));
+constant ctrl_addr : std_logic_vector (13 downto 0) := std_logic_vector(to_unsigned(0, 14));
+constant in1_addr : std_logic_vector (13 downto 0) := std_logic_vector(to_unsigned(1, 14));
+constant in2_addr : std_logic_vector (13 downto 0) := std_logic_vector(to_unsigned(2, 14));
+constant result_addr : std_logic_vector (13 downto 0) := std_logic_vector(to_unsigned(3, 14));
 
 signal in1_buf : std_logic_vector (63 downto 0) := (others => 'U');
 signal in2_buf : std_logic_vector (63 downto 0) := (others => 'U');
 signal result : std_logic_vector (63 downto 0) := (others => 'U');
-signal result_buf : std_logic_vector (63 downto 0) := (others => 'U');
 signal mul_new_data : std_logic := '0';
 signal mul_rdy : std_logic := '0';
 
@@ -82,10 +80,8 @@ begin
       case state is
       
       when IDLE =>
-        --cycle <= bram_di(7 downto 0);
-        --dbg_cnt <= (others => '0');
         bram_we <= x"00";
-        if (bram_di > x"0000_0000_0000_0000") then
+        if (pin_dv = '1') then
           state <= LOAD0;
           bram_a <= in1_addr;
         end if;
@@ -99,28 +95,29 @@ begin
         in1_buf <= bram_di;
 
       when LOAD2 =>
-        state <= MUL;
+        state <= LOAD3;
         in2_buf <= bram_di;
+        
+      when LOAD3 =>
+        state <= MUL;
         mul_new_data <= '1';
         
       when MUL =>
         mul_new_data <= '0';
-        result_buf <= result;
         if (mul_rdy = '1') then
           bram_we <= x"FF";
-          bram_do <= result_buf;
+          bram_do <= result;
           bram_a  <= result_addr;
           state   <= RET;
         end if;
         
       when RET =>
-        state <= NOTIFY;
-        
-      when NOTIFY =>
-        bram_we <= x"FF";
-        bram_do <= (others => '0');
-        bram_a <= ctrl_addr;
-        state <= IDLE;
+        bram_we <= x"00";
+        pin_rdy <= '1';
+        if (pin_dv = '0') then -- result downloaded by master
+          state <= IDLE;
+          pin_rdy <= '0';
+        end if;
         
       end case;
     end if;
