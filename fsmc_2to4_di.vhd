@@ -29,19 +29,27 @@ use IEEE.STD_LOGIC_1164.ALL;
 --library UNISIM;
 --use UNISIM.VComponents.all;
 
-entity fsmc_2to4_decoder is
+entity fsmc_2to4_di is
   port(
-    A  : in  STD_LOGIC_VECTOR(1 downto 0);
-    ce : out STD_LOGIC_VECTOR(3 downto 0) := "0001"
+    A   : in  STD_LOGIC_VECTOR(1 downto 0);
+    --en  : in  std_logic;
+    
+    di0 : in STD_LOGIC_VECTOR(15 downto 0);
+    di1 : in STD_LOGIC_VECTOR(15 downto 0);
+    di2 : in STD_LOGIC_VECTOR(15 downto 0);
+    di3 : in STD_LOGIC_VECTOR(15 downto 0);
+    
+    do : out STD_LOGIC_VECTOR(15 downto 0)
   );
-end fsmc_2to4_decoder;
+end fsmc_2to4_di;
 
-architecture Behavioral of fsmc_2to4_decoder is
+architecture Behavioral of fsmc_2to4_di is
 
 begin
-  ce <= ("0001") when (A="00") else
-        ("0010") when (A="01") else
-        ("0100") when (A="10") else
-        ("1000") ;
+  do <= di0 when (A="00") else
+        di1 when (A="01") else
+        di2 when (A="10") else
+        di3 when (A="11");
+
 end Behavioral;
 

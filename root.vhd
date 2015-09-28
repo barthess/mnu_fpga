@@ -35,7 +35,7 @@ use ieee.std_logic_misc.all;
 entity root is
   generic (
     FSMC_A_WIDTH_TOTAL : positive := 23;
-    FSMC_A_WIDTH : positive := 13;
+    FSMC_A_WIDTH : positive := 15;
     FSMC_D_WIDTH : positive := 16
   );
   port ( 
@@ -102,7 +102,7 @@ signal clk_180mhz : std_logic;
 signal clk_360mhz : std_logic;
 signal clk_locked : std_logic;
 
-signal fsmc_bram_a  : std_logic_vector (FSMC_A_WIDTH-1 downto 0); 
+signal fsmc_bram_a  : std_logic_vector (FSMC_A_WIDTH-1-2 downto 0); 
 signal fsmc_bram_do : std_logic_vector (15 downto 0); 
 signal fsmc_bram_di : std_logic_vector (15 downto 0); 
 signal fsmc_bram_en : std_logic; 
@@ -110,7 +110,7 @@ signal fsmc_bram_we : std_logic_vector (1 downto 0);
 
 signal mul2bram_d : STD_LOGIC_VECTOR (63 downto 0);
 signal bram2mul_d : STD_LOGIC_VECTOR (63 downto 0);
-signal mul2bram_a : STD_LOGIC_VECTOR (FSMC_A_WIDTH-1-2 downto 0);
+signal mul2bram_a : STD_LOGIC_VECTOR (FSMC_A_WIDTH-1-4 downto 0);
 signal mul2bram_we : STD_LOGIC_VECTOR (7 downto 0);
 
 signal fsmc_a_unused : std_logic;
@@ -167,18 +167,36 @@ begin
 		NWE => FSMC_NWE,
 		NBL => FSMC_NBL,
     
-    bram_a  => fsmc_bram_a,
-    bram_do => fsmc_bram_do,
-    bram_di => fsmc_bram_di,
-    bram_en => fsmc_bram_en,
-    bram_we => fsmc_bram_we
+    bram0_a  => fsmc_bram_a,
+    bram0_do => fsmc_bram_do,
+    bram0_di => fsmc_bram_di,
+    bram0_en => fsmc_bram_en,
+    bram0_we => fsmc_bram_we,
+    
+    bram1_a  => open,
+    bram1_do => open,
+    bram1_di => (others => '0'),
+    bram1_en => open,
+    bram1_we => open,
+    
+    bram2_a  => open,
+    bram2_do => open,
+    bram2_di => (others => '0'),
+    bram2_en => open,
+    bram2_we => open,
+    
+    bram3_a  => open,
+    bram3_do => open,
+    bram3_di => (others => '0'),
+    bram3_en => open,
+    bram3_we => open
 	);
   fsmc_a_unused <= or_reduce (FSMC_A (FSMC_A_WIDTH_TOTAL-1 downto FSMC_A_WIDTH));
   
   -- Double multiplier
   multiplier_test : entity work.multiplier_test
   generic map (
-    WA => FSMC_A_WIDTH-2
+    WA => FSMC_A_WIDTH-2-2
   )
   port map (
     clk => clk_180mhz,
