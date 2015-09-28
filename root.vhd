@@ -35,7 +35,7 @@ use ieee.std_logic_misc.all;
 entity root is
   generic (
     FSMC_A_WIDTH_TOTAL : positive := 23;
-    FSMC_A_WIDTH : positive := 16;
+    FSMC_A_WIDTH : positive := 13;
     FSMC_D_WIDTH : positive := 16
   );
   port ( 
@@ -162,7 +162,6 @@ begin
     
 		A => FSMC_A (FSMC_A_WIDTH-1 downto 0),
 		D => FSMC_D,
-
 		NCE => FSMC_NCE,
 		NOE => FSMC_NOE,
 		NWE => FSMC_NWE,
@@ -175,8 +174,12 @@ begin
     bram_we => fsmc_bram_we
 	);
   fsmc_a_unused <= or_reduce (FSMC_A (FSMC_A_WIDTH_TOTAL-1 downto FSMC_A_WIDTH));
-    
+  
+  -- Double multiplier
   multiplier_test : entity work.multiplier_test
+  generic map (
+    WA => FSMC_A_WIDTH-2
+  )
   port map (
     clk => clk_180mhz,
     
@@ -194,8 +197,8 @@ begin
   PORT MAP (
     clka  => FSMC_CLK,
     addra => fsmc_bram_a,
-    dina  => fsmc_bram_di,
-    douta => fsmc_bram_do,
+    dina  => fsmc_bram_do,
+    douta => fsmc_bram_di,
     ena   => fsmc_bram_en,
     wea   => fsmc_bram_we,
 
@@ -203,7 +206,8 @@ begin
     web   => mul2bram_we,
     addrb => mul2bram_a,
     dinb  => mul2bram_d,
-    doutb => bram2mul_d
+    doutb => bram2mul_d,
+    enb   => '1'
   );
 
 	-- raize ready flag

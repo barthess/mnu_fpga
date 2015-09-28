@@ -58,8 +58,8 @@
             <line x2="384" y1="-32" y2="-32" x1="320" />
         </blockdef>
         <blockdef name="bram">
-            <timestamp>2015-9-17T11:47:14</timestamp>
-            <rect width="288" x="32" y="32" height="632" />
+            <timestamp>2015-9-28T17:23:20</timestamp>
+            <rect width="512" x="32" y="32" height="1344" />
             <line x2="32" y1="80" y2="80" style="linewidth:W" x1="0" />
             <line x2="32" y1="112" y2="112" style="linewidth:W" x1="0" />
             <line x2="32" y1="144" y2="144" x1="0" />
@@ -67,11 +67,10 @@
             <line x2="32" y1="272" y2="272" x1="0" />
             <line x2="32" y1="432" y2="432" style="linewidth:W" x1="0" />
             <line x2="32" y1="464" y2="464" style="linewidth:W" x1="0" />
-            <line x2="32" y1="496" y2="496" x1="0" />
             <line x2="32" y1="560" y2="560" style="linewidth:W" x1="0" />
             <line x2="32" y1="624" y2="624" x1="0" />
-            <line x2="320" y1="80" y2="80" style="linewidth:W" x1="352" />
-            <line x2="320" y1="368" y2="368" style="linewidth:W" x1="352" />
+            <line x2="544" y1="80" y2="80" style="linewidth:W" x1="576" />
+            <line x2="544" y1="368" y2="368" style="linewidth:W" x1="576" />
         </blockdef>
         <block symbolname="fsmc_stimuly" name="stimuly">
             <blockpin signalname="XLXN_70" name="clk" />
@@ -102,16 +101,15 @@
             <blockpin signalname="XLXN_34" name="ena" />
             <blockpin signalname="XLXN_35(1:0)" name="wea(1:0)" />
             <blockpin signalname="XLXN_70" name="clka" />
-            <blockpin name="addrb(15:0)" />
-            <blockpin name="dinb(15:0)" />
-            <blockpin name="enb" />
-            <blockpin name="web(1:0)" />
+            <blockpin name="addrb(13:0)" />
+            <blockpin name="dinb(63:0)" />
+            <blockpin name="web(7:0)" />
             <blockpin signalname="XLXN_22" name="clkb" />
             <blockpin signalname="XLXN_38(15:0)" name="douta(15:0)" />
-            <blockpin name="doutb(15:0)" />
+            <blockpin name="doutb(63:0)" />
         </block>
     </netlist>
-    <sheet sheetnum="1" width="3801" height="2688">
+    <sheet sheetnum="1" width="7609" height="5382">
         <attr value="CM" name="LengthUnitName" />
         <attr value="4" name="GridsPerUnit" />
         <instance x="272" y="896" name="stimuly" orien="R0">
@@ -162,9 +160,9 @@
         <branch name="XLXN_38(15:0)">
             <wire x2="1344" y1="976" y2="976" x1="1296" />
             <wire x2="1344" y1="976" y2="1152" x1="1344" />
-            <wire x2="2000" y1="1152" y2="1152" x1="1344" />
-            <wire x2="2000" y1="496" y2="496" x1="1984" />
-            <wire x2="2000" y1="496" y2="1152" x1="2000" />
+            <wire x2="2336" y1="1152" y2="1152" x1="1344" />
+            <wire x2="2336" y1="496" y2="496" x1="2208" />
+            <wire x2="2336" y1="496" y2="1152" x1="2336" />
         </branch>
         <branch name="XLXN_34">
             <wire x2="1616" y1="592" y2="592" x1="1296" />

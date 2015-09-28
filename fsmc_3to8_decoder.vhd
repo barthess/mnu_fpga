@@ -31,7 +31,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 
 entity fsmc_3to8_decoder is
   port(
-    A  : in STD_LOGIC_VECTOR(2 downto 0);
+    A  : in  STD_LOGIC_VECTOR(2 downto 0);
     ce : out STD_LOGIC_VECTOR(7 downto 0) := "00000001"
   );
 end fsmc_3to8_decoder;

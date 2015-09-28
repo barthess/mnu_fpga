@@ -32,12 +32,15 @@ use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
 
 entity multiplier_test is
+  Generic (
+    WA : positive := 16
+  );
   Port (
     clk  : in  STD_LOGIC;
     
     bram_do : out std_logic_vector (63 downto 0) := (others => '0');
     bram_di : in std_logic_vector (63 downto 0);
-    bram_a : out std_logic_vector (13 downto 0) := (others => '0');
+    bram_a : out std_logic_vector (WA-1 downto 0) := (others => '0');
     bram_we : out STD_LOGIC_VECTOR(7 DOWNTO 0) := x"00";
     
     pin_rdy : out std_logic := '0';
@@ -51,10 +54,10 @@ architecture Behavioral of multiplier_test is
 type state_t is (IDLE, LOAD0, LOAD1, LOAD2, LOAD3, MUL, RET);
 signal state : state_t := IDLE;
 
-constant ctrl_addr : std_logic_vector (13 downto 0) := std_logic_vector(to_unsigned(0, 14));
-constant in1_addr : std_logic_vector (13 downto 0) := std_logic_vector(to_unsigned(1, 14));
-constant in2_addr : std_logic_vector (13 downto 0) := std_logic_vector(to_unsigned(2, 14));
-constant result_addr : std_logic_vector (13 downto 0) := std_logic_vector(to_unsigned(3, 14));
+constant ctrl_addr : std_logic_vector (WA-1 downto 0) := std_logic_vector(to_unsigned(0, WA));
+constant in1_addr : std_logic_vector (WA-1 downto 0) := std_logic_vector(to_unsigned(1, WA));
+constant in2_addr : std_logic_vector (WA-1 downto 0) := std_logic_vector(to_unsigned(2, WA));
+constant result_addr : std_logic_vector (WA-1 downto 0) := std_logic_vector(to_unsigned(3, WA));
 
 signal in1_buf : std_logic_vector (63 downto 0) := (others => 'U');
 signal in2_buf : std_logic_vector (63 downto 0) := (others => 'U');

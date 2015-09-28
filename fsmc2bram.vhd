@@ -37,16 +37,17 @@ entity fsmc2bram is
   );
 	Port (
     clk : in std_logic;
-    A : in  STD_LOGIC_VECTOR (WA-1 downto 0);
-    D : inout  STD_LOGIC_VECTOR (WD-1 downto 0);
-    NWE : in  STD_LOGIC;
-    NOE : in  STD_LOGIC;
-    NCE : in  STD_LOGIC;
+
+    A : in STD_LOGIC_VECTOR (WA-1 downto 0);
+    D : inout STD_LOGIC_VECTOR (WD-1 downto 0);
+    NWE : in STD_LOGIC;
+    NOE : in STD_LOGIC;
+    NCE : in STD_LOGIC;
     NBL : in std_logic_vector (1 downto 0);
 
-    bram_a : out STD_LOGIC_VECTOR (WA-1 downto 0);
-    bram_do : in STD_LOGIC_VECTOR (WD-1 downto 0);
-    bram_di : out STD_LOGIC_VECTOR (WD-1 downto 0);
+    bram_a  : out STD_LOGIC_VECTOR (WA-1 downto 0);
+    bram_di : in  STD_LOGIC_VECTOR (WD-1 downto 0);
+    bram_do : out STD_LOGIC_VECTOR (WD-1 downto 0);
     bram_en : out STD_LOGIC := '0';
     bram_we : out std_logic_vector (1 downto 0)
   );
@@ -62,8 +63,8 @@ signal a_buf : STD_LOGIC_VECTOR (WA-1 downto 0) := (others => 'U');
 
 begin
 
-  D <= bram_do when (NCE = '0' and NOE = '0') else (others => 'Z');
-  bram_di <= D;
+  D <= bram_di when (NCE = '0' and NOE = '0') else (others => 'Z');
+  bram_do <= D;
   
   process(clk, NCE) begin
     if (NCE = '1') then
