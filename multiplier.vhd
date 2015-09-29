@@ -33,23 +33,21 @@ use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
 entity multiplier is
   Generic (
-    WA : positive
+    AW : positive
   );
   Port (
-    -- multiplication clock and ram clock
     clk : in  STD_LOGIC;
-    clk_bram : out std_logic;
     
+    di_op0  : in  std_logic_vector (63 downto 0);
     di_op1  : in  std_logic_vector (63 downto 0);
-    di_op2  : in  std_logic_vector (63 downto 0);
     do_res  : out std_logic_vector (63 downto 0) := (others => 'X');
 
-    a_op1   : out std_logic_vector (WA-1 downto 0) := (others => '0');
-    a_op2   : out std_logic_vector (WA-1 downto 0) := (others => '0');
-    a_res   : out std_logic_vector (WA-1 downto 0) := (others => '0');
+    a_op0   : out std_logic_vector (AW-1 downto 0) := (others => '0');
+    a_op1   : out std_logic_vector (AW-1 downto 0) := (others => '0');
+    a_res   : out std_logic_vector (AW-1 downto 0) := (others => '0');
 
+    we_op0  : out STD_LOGIC_VECTOR (7 DOWNTO 0) := x"00";
     we_op1  : out STD_LOGIC_VECTOR (7 DOWNTO 0) := x"00";
-    we_op2  : out STD_LOGIC_VECTOR (7 DOWNTO 0) := x"00";
     we_res  : out STD_LOGIC_VECTOR (7 DOWNTO 0) := x"00";
 
     pin_rdy : out std_logic := '0';
@@ -84,10 +82,10 @@ signal out_state : out_state_t := OUT_IDLE;
 constant TOTAL_STEPS : integer := 2048;
 signal steps : integer := TOTAL_STEPS;
 
-constant start_address : std_logic_vector (WA-1 downto 0) := (others => '0');
+constant start_address : std_logic_vector (AW-1 downto 0) := (others => '0');
 
-signal addr_read  : std_logic_vector (WA-1 downto 0) := (others => '0');
-signal addr_write : std_logic_vector (WA-1 downto 0) := (others => '0');
+signal addr_read  : std_logic_vector (AW-1 downto 0) := (others => '0');
+signal addr_write : std_logic_vector (AW-1 downto 0) := (others => '0');
 signal mul_nd  : std_logic := '0';
 signal mul_ce  : std_logic := '0';
 signal mul_rdy : std_logic := '0';
@@ -97,19 +95,17 @@ begin
   double_mul : entity work.double_mul
   PORT MAP (
     clk => clk,
-    a => di_op1,
-    b => di_op2,
+    a => di_op0,
+    b => di_op1,
     result => do_res,    
     ce => mul_ce,
     rdy => mul_rdy,
     operation_nd => mul_nd
   );
 
+  a_op0 <= addr_read;
   a_op1 <= addr_read;
-  a_op2 <= addr_read;
   a_res <= addr_write;
-
-  
 
   -- output state machine
   process(clk) begin

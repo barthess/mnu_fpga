@@ -29,26 +29,34 @@ use IEEE.STD_LOGIC_1164.ALL;
 --library UNISIM;
 --use UNISIM.VComponents.all;
 
-entity fsmc_2to4_di is
+entity fsmc_3to8_di is
   port(
-    A   : in  STD_LOGIC_VECTOR(1 downto 0);
+    A  : in  STD_LOGIC_VECTOR(2 downto 0);
     
-    di0 : in STD_LOGIC_VECTOR(15 downto 0);
-    di1 : in STD_LOGIC_VECTOR(15 downto 0);
-    di2 : in STD_LOGIC_VECTOR(15 downto 0);
-    di3 : in STD_LOGIC_VECTOR(15 downto 0);
+    i0 : in STD_LOGIC_VECTOR(15 downto 0);
+    i1 : in STD_LOGIC_VECTOR(15 downto 0);
+    i2 : in STD_LOGIC_VECTOR(15 downto 0);
+    i3 : in STD_LOGIC_VECTOR(15 downto 0);
+    i4 : in STD_LOGIC_VECTOR(15 downto 0);
+    i5 : in STD_LOGIC_VECTOR(15 downto 0);
+    i6 : in STD_LOGIC_VECTOR(15 downto 0);
+    i7 : in STD_LOGIC_VECTOR(15 downto 0);
     
-    do  : out STD_LOGIC_VECTOR(15 downto 0)
+    o  : out STD_LOGIC_VECTOR(15 downto 0)
   );
-end fsmc_2to4_di;
+end fsmc_3to8_di;
 
-architecture Behavioral of fsmc_2to4_di is
+architecture Behavioral of fsmc_3to8_di is
 
 begin
-  do <= di0 when (A="00") else
-        di1 when (A="01") else
-        di2 when (A="10") else
-        di3 when (A="11");
+  o <= i0 when (A="000") else
+       i1 when (A="001") else
+       i2 when (A="010") else
+       i3 when (A="011") else
+       i4 when (A="100") else
+       i5 when (A="101") else
+       i6 when (A="110") else
+       i7;
 
 end Behavioral;
 
