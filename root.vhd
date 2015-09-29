@@ -194,7 +194,7 @@ begin
   fsmc_a_unused <= or_reduce (FSMC_A (FSMC_A_WIDTH_TOTAL-1 downto FSMC_A_WIDTH));
   
   -- Double multiplier
-  multiplier_test : entity work.multiplier_test
+  multiplier : entity work.multiplier
   generic map (
     WA => FSMC_A_WIDTH-2-2
   )

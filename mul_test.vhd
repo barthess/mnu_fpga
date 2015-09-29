@@ -31,9 +31,9 @@ use IEEE.STD_LOGIC_UNSIGNED.ALL;
 --use UNISIM.VComponents.all;
 
 
-entity multiplier_test is
+entity multiplier is
   Generic (
-    WA : positive := 16
+    WA : positive
   );
   Port (
     -- multiplication clock and ram clock
@@ -43,6 +43,7 @@ entity multiplier_test is
     di_op1  : in  std_logic_vector (63 downto 0);
     di_op2  : in  std_logic_vector (63 downto 0);
     do_res  : out std_logic_vector (63 downto 0) := (others => 'X');
+
     a_op1   : out std_logic_vector (WA-1 downto 0) := (others => '0');
     a_op2   : out std_logic_vector (WA-1 downto 0) := (others => '0');
     a_res   : out std_logic_vector (WA-1 downto 0) := (others => '0');
@@ -54,13 +55,13 @@ entity multiplier_test is
     pin_rdy : out std_logic := '0';
     pin_dv  : in std_logic
   );
-end multiplier_test;
+end multiplier;
 
 
 
 
 
-architecture Behavioral of multiplier_test is
+architecture Behavioral of multiplier is
 
 type state_t is (
   IDLE,
@@ -79,8 +80,8 @@ type out_state_t is (
 signal state : state_t := IDLE;
 signal out_state : out_state_t := IDLE;
 
-constant TOTAL_STEPS integer := 2048;
-signal steps integer := TOTAL_STEPS;
+constant TOTAL_STEPS : integer := 2048;
+signal steps : integer := TOTAL_STEPS;
 
 constant start_address : std_logic_vector (WA-1 downto 0) := (others => '0');
 
@@ -107,88 +108,73 @@ begin
   a_op2 <= addr_read;
   a_res <= addr_write;
 
-
-  -- read address increment
-  process(clk) begin
-    if rising_edge(clk) then
-      case state is
-      when LOAD0 or LOAD1 or MUL =>
-        addr_read <= addr_read + 1;
-      when others =>
-        addr_read <= start_address;
-      end case;
-    end if;
-  end process;
-
-
-
-  -- write address increment
-  process(clk) begin
-    if rising_edge(clk) then
-      case state is
-      when LOAD0 or LOAD1 or MUL =>
-        addr_read <= addr_read + 1;
-      when others =>
-        addr_read <= (others => '0');
-      end case;
-    end if;
-  end process;
-
   
 
+  -- output state machine
+  process(clk) begin
+    if rising_edge(clk) then
+      case out_state is
+      
+      when IDLE =>
+        we_res <= x"00";
+        addr_write <= start_address;
+        if (state = MUL) then
+          out_state <= WAIT_FIRST;
+        end if;
+        
+      when WAIT_FIRST =>
+        if (mul_rdy = '1') then
+          out_state <= DRAIN;
+          addr_write <= addr_write + 1;
+        end if;
+        
+      when DRAIN =>
+        addr_write <= addr_write + 1;
+        if (mul_rdy = '0') then
+          out_state <= IDLE;
+        end if;
 
-
-
-
-
+      end case;
+    end if;
+  end process;
 
 
   -- main state machine
   process(clk) begin
     if rising_edge(clk) then
       case state is
+      
       when IDLE =>
-        we_res <= x"00";
+        mul_ce <= '0';
+        addr_read <= start_address;
         if (pin_dv = '1') then
+          addr_read <= addr_read + 1;
           state <= LOAD0;
-          addr_write <= (others => '0');
         end if;
         
       when LOAD0 =>
+        addr_read <= addr_read + 1;
         state <= LOAD1;
-
+        
       when LOAD1 =>
+        addr_read <= addr_read + 1;
         state <= MUL;
         mul_nd <= '1';
+        mul_ce <= '1';
 
       when MUL =>
-        steps = steps - 1;
-        if (steps = 0) then -- address wrapped around zero
-          mul_nd = '0';
-          if (mul_rdy = '0') then
-            state <= WAIT_FIRST;
-          else
-            state <= DRAIN;
-          end if
+        addr_read <= addr_read + 1;
+        steps <= steps - 1;
+        if (steps = 0) then
+          mul_nd <= '0';
+          state <= WAIT_DRAIN;
         end if;
       
-      when WAIT_FIRST =>
-        if (mul_rdy = '1') then
-          state <= DRAIN;
-        end if
-
-      when DRAIN =>
-        if (mul_rdy = '0') then
-          state <= RET;
-        end if;
-        
-      when RET =>
-        pin_rdy <= '1';
-        if (pin_dv = '0') then -- result downloaded by master
+      when WAIT_DRAIN =>
+        if (out_state = IDLE) then
           state <= IDLE;
-          pin_rdy <= '0';
         end if;
-        
+
       end case;
     end if;
   end process;
