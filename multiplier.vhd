@@ -68,11 +68,12 @@ type state_t is (
   LOAD0,  -- latency cycle for BRAM
   LOAD1,  -- data valid on inputs
   MUL,
-  WAIT_DRAIN
+  WAIT_DRAIN,
+  NOTIFY
 );
 
 type out_state_t is (
-  IDLE,
+  OUT_IDLE,
   WAIT_FIRST,
   DRAIN
 );
@@ -115,7 +116,7 @@ begin
     if rising_edge(clk) then
       case out_state is
       
-      when IDLE =>
+      when OUT_IDLE =>
         we_res <= x"00";
         addr_write <= start_address;
         if (state = MUL) then
@@ -131,7 +132,7 @@ begin
       when DRAIN =>
         addr_write <= addr_write + 1;
         if (mul_rdy = '0') then
-          out_state <= IDLE;
+          out_state <= OUT_IDLE;
         end if;
 
       end case;
@@ -171,8 +172,16 @@ begin
         end if;
       
       when WAIT_DRAIN =>
-        if (out_state = IDLE) then
+        if (out_state = OUT_IDLE) then
+          state <= NOTIFY;
+        end if;
+
+      -- hardware handshake with STM32
+      when NOTIFY =>
+        pin_rdy <= '1';
+        if (pin_dv = '0') then -- result acquired by master
           state <= IDLE;
+          pin_rdy <= '0';
         end if;
 
       end case;
