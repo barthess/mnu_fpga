@@ -36,33 +36,58 @@ entity multiplier_test is
     WA : positive := 16
   );
   Port (
-    clk  : in  STD_LOGIC;
-
-    bram_do : out std_logic_vector (63 downto 0) := (others => '0');
-    bram_di : in  std_logic_vector (63 downto 0);
-    bram_a  : out std_logic_vector (WA-1 downto 0) := (others => '0');
-    bram_we : out STD_LOGIC_VECTOR (7 DOWNTO 0) := x"00";
+    -- multiplication clock and ram clock
+    clk : in  STD_LOGIC;
+    clk_bram : out std_logic;
     
+    di_op1  : in  std_logic_vector (63 downto 0);
+    di_op2  : in  std_logic_vector (63 downto 0);
+    do_res  : out std_logic_vector (63 downto 0) := (others => 'X');
+    a_op1   : out std_logic_vector (WA-1 downto 0) := (others => '0');
+    a_op2   : out std_logic_vector (WA-1 downto 0) := (others => '0');
+    a_res   : out std_logic_vector (WA-1 downto 0) := (others => '0');
+
+    we_op1  : out STD_LOGIC_VECTOR (7 DOWNTO 0) := x"00";
+    we_op2  : out STD_LOGIC_VECTOR (7 DOWNTO 0) := x"00";
+    we_res  : out STD_LOGIC_VECTOR (7 DOWNTO 0) := x"00";
+
     pin_rdy : out std_logic := '0';
-    pin_dv : in std_logic
+    pin_dv  : in std_logic
   );
 end multiplier_test;
 
 
+
+
+
 architecture Behavioral of multiplier_test is
 
-type state_t is (IDLE, LOAD0, LOAD1, LOAD2, LOAD3, MUL, RET);
+type state_t is (
+  IDLE,
+  LOAD0,  -- latency cycle for BRAM
+  LOAD1,  -- data valid on inputs
+  MUL,
+  WAIT_DRAIN
+);
+
+type out_state_t is (
+  IDLE,
+  WAIT_FIRST,
+  DRAIN
+);
+  
 signal state : state_t := IDLE;
+signal out_state : out_state_t := IDLE;
 
-constant ctrl_addr : std_logic_vector (WA-1 downto 0) := std_logic_vector(to_unsigned(0, WA));
-constant in1_addr : std_logic_vector (WA-1 downto 0) := std_logic_vector(to_unsigned(1, WA));
-constant in2_addr : std_logic_vector (WA-1 downto 0) := std_logic_vector(to_unsigned(2, WA));
-constant result_addr : std_logic_vector (WA-1 downto 0) := std_logic_vector(to_unsigned(3, WA));
+constant TOTAL_STEPS integer := 2048;
+signal steps integer := TOTAL_STEPS;
 
-signal in1_buf : std_logic_vector (63 downto 0) := (others => 'U');
-signal in2_buf : std_logic_vector (63 downto 0) := (others => 'U');
-signal result : std_logic_vector (63 downto 0) := (others => 'U');
-signal mul_new_data : std_logic := '0';
+constant start_address : std_logic_vector (WA-1 downto 0) := (others => '0');
+
+signal addr_read  : std_logic_vector (WA-1 downto 0) := (others => '0');
+signal addr_write : std_logic_vector (WA-1 downto 0) := (others => '0');
+signal mul_nd  : std_logic := '0';
+signal mul_ce  : std_logic := '0';
 signal mul_rdy : std_logic := '0';
 
 begin
@@ -70,52 +95,94 @@ begin
   double_mul : entity work.double_mul
   PORT MAP (
     clk => clk,
-    a => in1_buf,
-    b => in2_buf,
-    result => result,
-    
+    a => di_op1,
+    b => di_op2,
+    result => do_res,    
+    ce => mul_ce,
     rdy => mul_rdy,
-    operation_nd => mul_new_data
+    operation_nd => mul_nd
   );
 
+  a_op1 <= addr_read;
+  a_op2 <= addr_read;
+  a_res <= addr_write;
+
+
+  -- read address increment
   process(clk) begin
     if rising_edge(clk) then
       case state is
-      
+      when LOAD0 or LOAD1 or MUL =>
+        addr_read <= addr_read + 1;
+      when others =>
+        addr_read <= start_address;
+      end case;
+    end if;
+  end process;
+
+
+
+  -- write address increment
+  process(clk) begin
+    if rising_edge(clk) then
+      case state is
+      when LOAD0 or LOAD1 or MUL =>
+        addr_read <= addr_read + 1;
+      when others =>
+        addr_read <= (others => '0');
+      end case;
+    end if;
+  end process;
+
+  
+
+
+
+
+
+
+
+
+  -- main state machine
+  process(clk) begin
+    if rising_edge(clk) then
+      case state is
       when IDLE =>
-        bram_we <= x"00";
+        we_res <= x"00";
         if (pin_dv = '1') then
           state <= LOAD0;
-          bram_a <= in1_addr;
+          addr_write <= (others => '0');
         end if;
         
       when LOAD0 =>
         state <= LOAD1;
-        bram_a <= in2_addr;
 
       when LOAD1 =>
-        state <= LOAD2;
-        in1_buf <= bram_di;
-
-      when LOAD2 =>
-        state <= LOAD3;
-        in2_buf <= bram_di;
-        
-      when LOAD3 =>
         state <= MUL;
-        mul_new_data <= '1';
-        
+        mul_nd <= '1';
+
       when MUL =>
-        mul_new_data <= '0';
+        steps = steps - 1;
+        if (steps = 0) then -- address wrapped around zero
+          mul_nd = '0';
+          if (mul_rdy = '0') then
+            state <= WAIT_FIRST;
+          else
+            state <= DRAIN;
+          end if
+        end if;
+      
+      when WAIT_FIRST =>
         if (mul_rdy = '1') then
-          bram_we <= x"FF";
-          bram_do <= result;
-          bram_a  <= result_addr;
-          state   <= RET;
+          state <= DRAIN;
+        end if
+
+      when DRAIN =>
+        if (mul_rdy = '0') then
+          state <= RET;
         end if;
         
       when RET =>
-        bram_we <= x"00";
         pin_rdy <= '1';
         if (pin_dv = '0') then -- result downloaded by master
           state <= IDLE;
