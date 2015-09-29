@@ -37,11 +37,11 @@ entity multiplier_test is
   );
   Port (
     clk  : in  STD_LOGIC;
-    
+
     bram_do : out std_logic_vector (63 downto 0) := (others => '0');
-    bram_di : in std_logic_vector (63 downto 0);
-    bram_a : out std_logic_vector (WA-1 downto 0) := (others => '0');
-    bram_we : out STD_LOGIC_VECTOR(7 DOWNTO 0) := x"00";
+    bram_di : in  std_logic_vector (63 downto 0);
+    bram_a  : out std_logic_vector (WA-1 downto 0) := (others => '0');
+    bram_we : out STD_LOGIC_VECTOR (7 DOWNTO 0) := x"00";
     
     pin_rdy : out std_logic := '0';
     pin_dv : in std_logic
