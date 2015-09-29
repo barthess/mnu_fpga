@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <symbol version="7" name="double_mul">
     <symboltype>BLOCK</symboltype>
-    <timestamp>2015-9-28T17:20:39</timestamp>
+    <timestamp>2015-9-29T6:42:10</timestamp>
     <pin polarity="Input" x="0" y="80" name="a[63:0]" />
     <pin polarity="Input" x="0" y="112" name="b[63:0]" />
     <pin polarity="Input" x="0" y="208" name="operation_nd" />

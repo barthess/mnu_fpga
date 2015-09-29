@@ -69,6 +69,12 @@ entity fsmc2bram is
     bram3_en : out STD_LOGIC;
     bram3_we : out std_logic_vector (1 downto 0)
   );
+  
+  function address2en(A : in std_logic_vector(WA-1 downto 0)) return std_logic_vector is
+  begin
+    return A(WA-1 downto WA-2);
+  end address2en;
+  
 end fsmc2bram;
 
 -------------------------
@@ -103,9 +109,6 @@ begin
   bram2_do <= bram_do_common;
   bram3_do <= bram_do_common;
 
-  blk_select <= bram_a_common(WA-1 downto WA-2);
-  
-  "FIXME: enable must be sycronouse"
   en_decoder : entity work.fsmc_2to4_en
   PORT MAP (
     A  => blk_select,
@@ -142,6 +145,7 @@ begin
       when IDLE =>
         if (NCE = '0') then 
           a_cnt <= A;
+          blk_select <= address2en(A);
           state <= ADDR;
         end if;
         
@@ -152,7 +156,7 @@ begin
           state <= READ1;
           bram_en_common <= '1';
           a_cnt <= a_cnt + 1;
-          bram_a_common <= a_cnt; 
+          bram_a_common <= a_cnt;
         end if;
 
       when WRITE1 =>
