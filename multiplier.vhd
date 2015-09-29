@@ -79,7 +79,7 @@ type out_state_t is (
 );
   
 signal state : state_t := IDLE;
-signal out_state : out_state_t := IDLE;
+signal out_state : out_state_t := OUT_IDLE;
 
 constant TOTAL_STEPS : integer := 2048;
 signal steps : integer := TOTAL_STEPS;
