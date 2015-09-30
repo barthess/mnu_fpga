@@ -74,6 +74,8 @@ end mul_hive;
 
 architecture Behavioral of mul_hive is
 
+
+
 constant BW64 : positive := BW-2;
 
 signal bram0_a  : STD_LOGIC_VECTOR (BW64-1 downto 0);
@@ -192,4 +194,8 @@ begin
 
 
 end Behavioral;
+
+
+
+
 

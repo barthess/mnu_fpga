@@ -241,7 +241,7 @@ begin
     DW => FSMC_D_WIDTH
   )
   port map (
-    hclk => clk_180mhz,
+    hclk => clk_90mhz,
 
     pin_rdy => STM_IO_MUL_RDY,
     pin_dv  => STM_IO_MUL_DV,

@@ -195,7 +195,7 @@ begin
     i5 => bram5_di,
     i6 => bram6_di,
     i7 => bram7_di,
-    
+
     o  => di_common
   );
 
