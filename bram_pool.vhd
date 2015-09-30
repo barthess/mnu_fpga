@@ -32,36 +32,16 @@ use IEEE.NUMERIC_STD.ALL;
 entity bram_pool is
   Generic (
     BW : positive;
-    DW : positive
+    DW : positive;
+    count : positive
   );
   Port (
-    fsmc_bram4_a   : in STD_LOGIC_VECTOR (BW-1 downto 0);
-    fsmc_bram4_di  : in STD_LOGIC_VECTOR (DW-1 downto 0);
-    fsmc_bram4_do  : out STD_LOGIC_VECTOR (DW-1 downto 0);
-    fsmc_bram4_en  : in STD_LOGIC;
-    fsmc_bram4_we  : in std_logic_vector (1 downto 0);
-    fsmc_bram4_clk : in std_logic;
-    
-    fsmc_bram5_a   : in STD_LOGIC_VECTOR (BW-1 downto 0);
-    fsmc_bram5_di  : in STD_LOGIC_VECTOR (DW-1 downto 0);
-    fsmc_bram5_do  : out STD_LOGIC_VECTOR (DW-1 downto 0);
-    fsmc_bram5_en  : in STD_LOGIC;
-    fsmc_bram5_we  : in std_logic_vector (1 downto 0);
-    fsmc_bram5_clk : in std_logic;
-    
-    fsmc_bram6_a   : in STD_LOGIC_VECTOR (BW-1 downto 0);
-    fsmc_bram6_di  : in STD_LOGIC_VECTOR (DW-1 downto 0);
-    fsmc_bram6_do  : out STD_LOGIC_VECTOR (DW-1 downto 0);
-    fsmc_bram6_en  : in STD_LOGIC;
-    fsmc_bram6_we  : in std_logic_vector (1 downto 0);
-    fsmc_bram6_clk : in std_logic;
-    
-    fsmc_bram7_a   : in STD_LOGIC_VECTOR (BW-1 downto 0);
-    fsmc_bram7_di  : in STD_LOGIC_VECTOR (DW-1 downto 0);
-    fsmc_bram7_do  : out STD_LOGIC_VECTOR (DW-1 downto 0);
-    fsmc_bram7_en  : in STD_LOGIC;
-    fsmc_bram7_we  : in std_logic_vector (1 downto 0);
-    fsmc_bram7_clk : in std_logic
+    fsmc_bram_a   : in STD_LOGIC_VECTOR  (count*BW-1 downto 0);
+    fsmc_bram_di  : in STD_LOGIC_VECTOR  (count*DW-1 downto 0);
+    fsmc_bram_do  : out STD_LOGIC_VECTOR (count*DW-1 downto 0);
+    fsmc_bram_en  : in STD_LOGIC_vector  (count-1    downto 0);
+    fsmc_bram_we  : in std_logic_vector  (count*2-1  downto 0);
+    fsmc_bram_clk : in std_logic_vector  (count-1    downto 0)
   );
 end bram_pool;
 
@@ -69,96 +49,26 @@ end bram_pool;
 
 architecture Behavioral of bram_pool is
 
---constant BW64 : positive := BW-2;
-
---signal bram0_a  : STD_LOGIC_VECTOR (BW64-1 downto 0);
---signal bram0_di : STD_LOGIC_VECTOR (63 downto 0);
---signal bram0_do : STD_LOGIC_VECTOR (63 downto 0);
---signal bram0_we : std_logic_vector (7 downto 0) := x"00";
---  
---signal bram1_a  : STD_LOGIC_VECTOR (BW64-1 downto 0);
---signal bram1_di : STD_LOGIC_VECTOR (63 downto 0);
---signal bram1_do : STD_LOGIC_VECTOR (63 downto 0);
---signal bram1_we : std_logic_vector (7 downto 0) := x"00";
---  
---signal bram2_a  : STD_LOGIC_VECTOR (BW64-1 downto 0);
---signal bram2_di : STD_LOGIC_VECTOR (63 downto 0);
---signal bram2_do : STD_LOGIC_VECTOR (63 downto 0);
---signal bram2_we : std_logic_vector (7 downto 0) := x"00";
---  
---signal bram3_a  : STD_LOGIC_VECTOR (BW64-1 downto 0);
---signal bram3_di : STD_LOGIC_VECTOR (63 downto 0);
---signal bram3_do : STD_LOGIC_VECTOR (63 downto 0);
---signal bram3_we : std_logic_vector (7 downto 0) := x"00";
-  
 begin
 
-  bram4 : entity work.bram 
-  PORT MAP (
-    addra => fsmc_bram4_a,
-    dina  => fsmc_bram4_di,
-    douta => fsmc_bram4_do,
-    ena   => fsmc_bram4_en,
-    wea   => fsmc_bram4_we,
-    clka  => fsmc_bram4_clk,
+  bram_pool_array : for i in count downto 1 generate 
+  begin
+    bram : entity work.bram 
+    PORT MAP (
+    addra => fsmc_bram_a   (i*BW-1 downto (i-1)*BW),
+    dina  => fsmc_bram_di  (i*DW-1 downto (i-1)*DW),
+    douta => fsmc_bram_do  (i*DW-1 downto (i-1)*DW),
+    ena   => fsmc_bram_en  (i-1),
+    wea   => fsmc_bram_we  (i*2-1 downto (i-1)*2),
+    clka  => fsmc_bram_clk (i-1),
 
     web   => (others => '0'),
     addrb => (others => '0'),
     dinb  => (others => '0'),
     doutb => open,
     enb   => '0',
-    clkb  => fsmc_bram4_clk
+    clkb  => fsmc_bram_clk(0)
   );
-
-  bram5 : entity work.bram 
-  PORT MAP (
-    addra => fsmc_bram5_a,
-    dina  => fsmc_bram5_di,
-    douta => fsmc_bram5_do,
-    ena   => fsmc_bram5_en,
-    wea   => fsmc_bram5_we,
-    clka  => fsmc_bram5_clk,
-
-    web   => (others => '0'),
-    addrb => (others => '0'),
-    dinb  => (others => '0'),
-    doutb => open,
-    enb   => '0',
-    clkb  => fsmc_bram5_clk
-  );
-  
-  bram6 : entity work.bram 
-  PORT MAP (
-    addra => fsmc_bram6_a,
-    dina  => fsmc_bram6_di,
-    douta => fsmc_bram6_do,
-    ena   => fsmc_bram6_en,
-    wea   => fsmc_bram6_we,
-    clka  => fsmc_bram6_clk,
-
-    web   => (others => '0'),
-    addrb => (others => '0'),
-    dinb  => (others => '0'),
-    doutb => open,
-    enb   => '0',
-    clkb  => fsmc_bram6_clk
-  );
-
-  bram7 : entity work.bram 
-  PORT MAP (
-    addra => fsmc_bram7_a,
-    dina  => fsmc_bram7_di,
-    douta => fsmc_bram7_do,
-    ena   => fsmc_bram7_en,
-    wea   => fsmc_bram7_we,
-    clka  => fsmc_bram7_clk,
-
-    web   => (others => '0'),
-    addrb => (others => '0'),
-    dinb  => (others => '0'),
-    doutb => open,
-    enb   => '0',
-    clkb  => fsmc_bram7_clk
-  );
+  end generate;
 
 end Behavioral;

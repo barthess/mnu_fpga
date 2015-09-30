@@ -19,10 +19,11 @@
 ----------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
+--use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
 -- Uncomment the following library declaration if using
 -- arithmetic functions with Signed or Unsigned values
---use IEEE.NUMERIC_STD.ALL;
+use IEEE.NUMERIC_STD.ALL;
 
 -- Uncomment the following library declaration if instantiating
 -- any Xilinx primitives in this code.
@@ -101,67 +102,18 @@ signal clk_180mhz : std_logic;
 signal clk_360mhz : std_logic;
 signal clk_locked : std_logic;
 
-signal bram0_a  : std_logic_vector (FSMC_A_BLOCK_WIDTH-1 downto 0); 
-signal bram0_d1 : std_logic_vector (FSMC_D_WIDTH-1 downto 0); 
-signal bram0_d2 : std_logic_vector (FSMC_D_WIDTH-1 downto 0); 
-signal bram0_en : std_logic; 
-signal bram0_we : std_logic_vector (1 downto 0); 
-signal bram0_clk : std_logic; 
-
-signal bram1_a  : std_logic_vector (FSMC_A_BLOCK_WIDTH-1 downto 0); 
-signal bram1_d1 : std_logic_vector (FSMC_D_WIDTH-1 downto 0); 
-signal bram1_d2 : std_logic_vector (FSMC_D_WIDTH-1 downto 0); 
-signal bram1_en : std_logic; 
-signal bram1_we : std_logic_vector (1 downto 0); 
-signal bram1_clk : std_logic; 
-
-signal bram2_a  : std_logic_vector (FSMC_A_BLOCK_WIDTH-1 downto 0); 
-signal bram2_d1 : std_logic_vector (FSMC_D_WIDTH-1 downto 0); 
-signal bram2_d2 : std_logic_vector (FSMC_D_WIDTH-1 downto 0); 
-signal bram2_en : std_logic; 
-signal bram2_we : std_logic_vector (1 downto 0); 
-signal bram2_clk : std_logic; 
-
-signal bram3_a  : std_logic_vector (FSMC_A_BLOCK_WIDTH-1 downto 0); 
-signal bram3_d1 : std_logic_vector (FSMC_D_WIDTH-1 downto 0); 
-signal bram3_d2 : std_logic_vector (FSMC_D_WIDTH-1 downto 0); 
-signal bram3_en : std_logic; 
-signal bram3_we : std_logic_vector (1 downto 0); 
-signal bram3_clk : std_logic; 
-
-signal bram4_a  : std_logic_vector (FSMC_A_BLOCK_WIDTH-1 downto 0); 
-signal bram4_d1 : std_logic_vector (FSMC_D_WIDTH-1 downto 0); 
-signal bram4_d2 : std_logic_vector (FSMC_D_WIDTH-1 downto 0); 
-signal bram4_en : std_logic; 
-signal bram4_we : std_logic_vector (1 downto 0); 
-signal bram4_clk : std_logic; 
-
-signal bram5_a  : std_logic_vector (FSMC_A_BLOCK_WIDTH-1 downto 0); 
-signal bram5_d1 : std_logic_vector (FSMC_D_WIDTH-1 downto 0); 
-signal bram5_d2 : std_logic_vector (FSMC_D_WIDTH-1 downto 0); 
-signal bram5_en : std_logic; 
-signal bram5_we : std_logic_vector (1 downto 0); 
-signal bram5_clk : std_logic; 
-
-signal bram6_a  : std_logic_vector (FSMC_A_BLOCK_WIDTH-1 downto 0); 
-signal bram6_d1 : std_logic_vector (FSMC_D_WIDTH-1 downto 0); 
-signal bram6_d2 : std_logic_vector (FSMC_D_WIDTH-1 downto 0); 
-signal bram6_en : std_logic; 
-signal bram6_we : std_logic_vector (1 downto 0); 
-signal bram6_clk : std_logic; 
-
-signal bram7_a  : std_logic_vector (FSMC_A_BLOCK_WIDTH-1 downto 0); 
-signal bram7_d1 : std_logic_vector (FSMC_D_WIDTH-1 downto 0); 
-signal bram7_d2 : std_logic_vector (FSMC_D_WIDTH-1 downto 0); 
-signal bram7_en : std_logic; 
-signal bram7_we : std_logic_vector (1 downto 0); 
-signal bram7_clk : std_logic; 
-
-
+signal wire_bram_a   : std_logic_vector (8*FSMC_A_BLOCK_WIDTH-1 downto 0); 
+signal wire_bram_d1  : std_logic_vector (8*FSMC_D_WIDTH-1 downto 0); 
+signal wire_bram_d2  : std_logic_vector (8*FSMC_D_WIDTH-1 downto 0); 
+signal wire_bram_en  : std_logic_vector (7 downto 0); 
+signal wire_bram_we  : std_logic_vector (8*2-1 downto 0); 
+signal wire_bram_clk : std_logic_vector (7 downto 0); 
 
 signal fsmc_a_unused : std_logic;
 
 begin
+
+  assert 3 > 1 report "mram memory leak detected" severity error;
 
 	clk_src : entity work.clk_src port map (
 		CLK_IN1  => CLK_IN_27MHZ,
@@ -198,82 +150,47 @@ begin
 
 
 
+
   bram_pool : entity work.bram_pool
   generic map (
     BW => FSMC_A_BLOCK_WIDTH,
-    DW => FSMC_D_WIDTH
+    DW => FSMC_D_WIDTH,
+    count => 3
   )
   port map (
-		fsmc_bram4_a   => bram4_a,
-    fsmc_bram4_di  => bram4_d2,
-    fsmc_bram4_do  => bram4_d1,
-    fsmc_bram4_en  => bram4_en,
-    fsmc_bram4_we  => bram4_we,
-    fsmc_bram4_clk => bram4_clk,
-    
-		fsmc_bram5_a   => bram5_a,
-    fsmc_bram5_di  => bram5_d2,
-    fsmc_bram5_do  => bram5_d1,
-    fsmc_bram5_en  => bram5_en,
-    fsmc_bram5_we  => bram5_we,
-    fsmc_bram5_clk => bram5_clk,
-
-		fsmc_bram6_a   => bram6_a,
-    fsmc_bram6_di  => bram6_d2,
-    fsmc_bram6_do  => bram6_d1,
-    fsmc_bram6_en  => bram6_en,
-    fsmc_bram6_we  => bram6_we,
-    fsmc_bram6_clk => bram6_clk,
-
-		fsmc_bram7_a   => bram7_a,
-    fsmc_bram7_di  => bram7_d2,
-    fsmc_bram7_do  => bram7_d1,
-    fsmc_bram7_en  => bram7_en,
-    fsmc_bram7_we  => bram7_we,
-    fsmc_bram7_clk => bram7_clk
+		fsmc_bram_a   => wire_bram_a  (8*FSMC_A_BLOCK_WIDTH-1 downto 5*FSMC_A_BLOCK_WIDTH),
+    fsmc_bram_di  => wire_bram_d2 (8*FSMC_D_WIDTH-1 downto 5*FSMC_D_WIDTH),
+    fsmc_bram_do  => wire_bram_d1 (8*FSMC_D_WIDTH-1 downto 5*FSMC_D_WIDTH),
+    fsmc_bram_en  => wire_bram_en (7 downto 5),
+    fsmc_bram_we  => wire_bram_we (8*2-1 downto 5*2),
+    fsmc_bram_clk => wire_bram_clk(7 downto 5) 
   );
+
+
 
 
 
   mul_hive : entity work.mul_hive
   generic map (
     BW => FSMC_A_BLOCK_WIDTH,
-    DW => FSMC_D_WIDTH
+    DW => FSMC_D_WIDTH,
+    count => 5
   )
   port map (
     hclk => clk_90mhz,
 
     pin_rdy => STM_IO_MUL_RDY,
     pin_dv  => STM_IO_MUL_DV,
-
-		fsmc_bram0_a   => bram0_a,
-    fsmc_bram0_di  => bram0_d2,
-    fsmc_bram0_do  => bram0_d1,
-    fsmc_bram0_en  => bram0_en,
-    fsmc_bram0_we  => bram0_we,
-    fsmc_bram0_clk => bram0_clk,
-    
-		fsmc_bram1_a   => bram1_a,
-    fsmc_bram1_di  => bram1_d2,
-    fsmc_bram1_do  => bram1_d1,
-    fsmc_bram1_en  => bram1_en,
-    fsmc_bram1_we  => bram1_we,
-    fsmc_bram1_clk => bram1_clk,
-
-		fsmc_bram2_a   => bram2_a,
-    fsmc_bram2_di  => bram2_d2,
-    fsmc_bram2_do  => bram2_d1,
-    fsmc_bram2_en  => bram2_en,
-    fsmc_bram2_we  => bram2_we,
-    fsmc_bram2_clk => bram2_clk,
-
-		fsmc_bram3_a   => bram3_a,
-    fsmc_bram3_di  => bram3_d2,
-    fsmc_bram3_do  => bram3_d1,
-    fsmc_bram3_en  => bram3_en,
-    fsmc_bram3_we  => bram3_we,
-    fsmc_bram3_clk => bram3_clk
+		
+    fsmc_bram_a   => wire_bram_a  (5*FSMC_A_BLOCK_WIDTH-1 downto 0),
+    fsmc_bram_di  => wire_bram_d2 (5*FSMC_D_WIDTH-1 downto 0),
+    fsmc_bram_do  => wire_bram_d1 (5*FSMC_D_WIDTH-1 downto 0),
+    fsmc_bram_en  => wire_bram_en (5-1   downto 0),
+    fsmc_bram_we  => wire_bram_we (5*2-1 downto 0),
+    fsmc_bram_clk => wire_bram_clk(5-1   downto 0) 
   );
+
+
 
 
 
@@ -281,8 +198,9 @@ begin
   generic map (
     BW => FSMC_A_BLOCK_WIDTH,
     BS => FSMC_A_BLOCK_SELECT,
-    DW => 16,
-    AW => FSMC_A_BLOCK_WIDTH + FSMC_A_BLOCK_SELECT
+    DW => FSMC_D_WIDTH,
+    AW => FSMC_A_BLOCK_WIDTH + FSMC_A_BLOCK_SELECT,
+    count => 2**FSMC_A_BLOCK_SELECT
   )
   port map (
 		fsmc_clk => FSMC_CLK,
@@ -294,61 +212,12 @@ begin
 		NWE => FSMC_NWE,
 		NBL => FSMC_NBL,
 
-    bram0_a   => bram0_a,
-    bram0_do  => bram0_d2,
-    bram0_di  => bram0_d1,
-    bram0_en  => bram0_en,
-    bram0_we  => bram0_we,
-    bram0_clk => bram0_clk,
-    
-    bram1_a   => bram1_a,
-    bram1_do  => bram1_d2,
-    bram1_di  => bram1_d1,
-    bram1_en  => bram1_en,
-    bram1_we  => bram1_we,
-    bram1_clk => bram1_clk,
-    
-    bram2_a   => bram2_a,
-    bram2_do  => bram2_d2,
-    bram2_di  => bram2_d1,
-    bram2_en  => bram2_en,
-    bram2_we  => bram2_we,
-    bram2_clk => bram2_clk,
-    
-    bram3_a   => bram3_a,
-    bram3_do  => bram3_d2,
-    bram3_di  => bram3_d1,
-    bram3_en  => bram3_en,
-    bram3_we  => bram3_we,
-    bram3_clk => bram3_clk,
-
-    bram4_a   => bram4_a,
-    bram4_do  => bram4_d2,
-    bram4_di  => bram4_d1,
-    bram4_en  => bram4_en,
-    bram4_we  => bram4_we,
-    bram4_clk => bram4_clk,
-
-    bram5_a   => bram5_a,
-    bram5_do  => bram5_d2,
-    bram5_di  => bram5_d1,
-    bram5_en  => bram5_en,
-    bram5_we  => bram5_we,
-    bram5_clk => bram5_clk,
-
-    bram6_a   => bram6_a,
-    bram6_do  => bram6_d2,
-    bram6_di  => bram6_d1,
-    bram6_en  => bram6_en,
-    bram6_we  => bram6_we,
-    bram6_clk => bram6_clk,
-
-    bram7_a   => bram7_a,
-    bram7_do  => bram7_d2,
-    bram7_di  => bram7_d1,
-    bram7_en  => bram7_en,
-    bram7_we  => bram7_we,
-    bram7_clk => bram7_clk
+    bram_a   => wire_bram_a,
+    bram_do  => wire_bram_d2,
+    bram_di  => wire_bram_d1,
+    bram_en  => wire_bram_en,
+    bram_we  => wire_bram_we,
+    bram_clk => wire_bram_clk
 	);
   fsmc_a_unused <= or_reduce (FSMC_A ((FSMC_A_TOTAL_WIDTH - 1) downto (FSMC_A_BLOCK_WIDTH + FSMC_A_BLOCK_SELECT)));
   

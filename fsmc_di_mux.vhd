@@ -19,6 +19,7 @@
 ----------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
 -- Uncomment the following library declaration if using
 -- arithmetic functions with Signed or Unsigned values
@@ -29,26 +30,42 @@ use IEEE.STD_LOGIC_1164.ALL;
 --library UNISIM;
 --use UNISIM.VComponents.all;
 
-entity fsmc_2to4_di is
-  port(
-    A   : in  STD_LOGIC_VECTOR(1 downto 0);
-    
-    di0 : in STD_LOGIC_VECTOR(15 downto 0);
-    di1 : in STD_LOGIC_VECTOR(15 downto 0);
-    di2 : in STD_LOGIC_VECTOR(15 downto 0);
-    di3 : in STD_LOGIC_VECTOR(15 downto 0);
-    
-    do  : out STD_LOGIC_VECTOR(15 downto 0)
+entity fsmc_di_mux is
+  generic (
+    DW : positive;
+    count : positive
   );
-end fsmc_2to4_di;
+  port(
+    A : in  STD_LOGIC_VECTOR(2 downto 0);
+    i : in  STD_LOGIC_VECTOR(count*DW-1 downto 0);
+    o : out STD_LOGIC_VECTOR(DW-1 downto 0)
+  );
+end fsmc_di_mux;
 
-architecture Behavioral of fsmc_2to4_di is
+
+architecture Behavioral of fsmc_di_mux is
+
+type proxy_t is array(count-1 downto 0) of std_logic_vector(DW-1 downto 0);
+signal proxy : proxy_t;
 
 begin
-  do <= di0 when (A="00") else
-        di1 when (A="01") else
-        di2 when (A="10") else
-        di3 when (A="11");
+
+  array_assign : for n in count downto 1 generate 
+  begin
+    proxy(n-1) <= i(n*DW-1 downto (n-1)*DW);
+  end generate;
+  
+  o <= proxy(conv_integer(A));
 
 end Behavioral;
+
+
+
+
+
+
+
+
+
+
 

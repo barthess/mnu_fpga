@@ -29,15 +29,15 @@ use IEEE.STD_LOGIC_1164.ALL;
 --library UNISIM;
 --use UNISIM.VComponents.all;
 
-entity fsmc_3to8_en is
+entity fsmc_en_demux is
   port(
     A   : in  STD_LOGIC_VECTOR(2 downto 0);
     en  : in  std_logic;
     sel : out STD_LOGIC_VECTOR(7 downto 0) := "00000000"
   );
-end fsmc_3to8_en;
+end fsmc_en_demux;
 
-architecture Behavioral of fsmc_3to8_en is
+architecture Behavioral of fsmc_en_demux is
 
 begin
 
