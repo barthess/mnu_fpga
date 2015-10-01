@@ -64,7 +64,11 @@ signal we_array : std_logic_vector(count*8-1    downto 0);
 
 signal d_op0 : std_logic_vector(63 downto 0);
 signal d_op1 : std_logic_vector(63 downto 0);
+
 signal d_res : std_logic_vector(63 downto 0);
+signal d_spare0 : std_logic_vector(63 downto 0) := (others => '0');
+signal d_spare1 : std_logic_vector(63 downto 0) := (others => '0');
+signal d_spare2 : std_logic_vector(63 downto 0) := (others => '0');
 
 signal a_op0 : std_logic_vector(BW64-1 downto 0);
 signal a_op1 : std_logic_vector(BW64-1 downto 0);
@@ -142,6 +146,16 @@ begin
     o => a_array
   );
 
+  d_router : entity work.comm_matrix
+  generic map (
+    AW => 2,
+    DW => BW64
+  )
+  PORT MAP (
+    A => a_route_table,
+    i => a_spare & a_res & a_op1 & a_op0,
+    o => a_array
+  );
 
 
 
