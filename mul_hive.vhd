@@ -57,34 +57,38 @@ architecture Behavioral of mul_hive is
 
 constant BW64 : positive := BW-2;
 
-signal bram_a  : STD_LOGIC_VECTOR (count*BW64-1 downto 0);
-signal bram_di : STD_LOGIC_VECTOR (count*64-1   downto 0);
-signal bram_do : STD_LOGIC_VECTOR (count*64-1   downto 0);
-signal bram_we : std_logic_vector (count*8-1    downto 0);
+type a_array_t  is array(0 to count-1) of std_logic_vector(BW64-1 downto 0);
+type di_array_t is array(0 to count-1) of std_logic_vector(63 downto 0);
+type do_array_t is array(0 to count-1) of std_logic_vector(63 downto 0);
+type we_array_t is array(0 to count-1) of std_logic_vector(7 downto 0);
+
+signal a_array  : a_array_t;
+signal di_array : di_array_t;
+signal do_array : do_array_t;
+signal we_array : we_array_t;
 
 begin
 
-  bram_array : for i in count downto 1 generate 
+  -- interconnect between multipliers and FSMC
+  bram_bridge : for n in 0 to count-1 generate 
   begin
     bram : entity work.bram 
     PORT MAP (
-      addra => fsmc_bram_a   (i*BW-1 downto (i-1)*BW),
-      dina  => fsmc_bram_di  (i*DW-1 downto (i-1)*DW),
-      douta => fsmc_bram_do  (i*DW-1 downto (i-1)*DW),
-      ena   => fsmc_bram_en  (i-1),
-      wea   => fsmc_bram_we  (i*2-1 downto (i-1)*2),
-      clka  => fsmc_bram_clk (i-1),
+      addra => fsmc_bram_a   ((n+1)*BW-1 downto n*BW),
+      dina  => fsmc_bram_di  ((n+1)*DW-1 downto n*DW),
+      douta => fsmc_bram_do  ((n+1)*DW-1 downto n*DW),
+      ena   => fsmc_bram_en  (n),
+      wea   => fsmc_bram_we  ((n+1)*2-1 downto n*2),
+      clka  => fsmc_bram_clk (n),
 
-      web   => bram_we (i*8-1    downto (i-1)*8),
-      addrb => bram_a  (i*BW64-1 downto (i-1)*BW64),
-      dinb  => bram_di (i*64-1   downto (i-1)*64),
-      doutb => bram_do (i*64-1   downto (i-1)*64),
+      web   => we_array(n),
+      addrb => a_array(n),
+      dinb  => di_array(n),
+      doutb => do_array(n),
       enb   => '1',
       clkb  => hclk
     );
   end generate;
-
-
 
 
 
@@ -96,13 +100,13 @@ begin
   Port map (
     clk => hclk,
     
-    di_op0 => bram_do(63  downto 0),
-    di_op1 => bram_do(127 downto 64),
-    do_res => bram_di(191 downto 128),
+    di_op0 => do_array(0),
+    di_op1 => do_array(1),
+    do_res => di_array(2),
 
-    a_op0 => bram_a(BW64-1   downto 0),
-    a_op1 => bram_a(BW64*2-1 downto BW64),
-    a_res => bram_a(BW64*3-1 downto BW64*2),
+    a_op0 => a_array(0),
+    a_op1 => a_array(1),
+    a_res => a_array(2),
 
     we_op0 => open,
     we_op1 => open,
@@ -114,6 +118,7 @@ begin
 
 
 end Behavioral;
+
 
 
 

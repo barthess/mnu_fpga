@@ -36,31 +36,30 @@ entity bram_pool is
     count : positive
   );
   Port (
-    fsmc_bram_a   : in STD_LOGIC_VECTOR  (count*BW-1 downto 0);
-    fsmc_bram_di  : in STD_LOGIC_VECTOR  (count*DW-1 downto 0);
+    fsmc_bram_a   : in  STD_LOGIC_VECTOR (count*BW-1 downto 0);
+    fsmc_bram_di  : in  STD_LOGIC_VECTOR (count*DW-1 downto 0);
     fsmc_bram_do  : out STD_LOGIC_VECTOR (count*DW-1 downto 0);
-    fsmc_bram_en  : in STD_LOGIC_vector  (count-1    downto 0);
-    fsmc_bram_we  : in std_logic_vector  (count*2-1  downto 0);
-    fsmc_bram_clk : in std_logic_vector  (count-1    downto 0)
+    fsmc_bram_en  : in  STD_LOGIC_vector (count-1    downto 0);
+    fsmc_bram_we  : in  std_logic_vector (count*2-1  downto 0);
+    fsmc_bram_clk : in  std_logic_vector (count-1    downto 0)
   );
 end bram_pool;
-
 
 
 architecture Behavioral of bram_pool is
 
 begin
 
-  bram_pool_array : for i in count downto 1 generate 
+  bram_array : for n in 0 to count-1 generate 
   begin
     bram : entity work.bram 
     PORT MAP (
-    addra => fsmc_bram_a   (i*BW-1 downto (i-1)*BW),
-    dina  => fsmc_bram_di  (i*DW-1 downto (i-1)*DW),
-    douta => fsmc_bram_do  (i*DW-1 downto (i-1)*DW),
-    ena   => fsmc_bram_en  (i-1),
-    wea   => fsmc_bram_we  (i*2-1 downto (i-1)*2),
-    clka  => fsmc_bram_clk (i-1),
+    addra => fsmc_bram_a   ((n+1)*BW-1 downto n*BW),
+    dina  => fsmc_bram_di  ((n+1)*DW-1 downto n*DW),
+    douta => fsmc_bram_do  ((n+1)*DW-1 downto n*DW),
+    ena   => fsmc_bram_en  ((n+1)-1),
+    wea   => fsmc_bram_we  ((n+1)*2-1  downto n*2),
+    clka  => fsmc_bram_clk (n),
 
     web   => (others => '0'),
     addrb => (others => '0'),
@@ -72,3 +71,4 @@ begin
   end generate;
 
 end Behavioral;
+

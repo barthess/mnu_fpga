@@ -84,11 +84,11 @@ signal blk_select : STD_LOGIC_VECTOR (BS-1 downto 0);
 
 begin
 
-  fanout : for i in count downto 1 generate 
+  fanout : for n in 0 to count-1 generate 
   begin
-    bram_a  (i*BW-1 downto (i-1)*BW) <= a_cnt;
-    bram_we (i*2-1  downto (i-1)*2)  <= we_common;
-    bram_do (i*DW-1 downto (i-1)*DW) <= do_common;
+    bram_a  ((n+1)*BW-1 downto n*BW) <= a_cnt;
+    bram_we ((n+1)*2-1  downto n*2)  <= we_common;
+    bram_do ((n+1)*DW-1 downto n*DW) <= do_common;
   end generate;
   bram_clk <= (others => fsmc_clk);
   
