@@ -46,10 +46,10 @@ end muxer;
 
 architecture Behavioral of muxer is
 
+constant count : positive := 2**AW;
+
 type proxy_t is array(0 to count-1) of std_logic_vector(DW-1 downto 0);
 signal proxy : proxy_t;
-
-constant count : positive := 2**AW;
 
 begin
 

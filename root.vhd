@@ -109,6 +109,14 @@ signal wire_bram_en  : std_logic_vector (7 downto 0);
 signal wire_bram_we  : std_logic_vector (8*2-1 downto 0); 
 signal wire_bram_clk : std_logic_vector (7 downto 0); 
 
+signal wire_mul_a   : std_logic_vector (4*(FSMC_A_BLOCK_WIDTH-2)-1 downto 0); 
+signal wire_mul_di  : std_logic_vector (4*64-1 downto 0); 
+signal wire_mul_do  : std_logic_vector (4*64-1 downto 0); 
+signal wire_mul_en  : std_logic_vector (3 downto 0); 
+signal wire_mul_we  : std_logic_vector (4*8-1 downto 0); 
+signal wire_mul_clk : std_logic_vector (3 downto 0); 
+
+
 signal fsmc_a_unused : std_logic;
 
 begin
@@ -170,10 +178,39 @@ begin
 
 
 
+  bram_mul_proxy : entity work.bram_mul_proxy
+  generic map (
+    FSMC_AW => FSMC_A_BLOCK_WIDTH,
+    FSMC_DW => FSMC_D_WIDTH,
+    MUL_AW  => FSMC_A_BLOCK_WIDTH - 2,
+    MUL_DW  => 64,
+    count   => 4
+  )
+  port map (
+    hclk => clk_90mhz,
+
+    pin_rdy => STM_IO_MUL_RDY,
+    pin_dv  => STM_IO_MUL_DV,
+		
+    fsmc_a   => wire_bram_a  (4*FSMC_A_BLOCK_WIDTH-1 downto 0),
+    fsmc_di  => wire_bram_d2 (4*FSMC_D_WIDTH-1 downto 0),
+    fsmc_do  => wire_bram_d1 (4*FSMC_D_WIDTH-1 downto 0),
+    fsmc_en  => wire_bram_en (4-1   downto 0),
+    fsmc_we  => wire_bram_we (4*2-1 downto 0),
+    fsmc_clk => wire_bram_clk(4-1   downto 0),
+    
+    mul_a   => wire_mul_a,
+    mul_di  => wire_mul_di,
+    mul_do  => wire_mul_do,
+    mul_en  => wire_mul_en,
+    mul_we  => wire_mul_we,
+    mul_clk => wire_mul_clk
+  );
+
   mul_hive : entity work.mul_hive
   generic map (
-    BW => FSMC_A_BLOCK_WIDTH,
-    DW => FSMC_D_WIDTH,
+    AW => FSMC_A_BLOCK_WIDTH-2,
+    DW => 64,
     count => 4
   )
   port map (
@@ -182,12 +219,12 @@ begin
     pin_rdy => STM_IO_MUL_RDY,
     pin_dv  => STM_IO_MUL_DV,
 		
-    fsmc_bram_a   => wire_bram_a  (4*FSMC_A_BLOCK_WIDTH-1 downto 0),
-    fsmc_bram_di  => wire_bram_d2 (4*FSMC_D_WIDTH-1 downto 0),
-    fsmc_bram_do  => wire_bram_d1 (4*FSMC_D_WIDTH-1 downto 0),
-    fsmc_bram_en  => wire_bram_en (4-1   downto 0),
-    fsmc_bram_we  => wire_bram_we (4*2-1 downto 0),
-    fsmc_bram_clk => wire_bram_clk(4-1   downto 0) 
+    bram_a   => wire_mul_a,
+    bram_di  => wire_mul_do,
+    bram_do  => wire_mul_di,
+    bram_en  => wire_mul_en,
+    bram_we  => wire_mul_we,
+    bram_clk => wire_mul_clk
   );
 
 

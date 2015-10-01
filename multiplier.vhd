@@ -45,15 +45,18 @@ entity multiplier is
     height_op1 : in  std_logic_vector (15 downto 0);
     
     -- data buses
-    di_op0  : in  std_logic_vector (63 downto 0);
-    di_op1  : in  std_logic_vector (63 downto 0);
-    do_res  : out std_logic_vector (63 downto 0) := (others => 'X');
+    op0 : in  std_logic_vector (63 downto 0);
+    op1 : in  std_logic_vector (63 downto 0);
+    res : out std_logic_vector (63 downto 0) := (others => 'X');
 
     -- address buses
-    a_op0   : out std_logic_vector (AW-1 downto 0);
-    a_op1   : out std_logic_vector (AW-1 downto 0);
-    a_res   : out std_logic_vector (AW-1 downto 0);
-
+    a_op0 : out std_logic_vector (AW-1 downto 0);
+    a_op1 : out std_logic_vector (AW-1 downto 0);
+    a_res : out std_logic_vector (AW-1 downto 0);
+    
+    -- bram WE pin
+    we : out std_logic_vector (7 downto 0) := (others => '0');
+    
     pin_rdy : out std_logic;
     pin_dv  : in std_logic
   );
@@ -99,9 +102,9 @@ begin
   double_mul : entity work.double_mul
   PORT MAP (
     clk => clk,
-    a => di_op0,
-    b => di_op1,
-    result => do_res,    
+    a => op0,
+    b => op1,
+    result => res,    
     ce => mul_ce,
     rdy => mul_rdy,
     operation_nd => mul_nd
@@ -126,12 +129,14 @@ begin
         if (mul_rdy = '1') then
           out_state <= DRAIN;
           addr_write <= addr_write + 1;
+          we <= (others => '1');
         end if;
         
       when DRAIN =>
         addr_write <= addr_write + 1;
         if (mul_rdy = '0') then
           out_state <= OUT_IDLE;
+          we <= (others => '0');
         end if;
 
       end case;

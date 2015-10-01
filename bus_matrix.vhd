@@ -31,24 +31,25 @@ use IEEE.NUMERIC_STD.ALL;
 --use UNISIM.VComponents.all;
 
 
-entity comm_matrix is
+entity bus_matrix is
   generic (
-    AW : positive;  -- address width
-    DW : positive   -- data width 
+    AW   : positive; -- address width in bits
+    ocnt : positive; -- output ports count
+    DW   : positive  -- data bus width 
   );
   port(
-    A : in  STD_LOGIC_VECTOR(2**AW-1 downto 0);
+    A : in  STD_LOGIC_VECTOR(AW*ocnt-1  downto 0);
     i : in  STD_LOGIC_VECTOR(2**AW*DW-1 downto 0);
-    o : out STD_LOGIC_VECTOR(2**AW*DW-1 downto 0)
+    o : out STD_LOGIC_VECTOR(ocnt*DW-1  downto 0)
   );
-end demuxer;
+end bus_matrix;
 
 
-architecture Behavioral of comm_matrix is
-  constant count : positive := 2**AW; -- number of inputs
+architecture Behavioral of bus_matrix is
+
 begin
   
-  muxer_assign : for n in 0 to count-1 generate 
+  muxer_assign : for n in 0 to ocnt-1 generate 
   begin
     muxer_array : entity work.muxer
     generic map (
@@ -58,7 +59,7 @@ begin
     PORT MAP (
       i => i,
       o => o((n+1)*DW-1 downto n*DW),
-      A => o((n+1)*AW-1 downto n*AW)
+      A => A((n+1)*AW-1 downto n*AW)
     );
   end generate;
 

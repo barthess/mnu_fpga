@@ -47,9 +47,8 @@ end demuxer;
 
 architecture Behavioral of demuxer is
 
-signal addr : positive := conv_integer(A);
 begin
-
+  Этот демультиплексор не работает. Надо бы переписать
 --  process(A) begin
 --    if (0 = addr) then
 --      o((n+1)*DW-1 downto n*DW) <= i;
@@ -67,7 +66,7 @@ begin
 --    end if;
 --  end generate;
 
-  o((addr+1)*DW-1 downto addr*DW) <= i;
+  o((conv_integer(A)+1)*DW-1 downto conv_integer(A)*DW) <= i;
   --o <= (((addr+1)*DW-1 downto addr*DW) => i, others => '0');
   --o <= (15 downto 0 => i, others => '0');
   --o <= (0 => '1', others => '0');
