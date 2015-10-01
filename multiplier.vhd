@@ -37,20 +37,24 @@ entity multiplier is
   );
   Port (
     clk : in  STD_LOGIC;
+    ce  : in std_logic;
     
+    -- opernads' sizes
+    len : in  std_logic_vector (15 downto 0);
+    height_op0 : in  std_logic_vector (15 downto 0);
+    height_op1 : in  std_logic_vector (15 downto 0);
+    
+    -- data buses
     di_op0  : in  std_logic_vector (63 downto 0);
     di_op1  : in  std_logic_vector (63 downto 0);
     do_res  : out std_logic_vector (63 downto 0) := (others => 'X');
 
-    a_op0   : out std_logic_vector (AW-1 downto 0) := (others => '0');
-    a_op1   : out std_logic_vector (AW-1 downto 0) := (others => '0');
-    a_res   : out std_logic_vector (AW-1 downto 0) := (others => '0');
+    -- address buses
+    a_op0   : out std_logic_vector (AW-1 downto 0);
+    a_op1   : out std_logic_vector (AW-1 downto 0);
+    a_res   : out std_logic_vector (AW-1 downto 0);
 
-    we_op0  : out STD_LOGIC_VECTOR (7 DOWNTO 0) := x"00";
-    we_op1  : out STD_LOGIC_VECTOR (7 DOWNTO 0) := x"00";
-    we_res  : out STD_LOGIC_VECTOR (7 DOWNTO 0) := x"00";
-
-    pin_rdy : out std_logic := '0';
+    pin_rdy : out std_logic;
     pin_dv  : in std_logic
   );
 end multiplier;
@@ -113,7 +117,6 @@ begin
       case out_state is
       
       when OUT_IDLE =>
-        we_res <= x"00";
         addr_write <= start_address;
         if (state = MUL) then
           out_state <= WAIT_FIRST;

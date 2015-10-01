@@ -57,15 +57,25 @@ architecture Behavioral of mul_hive is
 
 constant BW64 : positive := BW-2;
 
-type a_array_t  is array(0 to count-1) of std_logic_vector(BW64-1 downto 0);
-type di_array_t is array(0 to count-1) of std_logic_vector(63 downto 0);
-type do_array_t is array(0 to count-1) of std_logic_vector(63 downto 0);
-type we_array_t is array(0 to count-1) of std_logic_vector(7 downto 0);
+signal a_array  : std_logic_vector(count*BW64-1 downto 0);
+signal di_array : std_logic_vector(count*64-1   downto 0);
+signal do_array : std_logic_vector(count*64-1   downto 0);
+signal we_array : std_logic_vector(count*8-1    downto 0);
 
-signal a_array  : a_array_t;
-signal di_array : di_array_t;
-signal do_array : do_array_t;
-signal we_array : we_array_t;
+signal d_op0 : std_logic_vector(63 downto 0);
+signal d_op1 : std_logic_vector(63 downto 0);
+signal d_res : std_logic_vector(63 downto 0);
+
+signal a_op0 : std_logic_vector(BW64-1 downto 0);
+signal a_op1 : std_logic_vector(BW64-1 downto 0);
+signal a_res : std_logic_vector(BW64-1 downto 0);
+signal a_spare : std_logic_vector(BW64-1 downto 0);
+
+signal select_op0 : std_logic_vector(1 downto 0);
+signal select_op1 : std_logic_vector(1 downto 0);
+signal select_res : std_logic_vector(1 downto 0);
+
+signal a_route_table : std_logic_vector(7 downto 0);
 
 begin
 
@@ -81,14 +91,65 @@ begin
       wea   => fsmc_bram_we  ((n+1)*2-1 downto n*2),
       clka  => fsmc_bram_clk (n),
 
-      web   => we_array(n),
-      addrb => a_array(n),
-      dinb  => di_array(n),
-      doutb => do_array(n),
+      addrb => a_array ((n+1)*BW64-1 downto n*BW64),
+      dinb  => di_array((n+1)*64-1   downto n*64),
+      doutb => do_array((n+1)*64-1   downto n*64),
+      web   => we_array((n+1)*8-1    downto n*8),
       enb   => '1',
       clkb  => hclk
     );
   end generate;
+
+
+
+  di_op0_mux : entity work.muxer
+  generic map (
+    AW => 2,
+    DW => 64,
+    count => 4
+  )
+  PORT MAP (
+    A => select_op0,
+    i => di_array,
+    o => d_op0
+  );
+
+  di_op1_mux : entity work.muxer
+  generic map (
+    AW => 2,
+    DW => 64,
+    count => 4
+  )
+  PORT MAP (
+    A => select_op1,
+    i => di_array,
+    o => d_op1
+  );
+
+
+
+
+
+
+  a_router : entity work.comm_matrix
+  generic map (
+    AW => 2,
+    DW => BW64
+  )
+  PORT MAP (
+    A => a_route_table,
+    i => a_spare & a_res & a_op1 & a_op0,
+    o => a_array
+  );
+
+
+
+
+
+
+
+
+
 
 
 
@@ -99,18 +160,19 @@ begin
   )
   Port map (
     clk => hclk,
+    ce => '1',
     
-    di_op0 => do_array(0),
-    di_op1 => do_array(1),
-    do_res => di_array(2),
+    len => x"000F",
+    height_op0 => x"000F",
+    height_op1 => x"000F",
+    
+    di_op0 => d_op0,
+    di_op1 => d_op1,
+    do_res => d_res,
 
-    a_op0 => a_array(0),
-    a_op1 => a_array(1),
-    a_res => a_array(2),
-
-    we_op0 => open,
-    we_op1 => open,
-    we_res => bram_we(7 downto 0),
+    a_op0 => a_op0,
+    a_op1 => a_op1,
+    a_res => a_res,
 
     pin_rdy => pin_rdy,
     pin_dv => pin_dv

@@ -92,15 +92,25 @@ begin
   end generate;
   bram_clk <= (others => fsmc_clk);
   
-  en_demux : entity work.fsmc_en_demux
+  
+  
+  en_demux : entity work.demuxer
+  generic map (
+    AW => BS,
+    DW => DW,
+    count => count
+  )
   PORT MAP (
-    A   => blk_select,
-    en  => en_common,
-    sel => bram_en
+    A    => blk_select,
+    i(0) => en_common,
+    o    => bram_en
   );
 
-  di_mux : entity work.fsmc_di_mux
+
+
+  di_mux : entity work.muxer
   generic map (
+    AW => BS,
     DW => DW,
     count => count
   )
@@ -110,8 +120,12 @@ begin
     o => di_common
   );
 
+
+
   D <= di_common when (NCE = '0' and NOE = '0') else (others => 'Z');
   do_common <= D;
+  
+  
   
   process(fsmc_clk, NCE) begin
     if (NCE = '1') then

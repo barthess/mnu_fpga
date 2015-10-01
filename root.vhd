@@ -155,15 +155,15 @@ begin
   generic map (
     BW => FSMC_A_BLOCK_WIDTH,
     DW => FSMC_D_WIDTH,
-    count => 3
+    count => 4
   )
   port map (
-		fsmc_bram_a   => wire_bram_a  (8*FSMC_A_BLOCK_WIDTH-1 downto 5*FSMC_A_BLOCK_WIDTH),
-    fsmc_bram_di  => wire_bram_d2 (8*FSMC_D_WIDTH-1 downto 5*FSMC_D_WIDTH),
-    fsmc_bram_do  => wire_bram_d1 (8*FSMC_D_WIDTH-1 downto 5*FSMC_D_WIDTH),
-    fsmc_bram_en  => wire_bram_en (7 downto 5),
-    fsmc_bram_we  => wire_bram_we (8*2-1 downto 5*2),
-    fsmc_bram_clk => wire_bram_clk(7 downto 5) 
+		fsmc_bram_a   => wire_bram_a  (8*FSMC_A_BLOCK_WIDTH-1 downto 4*FSMC_A_BLOCK_WIDTH),
+    fsmc_bram_di  => wire_bram_d2 (8*FSMC_D_WIDTH-1 downto 4*FSMC_D_WIDTH),
+    fsmc_bram_do  => wire_bram_d1 (8*FSMC_D_WIDTH-1 downto 4*FSMC_D_WIDTH),
+    fsmc_bram_en  => wire_bram_en (7 downto 4),
+    fsmc_bram_we  => wire_bram_we (8*2-1 downto 4*2),
+    fsmc_bram_clk => wire_bram_clk(7 downto 4) 
   );
 
 
@@ -174,7 +174,7 @@ begin
   generic map (
     BW => FSMC_A_BLOCK_WIDTH,
     DW => FSMC_D_WIDTH,
-    count => 5
+    count => 4
   )
   port map (
     hclk => clk_90mhz,
@@ -182,12 +182,12 @@ begin
     pin_rdy => STM_IO_MUL_RDY,
     pin_dv  => STM_IO_MUL_DV,
 		
-    fsmc_bram_a   => wire_bram_a  (5*FSMC_A_BLOCK_WIDTH-1 downto 0),
-    fsmc_bram_di  => wire_bram_d2 (5*FSMC_D_WIDTH-1 downto 0),
-    fsmc_bram_do  => wire_bram_d1 (5*FSMC_D_WIDTH-1 downto 0),
-    fsmc_bram_en  => wire_bram_en (5-1   downto 0),
-    fsmc_bram_we  => wire_bram_we (5*2-1 downto 0),
-    fsmc_bram_clk => wire_bram_clk(5-1   downto 0) 
+    fsmc_bram_a   => wire_bram_a  (4*FSMC_A_BLOCK_WIDTH-1 downto 0),
+    fsmc_bram_di  => wire_bram_d2 (4*FSMC_D_WIDTH-1 downto 0),
+    fsmc_bram_do  => wire_bram_d1 (4*FSMC_D_WIDTH-1 downto 0),
+    fsmc_bram_en  => wire_bram_en (4-1   downto 0),
+    fsmc_bram_we  => wire_bram_we (4*2-1 downto 0),
+    fsmc_bram_clk => wire_bram_clk(4-1   downto 0) 
   );
 
 

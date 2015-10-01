@@ -23,49 +23,46 @@ use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
 -- Uncomment the following library declaration if using
 -- arithmetic functions with Signed or Unsigned values
---use IEEE.NUMERIC_STD.ALL;
+use IEEE.NUMERIC_STD.ALL;
 
 -- Uncomment the following library declaration if instantiating
 -- any Xilinx primitives in this code.
 --library UNISIM;
 --use UNISIM.VComponents.all;
 
-entity muxer is
+
+entity comm_matrix is
   generic (
-    AW : positive;    -- address width
-    DW : positive     -- data width 
+    AW : positive;  -- address width
+    DW : positive   -- data width 
   );
   port(
-    A : in  STD_LOGIC_VECTOR(AW-1 downto 0);
+    A : in  STD_LOGIC_VECTOR(2**AW-1 downto 0);
     i : in  STD_LOGIC_VECTOR(2**AW*DW-1 downto 0);
-    o : out STD_LOGIC_VECTOR(DW-1 downto 0)
+    o : out STD_LOGIC_VECTOR(2**AW*DW-1 downto 0)
   );
-end muxer;
+end demuxer;
 
 
-
-architecture Behavioral of muxer is
-
-type proxy_t is array(0 to count-1) of std_logic_vector(DW-1 downto 0);
-signal proxy : proxy_t;
-
-constant count : positive := 2**AW;
-
+architecture Behavioral of comm_matrix is
+  constant count : positive := 2**AW; -- number of inputs
 begin
-
-  array_assign : for n in 0 to count-1 generate 
-  begin
-    proxy(n) <= i((n+1)*DW-1 downto n*DW);
-  end generate;
   
-  o <= proxy(conv_integer(A));
+  muxer_assign : for n in 0 to count-1 generate 
+  begin
+    muxer_array : entity work.muxer
+    generic map (
+      AW => AW,
+      DW => DW
+    )
+    PORT MAP (
+      i => i,
+      o => o((n+1)*DW-1 downto n*DW),
+      A => o((n+1)*AW-1 downto n*AW)
+    );
+  end generate;
 
 end Behavioral;
-
-
-
-
-
 
 
 
