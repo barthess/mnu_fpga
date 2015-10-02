@@ -65,7 +65,9 @@ signal we : std_logic_vector (7 downto 0);
 
 begin
 
-
+  op_word <= bram_di(7 downto 0);   -- dirty warning suppressor
+  a_spare <= (others => '0');-- dirty warning suppressor
+  
   di_mux : entity work.bus_matrix
   generic map (
     AW => 2,
@@ -95,8 +97,7 @@ begin
   we_demux : entity work.demuxer
   generic map (
     AW => 2,
-    DW => 8,
-    count => count
+    DW => 8
   )
   PORT MAP (
     A => op_word(5 downto 4),

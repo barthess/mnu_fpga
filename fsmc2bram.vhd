@@ -97,8 +97,7 @@ begin
   en_demux : entity work.demuxer
   generic map (
     AW => BS,
-    DW => 1,
-    count => count
+    DW => 1
   )
   PORT MAP (
     A    => blk_select,
