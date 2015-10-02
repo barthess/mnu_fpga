@@ -52,7 +52,7 @@ begin
 
   bram_array : for n in 0 to count-1 generate 
   begin
-    bram : entity work.bram 
+    bram : entity work.bram_mtrx
     PORT MAP (
     addra => fsmc_bram_a   ((n+1)*BW-1 downto n*BW),
     dina  => fsmc_bram_di  ((n+1)*DW-1 downto n*DW),

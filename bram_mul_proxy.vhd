@@ -69,7 +69,7 @@ begin
 
   bram_mul_proxy : for n in 0 to count-1 generate 
   begin
-    bram : entity work.bram 
+    bram : entity work.bram_mtrx
     PORT MAP (
       addra => fsmc_a   ((n+1)*FSMC_AW-1 downto n*FSMC_AW),
       dina  => fsmc_di  ((n+1)*FSMC_DW-1 downto n*FSMC_DW),
