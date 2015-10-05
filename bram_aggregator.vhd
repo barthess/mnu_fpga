@@ -61,22 +61,6 @@ entity bram_aggregator is
     return A(AW-1 downto AW-sel);
   end get_select;
 
-
-
---  function get_select_en(A : in std_logic_vector(AW-1 downto 0);
---                         WE : in std_logic_vector(0 downto 0))
---                         return std_logic_vector is
---  variable tmp : std_logic_vector (AW-1 downto 0) := std_logic_vector(to_unsigned(conv_integer(A) - 1, AW));
---  begin
---    if (WE = "1") then
---      return A(AW-1 downto AW-sel);
---    else
---      return tmp(AW-1 downto AW-sel);
---    end if;
---  end get_select_en;
-
-
-
   --
   function mmu_check(A : in std_logic_vector(AW-1 downto 0)) return std_logic is
   begin
@@ -90,13 +74,12 @@ entity bram_aggregator is
 end bram_aggregator;
 
 
+---------------------------------------------
 
-
--------------------------
 architecture beh of bram_aggregator is
 
 constant slaveaw : positive := AW - sel;
-signal select_reg : std_logic_vector(sel-1 downto 0) := (others => '0');
+signal select_tmp : std_logic_vector(sel-1 downto 0);
 
 begin
   
@@ -112,17 +95,18 @@ begin
   slave_clk <= (others => CLK);
   
   -- clock enable fanout
-  en_demux : entity work.demuxer
-    generic map (
-      AW => sel,
-      DW => 1
-    )
-    PORT MAP (
-      A    => select_reg,
-      i(0) => EN,
-      o    => slave_en
-    );
-    
+  slave_en <= (others => EN);
+--  en_demux : entity work.demuxer
+--    generic map (
+--      AW => sel,
+--      DW => 1
+--    )
+--    PORT MAP (
+--      A    => get_select(A-1),
+--      i(0) => EN,
+--      o    => slave_en
+--    );
+
   -- write enable fanout
   we_demux : entity work.demuxer
   generic map (
@@ -135,31 +119,18 @@ begin
     o => slave_we
   );
 
-  -- data bus fanout
+  -- data bus output fanout
+  select_tmp <= get_select(A-1);
   di_mux : entity work.muxer
   generic map (
     AW => sel,
     DW => DW
   )
   PORT MAP (
-    A => get_select(A),
+    A => select_tmp,
     i => slave_di,
     o => DO
   );
-
-
-  process(EN, WE, A) begin
-    if (EN = '1') then
-      if (WE = "1") then
-        select_reg <= get_select(A);
-      else
-        select_reg <= get_select(A-1);
-      end if;
-    else
-      select_reg <= (others => '0');
-    end if;
-  end process;
-
 
 end beh;
 
