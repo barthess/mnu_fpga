@@ -108,16 +108,8 @@ signal clk_180mhz : std_logic;
 signal clk_360mhz : std_logic;
 signal clk_locked : std_logic;
 
--- 0..0 settings for matrix multiplier
---signal wire_cmd_a   : std_logic_vector (cmdcnt*cmdaw-1        downto 0); 
---signal wire_cmd_di  : std_logic_vector (cmdcnt*FSMC_D_WIDTH-1 downto 0); 
---signal wire_cmd_do  : std_logic_vector (cmdcnt*FSMC_D_WIDTH-1 downto 0); 
---signal wire_cmd_en  : std_logic_vector (cmdcnt-1              downto 0); 
---signal wire_cmd_we  : std_logic_vector (cmdcnt*2-1            downto 0); 
---signal wire_cmd_clk : std_logic_vector (cmdcnt-1              downto 0); 
 
-
-signal wire_bram_a   : std_logic_vector (11 downto 0); 
+signal wire_bram_a   : std_logic_vector (14 downto 0); 
 signal wire_bram_di  : std_logic_vector (FSMC_D_WIDTH-1 downto 0); 
 signal wire_bram_do  : std_logic_vector (FSMC_D_WIDTH-1 downto 0); 
 signal wire_bram_en  : std_logic; 
@@ -164,27 +156,6 @@ begin
   );
 
 
-
-
---  bram_pool : entity work.bram_pool
---  generic map (
---    BW => FSMC_A_BLOCK_WIDTH,
---    DW => FSMC_D_WIDTH,
---    count => 4
---  )
---  port map (
---		fsmc_bram_a   => wire_bram_a  (8*FSMC_A_BLOCK_WIDTH-1 downto 4*FSMC_A_BLOCK_WIDTH),
---    fsmc_bram_di  => wire_bram_d2 (8*FSMC_D_WIDTH-1 downto 4*FSMC_D_WIDTH),
---    fsmc_bram_do  => wire_bram_d1 (8*FSMC_D_WIDTH-1 downto 4*FSMC_D_WIDTH),
---    fsmc_bram_en  => wire_bram_en (7 downto 4),
---    fsmc_bram_we  => wire_bram_we (8*2-1 downto 4*2),
---    fsmc_bram_clk => wire_bram_clk(7 downto 4) 
---  );
---
---
---
---
---
 --  bram_mul_proxy : entity work.bram_mul_proxy
 --  generic map (
 --    FSMC_AW => FSMC_A_BLOCK_WIDTH,
@@ -241,21 +212,30 @@ begin
 
 
 
-  bram : entity work.bram_mtrx
-    PORT MAP (
-      addra => wire_bram_a,
-      dina  => wire_bram_do,
-      douta => wire_bram_di,
-      ena   => wire_bram_en,
-      wea   => wire_bram_we,
-      clka  => wire_bram_clk,
-
-      addrb => (others => '0'),
-      dinb  => (others => '0'),
-      doutb => open,
-      enb   => '0',
-      web   => (others => '0'),
-      clkb  => clk_180mhz
+  mul_storage : entity work.mul_storage
+    generic map (
+      AW => 15, -- 15 (4096 * 8)
+      DW => 16, -- 16
+      AWMUL => 10, -- AW-sel-2
+      DWMUL => 64, -- 64
+      sel => 3, -- 3
+      count => 8 -- 8
+    )
+    port map (
+      
+      fsmc_a   => wire_bram_a,
+      fsmc_di  => wire_bram_di,
+      fsmc_do  => wire_bram_do,
+      fsmc_en  => wire_bram_en,
+      fsmc_we  => wire_bram_we,
+      fsmc_clk => wire_bram_clk,
+      
+      mul_a   => (others => '0'),
+      mul_di  => (others => '0'),
+      mul_do  => open,
+      mul_en  => (others => '0'),
+      mul_we  => (others => '0'),
+      mul_clk => (others => '0')
     );
 
 
@@ -263,22 +243,22 @@ begin
     generic map (
       AW => FSMC_A_WIDTH,
       DW => FSMC_D_WIDTH,
-      AWSPARE => FSMC_A_WIDTH - 12
+      AWSPARE => FSMC_A_WIDTH - (12 + 3)
     )
     port map (
       fsmc_clk => FSMC_CLK,
       mmu_int => STM_IO_MMU_INT,
       
-      A => FSMC_A,
-      D => FSMC_D,
+      A   => FSMC_A,
+      D   => FSMC_D,
       NCE => FSMC_NCE,
       NOE => FSMC_NOE,
       NWE => FSMC_NWE,
       NBL => FSMC_NBL,
 
       bram_a   => wire_bram_a,
-      bram_di  => wire_bram_di,
-      bram_do  => wire_bram_do,
+      bram_di  => wire_bram_do,
+      bram_do  => wire_bram_di,
       bram_en  => wire_bram_en,
       bram_we  => wire_bram_we,
       bram_clk => wire_bram_clk

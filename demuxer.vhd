@@ -52,42 +52,20 @@ begin
   addr <= conv_integer(A);
   
   process(addr, i) begin
-    if (0 = addr) then
-      o(DW-1 downto 0) <= i;
-      o(cnt*DW-1 downto DW) <= (others => '0');
-    elsif ((cnt-1) = addr) then
-      o(cnt*DW-1 downto (cnt-1)*DW) <= i;
-      o((cnt-1)*DW-1 downto 0) <= (others => '0');
-    else
-      o(cnt*DW-1 downto addr*DW) <= (others => '0');
-      o(addr*DW-1 downto (addr-1)*DW) <= i;
-      o((addr-1)*DW-1 downto 0) <= (others => '0');
-    end if;
+    o <= (others => '0');
+    o((addr+1)*DW-1 downto addr*DW) <= i;
+--    if (0 = addr) then
+--      odemux(DW-1 downto 0) <= i;
+--      odemux(cnt*DW-1 downto DW) <= (others => '0');
+--    elsif ((cnt-1) = addr) then
+--      odemux(cnt*DW-1 downto (cnt-1)*DW) <= i;
+--      odemux((cnt-1)*DW-1 downto 0) <= (others => '0');
+--    else
+--      odemux(cnt*DW-1 downto addr*DW) <= (others => '0');
+--      odemux(addr*DW-1 downto (addr-1)*DW) <= i;
+--      odemux((addr-1)*DW-1 downto 0) <= (others => '0');
+--    end if;
   end process;
-
---  array_assign : for n in 0 to count-1 generate 
---  begin
---    
---    lable1: if (n = conv_integer(A)) generate
---      o((n+1)*DW-1 downto n*DW) <= i;
---    end generate;
---    
---    lable2: if (n /= conv_integer(A)) generate
---      o((n+1)*DW-1 downto n*DW) <= (others => '0');
---    end generate;
---    
---  end generate;
-
-  
---  o((addr+1)*DW-1 downto addr*DW) <= i;
---  o(cnt*DW-1    downto (addr+1)*DW) <= (others => '0');
---  o(addr*DW-1   downto 0) <= (others => '0');
-  
-  --o((conv_integer(A)+1)*DW-1 downto conv_integer(A)*DW) <= i;
-  
-  --o <= (((addr+1)*DW-1 downto addr*DW) => i, others => '0');
-  --o <= (15 downto 0 => i, others => '0');
-  --o <= (0 => '1', others => '0');
 
 end Behavioral;
 
