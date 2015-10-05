@@ -78,8 +78,8 @@ end fsmc2bram;
 
 
 
+-----------------------------------------------------------------------------
 
--------------------------
 architecture beh of fsmc2bram is
 
 type state_t is (IDLE, ADDR, WRITE1, READ1);
