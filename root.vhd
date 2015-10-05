@@ -116,19 +116,19 @@ signal clk_locked : std_logic;
 --signal wire_cmd_we  : std_logic_vector (cmdcnt*2-1            downto 0); 
 --signal wire_cmd_clk : std_logic_vector (cmdcnt-1              downto 0); 
 
--- 0..7 matrix buffers
-signal wire_mtrx_a   : std_logic_vector (mtrxcnt*mtrxaw-1       downto 0); 
-signal wire_mtrx_di  : std_logic_vector (mtrxcnt*FSMC_D_WIDTH-1 downto 0); 
-signal wire_mtrx_do  : std_logic_vector (mtrxcnt*FSMC_D_WIDTH-1 downto 0); 
-signal wire_mtrx_en  : std_logic_vector (mtrxcnt-1              downto 0); 
-signal wire_mtrx_we  : std_logic_vector (mtrxcnt-1              downto 0); 
-signal wire_mtrx_clk : std_logic_vector (mtrxcnt-1              downto 0); 
+
+signal wire_bram_a   : std_logic_vector (11 downto 0); 
+signal wire_bram_di  : std_logic_vector (FSMC_D_WIDTH-1 downto 0); 
+signal wire_bram_do  : std_logic_vector (FSMC_D_WIDTH-1 downto 0); 
+signal wire_bram_en  : std_logic; 
+signal wire_bram_we  : std_logic_vector (1 downto 0);  
+signal wire_bram_clk : std_logic; 
 
 
 
 begin
 
-  assert 1 report "mram memory leak detected" severity error;
+  assert (3 > 1) report "bram memory leak detected" severity error;
 
 	clk_src : entity work.clk_src port map (
 		CLK_IN1  => CLK_IN_27MHZ,
@@ -233,44 +233,56 @@ begin
 --    bram_we  => wire_mul_we,
 --    bram_clk => wire_mul_clk
 --  );
+  STM_IO_MUL_RDY <= '0'; -- warning suppressor
 
 
 
+
+
+
+
+  bram : entity work.bram_mtrx
+    PORT MAP (
+      addra => wire_bram_a,
+      dina  => wire_bram_do,
+      douta => wire_bram_di,
+      ena   => wire_bram_en,
+      wea   => wire_bram_we,
+      clka  => wire_bram_clk,
+
+      addrb => (others => '0'),
+      dinb  => (others => '0'),
+      doutb => open,
+      enb   => '0',
+      web   => (others => '0'),
+      clkb  => clk_180mhz
+    );
 
 
 	fsmc2bram : entity work.fsmc2bram 
-  generic map (
-    BW => FSMC_A_BLOCK_WIDTH,
-    BS => FSMC_A_BLOCK_SELECT,
-    DW => FSMC_D_WIDTH,
-    AW => FSMC_A_BLOCK_WIDTH + FSMC_A_BLOCK_SELECT,
-    count => 2**FSMC_A_BLOCK_SELECT
-  )
-  port map (
-		fsmc_clk => FSMC_CLK,
-    mmu_int => STM_IO_MMU_INT,
-    
-		A => FSMC_A ((FSMC_A_BLOCK_WIDTH + FSMC_A_BLOCK_SELECT - 1) downto 0),
-		D => FSMC_D,
-		NCE => FSMC_NCE,
-		NOE => FSMC_NOE,
-		NWE => FSMC_NWE,
-		NBL => FSMC_NBL,
+    generic map (
+      AW => FSMC_A_WIDTH,
+      DW => FSMC_D_WIDTH,
+      AWSPARE => FSMC_A_WIDTH - 12
+    )
+    port map (
+      fsmc_clk => FSMC_CLK,
+      mmu_int => STM_IO_MMU_INT,
+      
+      A => FSMC_A,
+      D => FSMC_D,
+      NCE => FSMC_NCE,
+      NOE => FSMC_NOE,
+      NWE => FSMC_NWE,
+      NBL => FSMC_NBL,
 
-    mtrx_a   => wire_mtrx_a,
-    mtrx_di  => wire_mtrx_di,
-    mtrx_do  => wire_mtrx_do,
-    mtrx_en  => wire_mtrx_en,
-    mtrx_we  => wire_mtrx_we,
-    mtrx_clk => wire_mtrx_clk
-    
---    cmd_a    => wire_cmd_a,
---    cmd_di   => wire_cmd_di,
---    cmd_do   => wire_cmd_do,
---    cmd_en   => wire_cmd_en,
---    cmd_we   => wire_cmd_we,
---    cmd_clk  => wire_cmd_clk
-	);
+      bram_a   => wire_bram_a,
+      bram_di  => wire_bram_di,
+      bram_do  => wire_bram_do,
+      bram_en  => wire_bram_en,
+      bram_we  => wire_bram_we,
+      bram_clk => wire_bram_clk
+    );
 
 
 
@@ -288,7 +300,6 @@ begin
   LED_LINE(5 downto 0) <= (others => '0');
   
   DEV_NULL_BANK1 <= (
-    fsmc_a_unused or 
     STM_IO_OLD_FSMC_CLK or
     STM_IO_MUL_DV or
     STM_IO_8 or

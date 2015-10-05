@@ -41,12 +41,12 @@ entity bram_aggregator is
   Port (
     mmu_int : out std_logic;
 
-    a   : in STD_LOGIC_VECTOR (AW-1 downto 0);
-    do  : out STD_LOGIC_VECTOR (DW-1 downto 0);
-    di  : in STD_LOGIC_VECTOR (DW-1 downto 0);
-    we  : in STD_LOGIC;
-    ce  : in STD_LOGIC;
-    clk : in std_logic;
+    A   : in STD_LOGIC_VECTOR (AW-1 downto 0);
+    DO  : out STD_LOGIC_VECTOR (DW-1 downto 0);
+    DI  : in STD_LOGIC_VECTOR (DW-1 downto 0);
+    WE  : in STD_LOGIC;
+    CE  : in STD_LOGIC;
+    CLK : in std_logic;
     
     slave_a   : out STD_LOGIC_VECTOR (slavecnt*(AW-sel)-1    downto 0);
     slave_di  : in  STD_LOGIC_VECTOR (slavecnt*DW-1 downto 0);
@@ -56,17 +56,13 @@ entity bram_aggregator is
     slave_clk : out std_logic_vector (slavecnt-1    downto 0)
   );
   
-
+  --
   function get_select(A : in std_logic_vector(AW-1 downto 0)) return std_logic_vector is
   begin
     return A(AW-1 downto AW-sel);
   end address2en;
 
---  function address2cnt(A : in std_logic_vector(AW-1 downto 0)) return std_logic_vector is
---  begin
---    return A(BW-1 downto 0);
---  end address2cnt;
-
+  --
   function mmu_check(A : in std_logic_vector(AW-1 downto 0)) return std_logic is
   begin
     if get_select(A) + 1 > slavecnt then
@@ -84,12 +80,6 @@ end bram_aggregator;
 -------------------------
 architecture beh of bram_aggregator is
 
-signal do_common : STD_LOGIC_VECTOR (DW-1 downto 0) := (others => '0');
-signal di_common : STD_LOGIC_VECTOR (DW-1 downto 0) := (others => '0');
-signal we_common : STD_LOGIC;
-signal en_common : STD_LOGIC;
-signal blk_select : STD_LOGIC_VECTOR (BS-1 downto 0);
-
 constant slaveaw : positive := AW - sel;
 
 begin
@@ -97,84 +87,49 @@ begin
   -- fire up memory check
   mmu_int <= mmu_check(A);
   
-  -- fanout connections
+  -- fanout bus connections
   fanout : for n in 0 to slavecnt-1 generate 
   begin
-    slave_a  ((n+1)*slaveaw-1 downto n*slaveaw) <= a(slaveaw-1 downto 0);
-    slave_do ((n+1)*DW-1 downto n*DW) <= do;
+    slave_a  ((n+1)*slaveaw-1 downto n*slaveaw) <= A(slaveaw-1 downto 0);
+    slave_do ((n+1)*DW-1 downto n*DW) <= DI;
   end generate;
   
-  
-  
-  
-  
+  -- clock enable fanout
   en_demux : entity work.demuxer
   generic map (
-    AW => BS,
-    DW => 1
+    AW => sel,
+    DW => 2**sel
   )
   PORT MAP (
-    A    => blk_select,
-    i(0) => en_common,
-    o    => bram_en
+    A    => get_select(A),
+    i(0) => CE,
+    o    => slave_en
   );
 
-
-
+  -- write enable fanout
+  we_demux : entity work.demuxer
+  generic map (
+    AW => sel,
+    DW => 2**sel
+  )
+  PORT MAP (
+    A    => get_select(A),
+    i(0) => WE,
+    o    => slave_we
+  );
+  
+  -- data bus fanout
   di_mux : entity work.muxer
   generic map (
-    AW => BS,
+    AW => sel,
     DW => DW
   )
   PORT MAP (
-    A => blk_select,
-    i => bram_di,
-    o => di_common
+    A => get_select(A),
+    i => slave_di,
+    o => DO
   );
 
-
-
-  D <= di_common when (NCE = '0' and NOE = '0') else (others => 'Z');
-  do_common <= D;
-  
-  
-  
-  process(fsmc_clk, NCE) begin
-    if (NCE = '1') then
-      en_common <= '0';
-      we_common <= "00";
-      state <= IDLE;
-      
-    elsif rising_edge(fsmc_clk) then
-      case state is
-      
-      when IDLE =>
-        if (NCE = '0') then 
-          a_cnt <= address2cnt(A);
-          blk_select <= address2en(A);
-          state <= ADDR;
-        end if;
-        
-      when ADDR =>
-        if (NWE = '0') then
-          state <= WRITE1;
-        else
-          state <= READ1;
-          en_common <= '1';
-          a_cnt <= a_cnt + 1;
-        end if;
-
-      when WRITE1 =>
-        en_common <= '1';
-        we_common <= not NBL;
-        a_cnt <= a_cnt + 1;
-
-      when READ1 =>
-        a_cnt <= a_cnt + 1;
-
-      end case;
-    end if;
-  end process;
 end beh;
 
 
