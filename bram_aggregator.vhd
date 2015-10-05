@@ -41,19 +41,19 @@ entity bram_aggregator is
   Port (
     mmu_int : out std_logic;
 
-    A   : in STD_LOGIC_VECTOR (AW-1 downto 0);
+    A   : in  STD_LOGIC_VECTOR (AW-1 downto 0);
     DO  : out STD_LOGIC_VECTOR (DW-1 downto 0);
-    DI  : in STD_LOGIC_VECTOR (DW-1 downto 0);
-    WE  : in STD_LOGIC;
-    CE  : in STD_LOGIC;
-    CLK : in std_logic;
+    DI  : in  STD_LOGIC_VECTOR (DW-1 downto 0);
+    WE  : in  STD_LOGIC;
+    CE  : in  STD_LOGIC;
+    CLK : in  std_logic;
     
-    slave_a   : out STD_LOGIC_VECTOR (slavecnt*(AW-sel)-1    downto 0);
-    slave_di  : in  STD_LOGIC_VECTOR (slavecnt*DW-1 downto 0);
-    slave_do  : out STD_LOGIC_VECTOR (slavecnt*DW-1 downto 0);
-    slave_en  : out STD_LOGIC_vector (slavecnt-1    downto 0);
-    slave_we  : out std_logic_vector (slavecnt-1    downto 0);
-    slave_clk : out std_logic_vector (slavecnt-1    downto 0)
+    slave_a   : out STD_LOGIC_VECTOR (slavecnt*(AW-sel)-1 downto 0);
+    slave_di  : in  STD_LOGIC_VECTOR (slavecnt*DW-1       downto 0);
+    slave_do  : out STD_LOGIC_VECTOR (slavecnt*DW-1       downto 0);
+    slave_en  : out STD_LOGIC_vector (slavecnt-1          downto 0);
+    slave_we  : out std_logic_vector (slavecnt-1          downto 0);
+    slave_clk : out std_logic_vector (slavecnt-1          downto 0)
   );
   
   --
