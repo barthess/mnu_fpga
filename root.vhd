@@ -121,7 +121,7 @@ signal wire_bram_a   : std_logic_vector (11 downto 0);
 signal wire_bram_di  : std_logic_vector (FSMC_D_WIDTH-1 downto 0); 
 signal wire_bram_do  : std_logic_vector (FSMC_D_WIDTH-1 downto 0); 
 signal wire_bram_en  : std_logic; 
-signal wire_bram_we  : std_logic_vector (1 downto 0);  
+signal wire_bram_we  : std_logic_vector (0 downto 0);  
 signal wire_bram_clk : std_logic; 
 
 
