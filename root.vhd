@@ -115,6 +115,7 @@ signal wire_bram_do  : std_logic_vector (FSMC_D_WIDTH-1 downto 0);
 signal wire_bram_en  : std_logic; 
 signal wire_bram_we  : std_logic_vector (0 downto 0);  
 signal wire_bram_clk : std_logic; 
+signal wire_bram_asample : std_logic; 
 
 
 signal wire_blinker_a   : std_logic_vector (8 downto 0); 
@@ -219,7 +220,7 @@ begin
       AWMUL => 10, -- AW-sel-2
       DWMUL => 64, -- 64
       sel => 3, -- 3
-      count => 8 -- 8
+      count => 7 -- 8
     )
     port map (
       
@@ -229,6 +230,7 @@ begin
       fsmc_en  => wire_bram_en,
       fsmc_we  => wire_bram_we,
       fsmc_clk => wire_bram_clk,
+      fsmc_asample => wire_bram_asample,
       
       mul_a   => (others => '0'),
       mul_di  => (others => '0'),
@@ -264,7 +266,8 @@ begin
       bram_do  => wire_bram_di,
       bram_en  => wire_bram_en,
       bram_we  => wire_bram_we,
-      bram_clk => wire_bram_clk
+      bram_clk => wire_bram_clk,
+      bram_asample => wire_bram_asample
     );
 
 

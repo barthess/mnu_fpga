@@ -46,6 +46,7 @@ entity bram_aggregator is
     WE  : in  STD_LOGIC_VECTOR (0 downto 0);
     EN  : in  STD_LOGIC;
     CLK : in  std_logic;
+    ASAMPLE : in STD_LOGIC; -- address sample strobe. Must be raised during 1 clock period
     
     slave_a   : out STD_LOGIC_VECTOR (slavecnt*(AW-sel)-1 downto 0);
     slave_di  : in  STD_LOGIC_VECTOR (slavecnt*DW-1       downto 0);
@@ -95,17 +96,18 @@ begin
   slave_clk <= (others => CLK);
   
   -- clock enable fanout
-  slave_en <= (others => EN);
---  en_demux : entity work.demuxer
---    generic map (
---      AW => sel,
---      DW => 1
---    )
---    PORT MAP (
---      A    => get_select(A-1),
---      i(0) => EN,
---      o    => slave_en
---    );
+  --slave_en <= (others => EN);
+  en_demux : entity work.demuxer
+    generic map (
+      AW => sel,
+      DW => 1,
+      count => slavecnt
+    )
+    PORT MAP (
+      A    => select_tmp,
+      i(0) => EN,
+      o    => slave_en
+    );
 
   -- write enable fanout
   we_demux : entity work.demuxer
@@ -115,13 +117,12 @@ begin
     count => slavecnt
   )
   PORT MAP (
-    A => get_select(A),
+    A => select_tmp,
     i => WE,
     o => slave_we
   );
 
   -- data bus output fanout
-  select_tmp <= get_select(A-1);
   di_mux : entity work.muxer
   generic map (
     AW => sel,
@@ -133,6 +134,18 @@ begin
     i => slave_di,
     o => DO
   );
+
+  -- 
+  process(CLK) begin
+    if rising_edge(CLK) then
+      if (ASAMPLE = '1') then
+        select_tmp <= get_select(A);
+      end if;
+    end if;
+  end process;
+
+
+
 
 end beh;
 

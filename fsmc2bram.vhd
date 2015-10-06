@@ -52,7 +52,8 @@ entity fsmc2bram is
     bram_do  : out STD_LOGIC_VECTOR (DW-1 downto 0);
     bram_en  : out STD_LOGIC;
     bram_we  : out STD_LOGIC_VECTOR (0 downto 0);
-    bram_clk : out std_logic
+    bram_clk : out std_logic;
+    bram_asample : out STD_LOGIC
   );
   
 
@@ -96,7 +97,7 @@ begin
   -- coonect 3-state data bus
   D <= bram_di when (NCE = '0' and NOE = '0') else (others => 'Z');
   bram_do <= D;
-  
+
   -- main process
   process(fsmc_clk, NCE) begin
     if (NCE = '1') then
@@ -111,11 +112,13 @@ begin
       when IDLE =>
         if (NCE = '0') then 
           a_cnt <= address2cnt(A);
+          bram_asample <= '1';
           mmu_int <= mmu_check(A, NBL);
           state <= ADDR;
         end if;
         
       when ADDR =>
+        bram_asample <= '0';
         if (NWE = '0') then
           state <= WRITE1;
         else

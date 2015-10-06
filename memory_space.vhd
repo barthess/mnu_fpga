@@ -48,6 +48,7 @@ entity memory_space is
     fsmc_en  : in  STD_LOGIC;
     fsmc_we  : in  std_logic_vector (0 downto 0);
     fsmc_clk : in  std_logic;
+    fsmc_asample : in  STD_LOGIC;
     
     -- wide bus part
     mul_a   : in  STD_LOGIC_VECTOR (count*AWMUL-1 downto 0);
@@ -90,6 +91,7 @@ begin
       EN  => fsmc_en,
       WE  => fsmc_we,
       CLK => fsmc_clk,
+      ASAMPLE => fsmc_asample,
       
       slave_a   => wire_fsmc_a,
       slave_di  => wire_fsmc_di,
