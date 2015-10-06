@@ -241,9 +241,6 @@ begin
     );
 
 
-
-
-
 	fsmc2bram : entity work.fsmc2bram 
     generic map (
       AW => FSMC_A_WIDTH,
