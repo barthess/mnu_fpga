@@ -29,7 +29,7 @@ use IEEE.NUMERIC_STD.ALL;
 --library UNISIM;
 --use UNISIM.VComponents.all;
 
-entity mul_storage is
+entity memory_space is
   Generic (
     AW : positive; -- 15 (4096 * 8)
     DW : positive; -- 16
@@ -57,12 +57,12 @@ entity mul_storage is
     mul_we  : in  std_logic_vector (count-1       downto 0);
     mul_clk : in  std_logic_vector (count-1       downto 0)
   );
-end mul_storage;
+end memory_space;
 
 
 
 
-architecture Behavioral of mul_storage is
+architecture Behavioral of memory_space is
 
   signal wire_fsmc_a   : STD_LOGIC_VECTOR (count*(AW-sel)-1 downto 0);
   signal wire_fsmc_di  : STD_LOGIC_VECTOR (count*DW-1 downto 0);
@@ -100,7 +100,7 @@ begin
     );
 
   -- BRAM array
-  mul_storage : for n in 0 to count-1 generate 
+  memory_space : for n in 0 to count-1 generate 
   begin
     bram : entity work.bram_mtrx
     PORT MAP (
