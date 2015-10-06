@@ -36,15 +36,7 @@ use ieee.std_logic_misc.all;
 entity root is
   generic (
     FSMC_A_WIDTH : positive := 23;
-    FSMC_D_WIDTH : positive := 16;
-    
-    cmdaw   : positive := 9;  -- address width of single CMD region
-    cmdcnt  : positive := 1;  -- number of used command regions (0..2**cmdsel)
-    cmdsel  : positive := 3;  -- command region select bits
-    
-    mtrxsel : positive := 3;  -- matrix region select bits
-    mtrxaw  : positive := 12; -- address width of single matrix region
-    mtrxcnt : positive := 8   -- number of used matrix regions (0..2**mtrxsel)
+    FSMC_D_WIDTH : positive := 16
   );
   port ( 
     CLK_IN_27MHZ : in std_logic;
@@ -117,17 +109,19 @@ signal wire_bram_we  : std_logic_vector (0 downto 0);
 signal wire_bram_clk : std_logic; 
 signal wire_bram_asample : std_logic; 
 
-
-signal wire_blinker_a   : std_logic_vector (8 downto 0); 
+signal wire_blinker_a   : std_logic_vector (11 downto 0); 
 signal wire_blinker_di  : std_logic_vector (15 downto 0); 
 signal wire_blinker_do  : std_logic_vector (15 downto 0); 
 signal wire_blinker_en  : std_logic; 
 signal wire_blinker_we  : std_logic_vector (0 downto 0);  
 signal wire_blinker_clk : std_logic; 
 
+signal zeroes : std_logic_vector (511 downto 0); 
 
 begin
 
+  zeroes <= (others => '0'); 
+  
   assert (3 > 1) report "bram memory leak detected" severity error;
 
 	clk_src : entity work.clk_src port map (
@@ -165,13 +159,17 @@ begin
 
   STM_IO_MUL_RDY <= '0'; -- warning suppressor
 
+
+
+
 --  blinker : entity work.blinker
 --    generic map (
---      AW => 9, -- (512 * 8)
+--      AW => 12, -- (512 * 8)
 --      DW => 16
 --    )
 --    port map (
 --      hclk => clk_10mhz,
+--
 --      led  => LED_LINE(0),
 --
 --      bram_a   => wire_blinker_a,
@@ -181,35 +179,6 @@ begin
 --      bram_we  => wire_blinker_we,
 --      bram_clk => wire_blinker_clk
 --    );
-
---  cmd_space : entity work.memory_space
---    generic map (
---      AW => 12, -- (512 * 8)
---      DW => 16, -- 16
---      AWMUL => 9, -- AW-sel
---      DWMUL => 16,
---      sel => 3, -- 3
---      count => 1 -- 8
---    )
---    port map (
---      
---      fsmc_a   => wire_bram_a,
---      fsmc_di  => wire_bram_di,
---      fsmc_do  => wire_bram_do,
---      fsmc_en  => wire_bram_en,
---      fsmc_we  => wire_bram_we,
---      fsmc_clk => wire_bram_clk,
---
---      mul_a   => wire_blinker_a,
---      mul_di  => wire_blinker_do,
---      mul_do  => wire_blinker_di,
---      mul_en  => wire_blinker_en,
---      mul_we  => wire_blinker_we,
---      mul_clk => wire_blinker_clk
---    );
-
-
-
 
 
 
@@ -223,7 +192,6 @@ begin
       count => 7 -- 8
     )
     port map (
-      
       fsmc_a   => wire_bram_a,
       fsmc_di  => wire_bram_di,
       fsmc_do  => wire_bram_do,
