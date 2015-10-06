@@ -33,42 +33,22 @@ use IEEE.STD_LOGIC_UNSIGNED.ALL;
 entity muxer is
   generic (
     AW : positive;    -- address width
-    DW : positive     -- data width 
+    DW : positive;    -- data width 
+    count : positive  -- actual inputs count
   );
   port(
     A : in  STD_LOGIC_VECTOR(AW-1 downto 0);
-    i : in  STD_LOGIC_VECTOR(2**AW*DW-1 downto 0);
+    --i : in  STD_LOGIC_VECTOR(2**AW*DW-1 downto 0);
+    i : in  STD_LOGIC_VECTOR(count*DW-1 downto 0);
     o : out STD_LOGIC_VECTOR(DW-1 downto 0)
   );
 end muxer;
 
 
-
 architecture Behavioral of muxer is
-
-constant count : positive := 2**AW;
-
-type proxy_t is array(0 to count-1) of std_logic_vector(DW-1 downto 0);
-signal proxy : proxy_t;
-
+  signal addr : positive;
 begin
-
-  array_assign : for n in 0 to count-1 generate 
-  begin
-    proxy(n) <= i((n+1)*DW-1 downto n*DW);
-  end generate;
-  
-  o <= proxy(conv_integer(A));
-
+  addr <= conv_integer(A);
+  o <= i((addr+1)*DW-1 downto addr*DW);
 end Behavioral;
-
-
-
-
-
-
-
-
-
-
 
