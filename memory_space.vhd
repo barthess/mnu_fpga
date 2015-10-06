@@ -76,10 +76,10 @@ begin
   -- BRAM aggregator
   bram_aggregator : entity work.bram_aggregator
     generic map (
-      AW => 15, -- input address width
-      DW => 16, -- data witdth
-      sel => 3, -- number bits used for slave addressing
-      slavecnt => 8 -- number of actually realized outputs
+      AW => AW, -- input address width
+      DW => DW, -- data witdth
+      sel => sel, -- number bits used for slave addressing
+      slavecnt => count -- number of actually realized outputs
     )
     port map (
       --mmu_int => mmu_int,

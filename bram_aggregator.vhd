@@ -111,7 +111,8 @@ begin
   we_demux : entity work.demuxer
   generic map (
     AW => sel,
-    DW => 1
+    DW => 1,
+    count => slavecnt
   )
   PORT MAP (
     A => get_select(A),
@@ -124,7 +125,8 @@ begin
   di_mux : entity work.muxer
   generic map (
     AW => sel,
-    DW => DW
+    DW => DW,
+    count => slavecnt
   )
   PORT MAP (
     A => select_tmp,

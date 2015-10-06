@@ -164,9 +164,6 @@ begin
 
   STM_IO_MUL_RDY <= '0'; -- warning suppressor
 
-
-
-
 --  blinker : entity work.blinker
 --    generic map (
 --      AW => 9, -- (512 * 8)
@@ -183,11 +180,7 @@ begin
 --      bram_we  => wire_blinker_we,
 --      bram_clk => wire_blinker_clk
 --    );
---
---
---
---
---
+
 --  cmd_space : entity work.memory_space
 --    generic map (
 --      AW => 12, -- (512 * 8)
