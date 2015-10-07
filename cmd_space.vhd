@@ -47,12 +47,12 @@ entity cmd_space is
     asample : in STD_LOGIC;
     
     -- wide bus part for command space
-    cmd_a   : in  STD_LOGIC_VECTOR (cnt*(AW-sel)-1 downto 0);
-    cmd_di  : in  STD_LOGIC_VECTOR (cnt*DW-1 downto 0);
-    cmd_do  : out STD_LOGIC_VECTOR (cnt*DW-1 downto 0);
-    cmd_en  : in  STD_LOGIC_vector (cnt-1    downto 0);
-    cmd_we  : in  std_logic_vector (cnt-1    downto 0);
-    cmd_clk : in  std_logic_vector (cnt-1    downto 0)
+    cmd_a   : in  STD_LOGIC_VECTOR (cnt*(AW-sel)-1  downto 0);
+    cmd_di  : in  STD_LOGIC_VECTOR (cnt*DW-1        downto 0);
+    cmd_do  : out STD_LOGIC_VECTOR (cnt*DW-1        downto 0);
+    cmd_en  : in  STD_LOGIC_vector (cnt-1           downto 0);
+    cmd_we  : in  std_logic_vector (cnt-1           downto 0);
+    cmd_clk : in  std_logic_vector (cnt-1           downto 0)
   );
 end cmd_space;
 

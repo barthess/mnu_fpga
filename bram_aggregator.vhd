@@ -38,8 +38,6 @@ entity bram_aggregator is
     slavecnt : positive -- number of actually realized outputs
   );
   Port (
-    --mmu_int : out std_logic;
-
     A   : in  STD_LOGIC_VECTOR (AW-1 downto 0);
     DO  : out STD_LOGIC_VECTOR (DW-1 downto 0);
     DI  : in  STD_LOGIC_VECTOR (DW-1 downto 0);
@@ -83,9 +81,6 @@ constant slaveaw : positive := AW - sel;
 signal select_tmp : std_logic_vector(sel-1 downto 0);
 
 begin
-  
-  -- fire up memory check
-  --mmu_int <= mmu_check(A);
   
   -- fanout bus connections
   fanout : for n in 0 to slavecnt-1 generate 
@@ -134,7 +129,6 @@ begin
     i => slave_di,
     o => DO
   );
-
 
   -- 
   process(CLK) begin

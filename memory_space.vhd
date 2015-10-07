@@ -89,30 +89,29 @@ architecture Behavioral of memory_space is
   signal wire_mtrx_we  : std_logic_vector (cntmtrx-1         downto 0);
   signal wire_mtrx_clk : std_logic_vector (cntmtrx-1         downto 0);
   
-  signal wire_cmd_a   : STD_LOGIC_VECTOR (11 downto 0);
-  signal wire_cmd_di  : STD_LOGIC_VECTOR (15 downto 0);
-  signal wire_cmd_do  : STD_LOGIC_VECTOR (15 downto 0);
+  signal wire_cmd_a   : STD_LOGIC_VECTOR (AWCMD-1 downto 0);
+  signal wire_cmd_di  : STD_LOGIC_VECTOR (DWCMD-1 downto 0);
+  signal wire_cmd_do  : STD_LOGIC_VECTOR (DWCMD-1 downto 0);
   signal wire_cmd_en  : STD_LOGIC;
   signal wire_cmd_we  : std_logic_vector (0 downto 0);
   signal wire_cmd_clk : std_logic;
 
-  signal wire_mtrxcmd_a   : STD_LOGIC_VECTOR (8*12-1    downto 0);
-  signal wire_mtrxcmd_di  : STD_LOGIC_VECTOR (8*DWCMD-1 downto 0);
-  signal wire_mtrxcmd_do  : STD_LOGIC_VECTOR (8*DWCMD-1 downto 0);
-  signal wire_mtrxcmd_en  : STD_LOGIC_vector (8-1       downto 0);
-  signal wire_mtrxcmd_we  : std_logic_vector (8-1       downto 0);
-  signal wire_mtrxcmd_clk : std_logic_vector (8-1       downto 0);
+  signal wire_mtrxcmd_a   : STD_LOGIC_VECTOR (cntfsmc*AWCMD-1 downto 0);
+  signal wire_mtrxcmd_di  : STD_LOGIC_VECTOR (cntfsmc*DWCMD-1 downto 0);
+  signal wire_mtrxcmd_do  : STD_LOGIC_VECTOR (cntfsmc*DWCMD-1 downto 0);
+  signal wire_mtrxcmd_en  : STD_LOGIC_vector (cntfsmc-1       downto 0);
+  signal wire_mtrxcmd_we  : std_logic_vector (cntfsmc-1       downto 0);
+  signal wire_mtrxcmd_clk : std_logic_vector (cntfsmc-1       downto 0);
   
 begin
 
-
-
+  
   cmd_space : entity work.cmd_space
   generic map (
-    AW => 12,
-    DW => 16,
-    sel => 3,
-    cnt => 8
+    AW => AWCMD,
+    DW => DWCMD,
+    sel => selcmd,
+    cnt => cntcmd
   )
   port map (
     -- stm32 part
@@ -132,8 +131,6 @@ begin
     cmd_we  => cmd_we,
     cmd_clk => cmd_clk
   );
-
-
 
 
   -- BRAM array for matrices
@@ -160,33 +157,30 @@ begin
   end generate;
 
 
-
-
   -- top level aggregator  
   wire_mtrxcmd_do  <= wire_mtrx_do  & wire_cmd_do;
   
-  wire_mtrx_we  <= wire_mtrxcmd_we(7 downto 1);
+  wire_mtrx_we  <= wire_mtrxcmd_we(cntfsmc-1 downto 1);
   wire_cmd_we   <= wire_mtrxcmd_we(0 downto 0);
   
-  wire_mtrx_en  <= wire_mtrxcmd_en(7 downto 1);
+  wire_mtrx_en  <= wire_mtrxcmd_en(cntfsmc-1 downto 1);
   wire_cmd_en   <= wire_mtrxcmd_en(0);
   
-  wire_mtrx_clk <= wire_mtrxcmd_clk(7 downto 1);
+  wire_mtrx_clk <= wire_mtrxcmd_clk(cntfsmc-1 downto 1);
   wire_cmd_clk  <= wire_mtrxcmd_clk(0);
   
-  wire_mtrx_a   <= wire_mtrxcmd_a(95 downto 12);
-  wire_cmd_a    <= wire_mtrxcmd_a(11 downto 0);
+  wire_mtrx_a   <= wire_mtrxcmd_a(cntfsmc*AWCMD-1 downto AWCMD);
+  wire_cmd_a    <= wire_mtrxcmd_a(AWCMD-1 downto 0);
   
-  wire_mtrx_di  <= wire_mtrxcmd_di(127 downto 16);
-  wire_cmd_di   <= wire_mtrxcmd_di(15 downto 0);
+  wire_mtrx_di  <= wire_mtrxcmd_di(cntfsmc*DWFSMC-1 downto DWFSMC);
+  wire_cmd_di   <= wire_mtrxcmd_di(DWFSMC-1 downto 0);
   
-
   top_aggregator : entity work.bram_aggregator
     generic map (
-      AW => 15, -- 15
-      DW => 16, -- 16
-      sel => 3, -- 3
-      slavecnt => 8 -- 8
+      AW => AWFSMC, -- 15
+      DW => DWFSMC, -- 16
+      sel => selfsmc, -- 3
+      slavecnt => cntfsmc -- 8
     )
     port map (
       A   => fsmc_a,
