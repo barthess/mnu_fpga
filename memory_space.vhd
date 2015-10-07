@@ -95,17 +95,9 @@ architecture Behavioral of memory_space is
   signal wire_cmd_en  : STD_LOGIC;
   signal wire_cmd_we  : std_logic_vector (0 downto 0);
   signal wire_cmd_clk : std_logic;
-
-  signal wire_mtrxcmd_a   : STD_LOGIC_VECTOR (cntfsmc*AWCMD-1 downto 0);
-  signal wire_mtrxcmd_di  : STD_LOGIC_VECTOR (cntfsmc*DWCMD-1 downto 0);
-  signal wire_mtrxcmd_do  : STD_LOGIC_VECTOR (cntfsmc*DWCMD-1 downto 0);
-  signal wire_mtrxcmd_en  : STD_LOGIC_vector (cntfsmc-1       downto 0);
-  signal wire_mtrxcmd_we  : std_logic_vector (cntfsmc-1       downto 0);
-  signal wire_mtrxcmd_clk : std_logic_vector (cntfsmc-1       downto 0);
   
 begin
 
-  
   cmd_space : entity work.cmd_space
   generic map (
     AW => AWCMD,
@@ -158,23 +150,6 @@ begin
 
 
   -- top level aggregator  
-  wire_mtrxcmd_do  <= wire_mtrx_do  & wire_cmd_do;
-  
-  wire_mtrx_we  <= wire_mtrxcmd_we(cntfsmc-1 downto 1);
-  wire_cmd_we   <= wire_mtrxcmd_we(0 downto 0);
-  
-  wire_mtrx_en  <= wire_mtrxcmd_en(cntfsmc-1 downto 1);
-  wire_cmd_en   <= wire_mtrxcmd_en(0);
-  
-  wire_mtrx_clk <= wire_mtrxcmd_clk(cntfsmc-1 downto 1);
-  wire_cmd_clk  <= wire_mtrxcmd_clk(0);
-  
-  wire_mtrx_a   <= wire_mtrxcmd_a(cntfsmc*AWCMD-1 downto AWCMD);
-  wire_cmd_a    <= wire_mtrxcmd_a(AWCMD-1 downto 0);
-  
-  wire_mtrx_di  <= wire_mtrxcmd_di(cntfsmc*DWFSMC-1 downto DWFSMC);
-  wire_cmd_di   <= wire_mtrxcmd_di(DWFSMC-1 downto 0);
-  
   top_aggregator : entity work.bram_aggregator
     generic map (
       AW => AWFSMC, -- 15
@@ -191,12 +166,23 @@ begin
       CLK => fsmc_clk,
       ASAMPLE => fsmc_asample,
       
-      slave_a   => wire_mtrxcmd_a,
-      slave_di  => wire_mtrxcmd_do,
-      slave_do  => wire_mtrxcmd_di,
-      slave_en  => wire_mtrxcmd_en,
-      slave_we  => wire_mtrxcmd_we,
-      slave_clk => wire_mtrxcmd_clk
+      slave_a(cntfsmc*AWCMD-1   downto AWCMD)  => wire_mtrx_a,
+      slave_a(AWCMD-1           downto 0)      => wire_cmd_a,
+
+      slave_di(cntfsmc*DWFSMC-1 downto DWFSMC) => wire_mtrx_do,
+      slave_di(DWFSMC-1         downto 0)      => wire_cmd_do,
+      
+      slave_do(cntfsmc*DWFSMC-1 downto DWFSMC) => wire_mtrx_di,
+      slave_do(DWFSMC-1         downto 0)      => wire_cmd_di,
+      
+      slave_en(cntfsmc-1 downto 1)  => wire_mtrx_en,
+      slave_en(0)                   => wire_cmd_en,
+      
+      slave_we(cntfsmc-1 downto 1)  => wire_mtrx_we,
+      slave_we(0 downto 0)          => wire_cmd_we,
+  
+      slave_clk(cntfsmc-1 downto 1) => wire_mtrx_clk,
+      slave_clk(0)                  => wire_cmd_clk
     );
 
 end Behavioral;

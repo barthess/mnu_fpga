@@ -155,13 +155,13 @@ begin
 
 
 
-  pwm : entity work.pwm_wrapper
-    port map (
-      clk   => clk_90mhz,
-      leds  => LED_LINE,
-      a     => wire_blinker_a,
-      di    => wire_blinker_di
-    );
+--  pwm : entity work.pwm_wrapper
+--    port map (
+--      clk  => clk_90mhz,
+--      leds => LED_LINE,
+--      a    => wire_blinker_a,
+--      di   => wire_blinker_di
+--    );
 
 
 
@@ -241,7 +241,7 @@ begin
 	STM_IO_FPGA_READY <= not clk_locked;
 
   -- warning suppressors
-  --LED_LINE(5 downto 0) <= (others => '0');
+  LED_LINE(5 downto 0) <= (others => '0');
   
   DEV_NULL_BANK1 <= (
     STM_IO_OLD_FSMC_CLK or
