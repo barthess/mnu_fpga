@@ -135,6 +135,7 @@ begin
     o => DO
   );
 
+
   -- 
   process(CLK) begin
     if rising_edge(CLK) then
@@ -143,9 +144,6 @@ begin
       end if;
     end if;
   end process;
-
-
-
 
 end beh;
 

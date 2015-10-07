@@ -33,14 +33,19 @@ entity memory_space is
   Generic (
     AWFSMC : positive; -- 15 (4096 * 8)
     DWFSMC : positive; -- 16
+    selfsmc : positive; -- 3
+    cntfsmc : positive; -- 8
     
     AWCMD : positive; -- 12 (512 * 8)
     DWCMD : positive; -- 16
     selcmd : positive; -- 3
     cntcmd : positive; -- 8
     
-    AWMTRX : positive; -- AW-sel-2
-    DWMTRX : positive; -- 64
+    -- BRAMs for matrices have different widths of A and B ports
+    AWMTRXA : positive; -- 12+sel
+    DWMTRXA : positive; -- 16
+    AWMTRXB : positive; -- 12-2
+    DWMTRXB : positive; -- 64
     selmtrx : positive; -- 3
     cntmtrx : positive -- 7
   );
@@ -55,20 +60,20 @@ entity memory_space is
     fsmc_asample : in STD_LOGIC;
     
     -- wide bus part for command space
-    cmd_a   : in  STD_LOGIC_VECTOR (cntcmd*AWCMD-1 downto 0);
+    cmd_a   : in  STD_LOGIC_VECTOR (cntcmd*(AWCMD-selcmd)-1 downto 0);
     cmd_di  : in  STD_LOGIC_VECTOR (cntcmd*DWCMD-1 downto 0);
     cmd_do  : out STD_LOGIC_VECTOR (cntcmd*DWCMD-1 downto 0);
     cmd_en  : in  STD_LOGIC_vector (cntcmd-1       downto 0);
     cmd_we  : in  std_logic_vector (cntcmd-1       downto 0);
-    cmd_clk : in  std_logic_vector (cntcmd-1       downto 0)
+    cmd_clk : in  std_logic_vector (cntcmd-1       downto 0);
     
     -- wide bus part for matrices
-    mtrx_a   : in  STD_LOGIC_VECTOR (cntmtrx*AWMTRX-1 downto 0);
-    mtrx_di  : in  STD_LOGIC_VECTOR (cntmtrx*DWMTRX-1 downto 0);
-    mtrx_do  : out STD_LOGIC_VECTOR (cntmtrx*DWMTRX-1 downto 0);
-    mtrx_en  : in  STD_LOGIC_vector (cntmtrx-1        downto 0);
-    mtrx_we  : in  std_logic_vector (cntmtrx-1        downto 0);
-    mtrx_clk : in  std_logic_vector (cntmtrx-1        downto 0)
+    mtrx_a   : in  STD_LOGIC_VECTOR (cntmtrx*AWMTRXB-1 downto 0);
+    mtrx_di  : in  STD_LOGIC_VECTOR (cntmtrx*DWMTRXB-1 downto 0);
+    mtrx_do  : out STD_LOGIC_VECTOR (cntmtrx*DWMTRXB-1 downto 0);
+    mtrx_en  : in  STD_LOGIC_vector (cntmtrx-1         downto 0);
+    mtrx_we  : in  std_logic_vector (cntmtrx-1         downto 0);
+    mtrx_clk : in  std_logic_vector (cntmtrx-1         downto 0)
   );
 end memory_space;
 
@@ -76,119 +81,112 @@ end memory_space;
 
 
 architecture Behavioral of memory_space is
-
-  signal wire_fsmc_a   : STD_LOGIC_VECTOR (count*(AW-sel)-1 downto 0);
-  signal wire_fsmc_di  : STD_LOGIC_VECTOR (count*DW-1 downto 0);
-  signal wire_fsmc_do  : STD_LOGIC_VECTOR (count*DW-1 downto 0);
-  signal wire_fsmc_en  : STD_LOGIC_vector (count-1    downto 0);
-  signal wire_fsmc_we  : std_logic_vector (count-1    downto 0);
-  signal wire_fsmc_clk : std_logic_vector (count-1    downto 0);
   
-  signal wire_mtrx_a   : STD_LOGIC_VECTOR (count*(AW-sel)-1 downto 0);
-  signal wire_mtrx_di  : STD_LOGIC_VECTOR (count*DW-1 downto 0);
-  signal wire_mtrx_do  : STD_LOGIC_VECTOR (count*DW-1 downto 0);
-  signal wire_mtrx_en  : STD_LOGIC_vector (count-1    downto 0);
-  signal wire_mtrx_we  : std_logic_vector (count-1    downto 0);
-  signal wire_mtrx_clk : std_logic_vector (count-1    downto 0);
+  signal wire_mtrx_a   : STD_LOGIC_VECTOR (cntmtrx*(AWMTRXA-selmtrx)-1 downto 0);
+  signal wire_mtrx_di  : STD_LOGIC_VECTOR (cntmtrx*DWMTRXA-1 downto 0);
+  signal wire_mtrx_do  : STD_LOGIC_VECTOR (cntmtrx*DWMTRXA-1 downto 0);
+  signal wire_mtrx_en  : STD_LOGIC_vector (cntmtrx-1         downto 0);
+  signal wire_mtrx_we  : std_logic_vector (cntmtrx-1         downto 0);
+  signal wire_mtrx_clk : std_logic_vector (cntmtrx-1         downto 0);
   
-  signal wire_cmd_a   : STD_LOGIC_VECTOR (count*(AW-sel)-1 downto 0);
-  signal wire_cmd_di  : STD_LOGIC_VECTOR (count*DW-1 downto 0);
-  signal wire_cmd_do  : STD_LOGIC_VECTOR (count*DW-1 downto 0);
-  signal wire_cmd_en  : STD_LOGIC_vector (count-1    downto 0);
-  signal wire_cmd_we  : std_logic_vector (count-1    downto 0);
-  signal wire_cmd_clk : std_logic_vector (count-1    downto 0);
+  signal wire_cmd_a   : STD_LOGIC_VECTOR (11 downto 0);
+  signal wire_cmd_di  : STD_LOGIC_VECTOR (15 downto 0);
+  signal wire_cmd_do  : STD_LOGIC_VECTOR (15 downto 0);
+  signal wire_cmd_en  : STD_LOGIC;
+  signal wire_cmd_we  : std_logic_vector (0 downto 0);
+  signal wire_cmd_clk : std_logic;
 
-  signal aggr_cmd_a   : STD_LOGIC_VECTOR (count*(AW-sel)-1 downto 0);
-  signal aggr_cmd_di  : STD_LOGIC_VECTOR (count*DW-1 downto 0);
-  signal aggr_cmd_do  : STD_LOGIC_VECTOR (count*DW-1 downto 0);
-  signal aggr_cmd_en  : STD_LOGIC_vector (count-1    downto 0);
-  signal aggr_cmd_we  : std_logic_vector (count-1    downto 0);
-  signal aggr_cmd_clk : std_logic_vector (count-1    downto 0);
+  signal wire_mtrxcmd_a   : STD_LOGIC_VECTOR (8*12-1    downto 0);
+  signal wire_mtrxcmd_di  : STD_LOGIC_VECTOR (8*DWCMD-1 downto 0);
+  signal wire_mtrxcmd_do  : STD_LOGIC_VECTOR (8*DWCMD-1 downto 0);
+  signal wire_mtrxcmd_en  : STD_LOGIC_vector (8-1       downto 0);
+  signal wire_mtrxcmd_we  : std_logic_vector (8-1       downto 0);
+  signal wire_mtrxcmd_clk : std_logic_vector (8-1       downto 0);
   
 begin
+
+
+
+  cmd_space : entity work.cmd_space
+  generic map (
+    AW => 12,
+    DW => 16,
+    sel => 3,
+    cnt => 8
+  )
+  port map (
+    -- stm32 part
+    a   => wire_cmd_a,
+    di  => wire_cmd_di,
+    do  => wire_cmd_do,
+    en  => wire_cmd_en,
+    we  => wire_cmd_we,
+    clk => wire_cmd_clk,
+    asample => fsmc_asample,
+
+    -- peripheral part
+    cmd_a   => cmd_a,
+    cmd_di  => cmd_di,
+    cmd_do  => cmd_do,
+    cmd_en  => cmd_en,
+    cmd_we  => cmd_we,
+    cmd_clk => cmd_clk
+  );
+
+
+
 
   -- BRAM array for matrices
   mtrx_space : for n in 0 to cntmtrx-1 generate 
   begin
     bram : entity work.bram_mtrx
     PORT MAP (
-      -- port A connected to aggregator
-      addra => wire_mtrx_a   ((n+1)*(12)-1  downto n*(12)),
-      dina  => wire_mtrx_do  ((n+1)*DWFSMC-1        downto n*DWFSMC),
-      douta => wire_mtrx_di  ((n+1)*DWFSMC-1        downto n*DWFSMC),
+      -- port A 16-bit width connected to aggregator
+      addra => wire_mtrx_a   ((n+1)*(AWMTRXA-selmtrx)-1 downto n*(AWMTRXA-selmtrx)),
+      dina  => wire_mtrx_di  ((n+1)*DWMTRXA-1           downto n*DWMTRXA),
+      douta => wire_mtrx_do  ((n+1)*DWMTRXA-1           downto n*DWMTRXA),
       ena   => wire_mtrx_en  (n),
       wea   => wire_mtrx_we  (n downto n),
       clka  => wire_mtrx_clk (n),
 
-      -- port B is connected to output ports of module
-      addrb => mtrx_a  ((n+1)*AWMTRX-1 downto n*AWMTRX),
-      dinb  => mtrx_di ((n+1)*DWMTRX-1 downto n*DWMTRX),
-      doutb => mtrx_do ((n+1)*DWMTRX-1 downto n*DWMTRX),
+      -- port B 64-bit width is connected to output ports of module
+      addrb => mtrx_a  ((n+1)*AWMTRXB-1 downto n*AWMTRXB),
+      dinb  => mtrx_di ((n+1)*DWMTRXB-1 downto n*DWMTRXB),
+      doutb => mtrx_do ((n+1)*DWMTRXB-1 downto n*DWMTRXB),
       web   => mtrx_we (n downto n),
       enb   => mtrx_en (n),
       clkb  => mtrx_clk(n)
     );
   end generate;
 
-  -- BRAM array for commands
-  cmd_space : for n in 0 to cntcmd-1 generate 
-  begin
-    bram : entity work.bram_cmd
-    PORT MAP (
-      -- port A connected to aggregator
-      addra => wire_cmd_a   ((n+1)*(AWCMD-selcmd)-1 downto n*(AWCMD-selcmd)),
-      dina  => wire_cmd_do  ((n+1)*DWCMD-1          downto n*DWCMD),
-      douta => wire_cmd_di  ((n+1)*DWCMD-1          downto n*DWCMD),
-      ena   => wire_cmd_en  (n),
-      wea   => wire_cmd_we  (n downto n),
-      clka  => wire_cmd_clk (n),
 
-      -- port B is connected to output ports of module
-      addrb => cmd_a  ((n+1)*(AWCMD-selcmd)-1 downto n*AWCMD),
-      dinb  => cmd_di ((n+1)*DWCMD-1          downto n*DWCMD),
-      doutb => cmd_do ((n+1)*DWCMD-1          downto n*DWCMD),
-      web   => cmd_we (n downto n),
-      enb   => cmd_en (n),
-      clkb  => cmd_clk(n)
-    );
-  end generate;
+
+
+  -- top level aggregator  
+  wire_mtrxcmd_do  <= wire_mtrx_do  & wire_cmd_do;
+  
+  wire_mtrx_we  <= wire_mtrxcmd_we(7 downto 1);
+  wire_cmd_we   <= wire_mtrxcmd_we(0 downto 0);
+  
+  wire_mtrx_en  <= wire_mtrxcmd_en(7 downto 1);
+  wire_cmd_en   <= wire_mtrxcmd_en(0);
+  
+  wire_mtrx_clk <= wire_mtrxcmd_clk(7 downto 1);
+  wire_cmd_clk  <= wire_mtrxcmd_clk(0);
+  
+  wire_mtrx_a   <= wire_mtrxcmd_a(95 downto 12);
+  wire_cmd_a    <= wire_mtrxcmd_a(11 downto 0);
+  
+  wire_mtrx_di  <= wire_mtrxcmd_di(127 downto 16);
+  wire_cmd_di   <= wire_mtrxcmd_di(15 downto 0);
   
 
-  -- now aggregate all comand BRAMs into single block with
-  -- same interface like single matrix BRAM 
-  cmd_aggregator : entity work.bram_aggregator
-    generic map (
-      AW => AWCMD, -- 12
-      DW => DWCMD, -- 16
-      sel => selcmd, -- 3
-      slavecnt => cntcmd -- 8
-    )
-    port map (
-      A   => aggr_cmd_a,
-      DI  => aggr_cmd_di,
-      DO  => aggr_cmd_do,
-      EN  => aggr_cmd_en,
-      WE  => aggr_cmd_we,
-      CLK => aggr_cmd_clk,
-      ASAMPLE => fsmc_asample,
-      
-      slave_a   => wire_cmd_a,
-      slave_di  => wire_cmd_di,
-      slave_do  => wire_cmd_do,
-      slave_en  => wire_cmd_en,
-      slave_we  => wire_cmd_we,
-      slave_clk => wire_cmd_clk
-    );
-
-
-
-  -- top level aggregator
   top_aggregator : entity work.bram_aggregator
     generic map (
-      AW => AWFSMC, -- 15
-      DW => DWFSMC, -- 16
-      sel => sel, -- 3
-      slavecnt => count -- 8
+      AW => 15, -- 15
+      DW => 16, -- 16
+      sel => 3, -- 3
+      slavecnt => 8 -- 8
     )
     port map (
       A   => fsmc_a,
@@ -199,17 +197,12 @@ begin
       CLK => fsmc_clk,
       ASAMPLE => fsmc_asample,
       
-      slave_a   => wire_mtrx_a   & aggr_cmd_a,
-      slave_di  => wire_mtrx_di  & aggr_cmd_di,
-      slave_do  => wire_mtrx_do  & aggr_cmd_do,
-      slave_en  => wire_mtrx_en  & aggr_cmd_en,
-      slave_we  => wire_mtrx_we  & aggr_cmd_we,
-      slave_clk => wire_mtrx_clk & aggr_cmd_clk
+      slave_a   => wire_mtrxcmd_a,
+      slave_di  => wire_mtrxcmd_do,
+      slave_do  => wire_mtrxcmd_di,
+      slave_en  => wire_mtrxcmd_en,
+      slave_we  => wire_mtrxcmd_we,
+      slave_clk => wire_mtrxcmd_clk
     );
 
-
-  
-  
 end Behavioral;
-
-

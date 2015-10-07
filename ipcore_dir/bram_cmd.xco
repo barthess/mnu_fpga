@@ -1,7 +1,7 @@
 ##############################################################
 #
 # Xilinx Core Generator version 14.3
-# Date: Tue Oct  6 18:56:35 2015
+# Date: Wed Oct  7 06:56:41 2015
 #
 ##############################################################
 #
@@ -54,8 +54,8 @@ CSET disable_out_of_range_warnings=false
 CSET ecc=false
 CSET ecctype=No_ECC
 CSET enable_32bit_address=false
-CSET enable_a=Always_Enabled
-CSET enable_b=Always_Enabled
+CSET enable_a=Use_ENA_Pin
+CSET enable_b=Use_ENB_Pin
 CSET error_injection_type=Single_Bit_Error_Injection
 CSET fill_remaining_memory_locations=false
 CSET interface_type=Native
@@ -105,4 +105,4 @@ CSET write_width_b=16
 MISC pkg_timestamp=2012-09-17T22:14:36Z
 # END Extra information
 GENERATE
-# CRC: 257399b3
+# CRC: bf9138d1

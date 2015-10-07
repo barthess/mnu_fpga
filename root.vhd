@@ -116,13 +116,7 @@ signal wire_blinker_en  : std_logic;
 signal wire_blinker_we  : std_logic_vector (0 downto 0);  
 signal wire_blinker_clk : std_logic; 
 
-signal zeroes : std_logic_vector (511 downto 0); 
-
 begin
-
-  zeroes <= (others => '0'); 
-  
-  assert (3 > 1) report "bram memory leak detected" severity error;
 
 	clk_src : entity work.clk_src port map (
 		CLK_IN1  => CLK_IN_27MHZ,
@@ -182,33 +176,6 @@ begin
 
 
 
-  mul_space : entity work.memory_space
-    generic map (
-      AW => 15, -- 15 (4096 * 8)
-      DW => 16, -- 16
-      AWMUL => 10, -- AW-sel-2
-      DWMUL => 64, -- 64
-      sel => 3, -- 3
-      count => 7 -- 8
-    )
-    port map (
-      fsmc_a   => wire_bram_a,
-      fsmc_di  => wire_bram_di,
-      fsmc_do  => wire_bram_do,
-      fsmc_en  => wire_bram_en,
-      fsmc_we  => wire_bram_we,
-      fsmc_clk => wire_bram_clk,
-      fsmc_asample => wire_bram_asample,
-      
-      mul_a   => (others => '0'),
-      mul_di  => (others => '0'),
-      mul_do  => open,
-      mul_en  => (others => '0'),
-      mul_we  => (others => '0'),
-      mul_clk => (others => '0')
-    );
-
-
 	fsmc2bram : entity work.fsmc2bram 
     generic map (
       AW => FSMC_A_WIDTH,
@@ -234,13 +201,50 @@ begin
       bram_clk => wire_bram_clk,
       bram_asample => wire_bram_asample
     );
+    
+    
+  memory_space : entity work.memory_space
+    generic map (
+      AWFSMC => 15, -- 15 (4096 * 8)
+      DWFSMC => 16, -- 16
+      selfsmc => 3, -- 3
+      cntfsmc => 8, -- 8
+      
+      AWCMD => 12, -- 12 (512 * 8)
+      DWCMD => 16, -- 16
+      selcmd => 3, -- 3
+      cntcmd => 8, -- 8
 
-
-
-
-
-
-
+      AWMTRXA => 15,
+      DWMTRXA => 16,
+      AWMTRXB => 10,
+      DWMTRXB => 64,
+      selmtrx => 3,
+      cntmtrx => 7
+    )
+    port map (
+      fsmc_a   => wire_bram_a,
+      fsmc_di  => wire_bram_di,
+      fsmc_do  => wire_bram_do,
+      fsmc_en  => wire_bram_en,
+      fsmc_we  => wire_bram_we,
+      fsmc_clk => wire_bram_clk,
+      fsmc_asample => wire_bram_asample,
+    
+      cmd_a   => (others => '0'),
+      cmd_di  => (others => '0'),
+      cmd_do  => open,
+      cmd_en  => (others => '0'),
+      cmd_we  => (others => '0'),
+      cmd_clk => (others => '0'),
+      
+      mtrx_a   => (others => '0'),
+      mtrx_di  => (others => '0'),
+      mtrx_do  => open,
+      mtrx_en  => (others => '0'),
+      mtrx_we  => (others => '0'),
+      mtrx_clk => (others => '0')
+    );
 
 
 
