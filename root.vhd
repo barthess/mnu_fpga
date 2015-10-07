@@ -100,7 +100,6 @@ signal clk_180mhz : std_logic;
 signal clk_360mhz : std_logic;
 signal clk_locked : std_logic;
 
-
 signal wire_bram_a   : std_logic_vector (14 downto 0); 
 signal wire_bram_di  : std_logic_vector (FSMC_D_WIDTH-1 downto 0); 
 signal wire_bram_do  : std_logic_vector (FSMC_D_WIDTH-1 downto 0); 
@@ -109,7 +108,7 @@ signal wire_bram_we  : std_logic_vector (0 downto 0);
 signal wire_bram_clk : std_logic; 
 signal wire_bram_asample : std_logic; 
 
-signal wire_blinker_a   : std_logic_vector (11 downto 0); 
+signal wire_blinker_a   : std_logic_vector (8 downto 0); 
 signal wire_blinker_di  : std_logic_vector (15 downto 0); 
 signal wire_blinker_do  : std_logic_vector (15 downto 0); 
 signal wire_blinker_en  : std_logic; 
@@ -156,23 +155,13 @@ begin
 
 
 
---  blinker : entity work.blinker
---    generic map (
---      AW => 12, -- (512 * 8)
---      DW => 16
---    )
---    port map (
---      hclk => clk_10mhz,
---
---      led  => LED_LINE(0),
---
---      bram_a   => wire_blinker_a,
---      bram_di  => wire_blinker_di,
---      bram_do  => wire_blinker_do,
---      bram_en  => wire_blinker_en,
---      bram_we  => wire_blinker_we,
---      bram_clk => wire_blinker_clk
---    );
+  pwm : entity work.pwm_wrapper
+    port map (
+      clk   => clk_90mhz,
+      leds  => LED_LINE,
+      a     => wire_blinker_a,
+      di    => wire_blinker_di
+    );
 
 
 
@@ -252,7 +241,7 @@ begin
 	STM_IO_FPGA_READY <= not clk_locked;
 
   -- warning suppressors
-  LED_LINE(5 downto 0) <= (others => '0');
+  --LED_LINE(5 downto 0) <= (others => '0');
   
   DEV_NULL_BANK1 <= (
     STM_IO_OLD_FSMC_CLK or
