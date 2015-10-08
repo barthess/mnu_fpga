@@ -108,11 +108,11 @@ signal wire_bram_we  : std_logic_vector (0 downto 0);
 signal wire_bram_clk : std_logic; 
 signal wire_bram_asample : std_logic; 
 
-signal wire_blinker_a   : std_logic_vector (8 downto 0); 
+signal wire_blinker_a   : std_logic_vector (8  downto 0); 
 signal wire_blinker_di  : std_logic_vector (15 downto 0); 
 signal wire_blinker_do  : std_logic_vector (15 downto 0); 
 signal wire_blinker_en  : std_logic; 
-signal wire_blinker_we  : std_logic_vector (0 downto 0);  
+signal wire_blinker_we  : std_logic_vector (0  downto 0);  
 signal wire_blinker_clk : std_logic; 
 
 begin
@@ -154,14 +154,32 @@ begin
 
 
 
+  -- connect PWM to memory space
+  pwm : entity work.pwm_wrapper
+    generic map (
+      CLKIN_FREQ => 90
+    )
+    port map (
+      clk  => clk_90mhz,
+      leds => LED_LINE,
+      
+      a       => wire_blinker_a,
+      di      => wire_blinker_di,
+      do      => wire_blinker_do,
+      en      => wire_blinker_en,
+      we      => wire_blinker_we,
+      bramclk => wire_blinker_clk
+    );
 
---  pwm : entity work.pwm_wrapper
---    port map (
---      clk  => clk_90mhz,
---      leds => LED_LINE,
---      a    => wire_blinker_a,
---      di   => wire_blinker_di
---    );
+
+
+
+
+
+
+
+
+
 
 
 
@@ -220,13 +238,28 @@ begin
       fsmc_clk => wire_bram_clk,
       fsmc_asample => wire_bram_asample,
     
-      cmd_a   => (others => '0'),
-      cmd_di  => (others => '0'),
-      cmd_do  => open,
-      cmd_en  => (others => '0'),
-      cmd_we  => (others => '0'),
-      cmd_clk => (others => '0'),
+      -- 
+      cmd_a   (71  downto 9)  => (others => '0'),
+      cmd_a   (8   downto 0)  => wire_blinker_a,
       
+      cmd_di  (127 downto 16) => (others => '0'),
+      cmd_di  (15 downto 0)   => wire_blinker_do,
+      
+      cmd_do  (127 downto 16) => open,
+      cmd_do  (15 downto 0)   => wire_blinker_di,
+      
+      cmd_en  (7   downto 1)  => (others => '0'),
+      cmd_en  (0)             => wire_blinker_en,
+      
+      cmd_we  (7   downto 1)  => (others => '0'),
+      cmd_we  (0  downto 0)   => wire_blinker_we,
+      
+      cmd_clk (7   downto 1)  => (others => '0'),
+      cmd_clk (0)             => wire_blinker_clk,
+      
+      
+      
+      -- matrix unused pool
       mtrx_a   => (others => '0'),
       mtrx_di  => (others => '0'),
       mtrx_do  => open,
@@ -241,7 +274,7 @@ begin
 	STM_IO_FPGA_READY <= not clk_locked;
 
   -- warning suppressors
-  LED_LINE(5 downto 0) <= (others => '0');
+  --LED_LINE(5 downto 0) <= (others => '0');
   
   DEV_NULL_BANK1 <= (
     STM_IO_OLD_FSMC_CLK or
