@@ -78,6 +78,17 @@ entity root is
     STM_IO_11 : in std_logic;
     STM_IO_12 : in std_logic;
     STM_IO_13 : in std_logic;
+
+    -- bridge between Xbee modem and UART6
+    -- needs only during hardware debug
+    STM_UART6_TX  : in  std_logic;
+    STM_UART6_RX  : out std_logic;
+    STM_UART6_CTS : out std_logic;
+    STM_UART6_RTS : in  std_logic;
+    XBEE_TX       : in  std_logic;
+    XBEE_RX       : out std_logic;
+    XBEE_CTS      : out std_logic;
+    XBEE_RTS      : in  std_logic;
     
 --    SPI1_MISO : out std_logic;
 --    SPI1_MOSI : in std_logic;		  
@@ -117,6 +128,14 @@ signal wire_blinker_clk : std_logic;
 
 begin
 
+  -- connect debug modem
+  STM_UART6_RX  <= XBEE_TX;
+  STM_UART6_CTS <= XBEE_RTS;
+  XBEE_RX       <= STM_UART6_TX;
+  XBEE_CTS      <= STM_UART6_RTS;
+
+
+  -- clocking sources
 	clk_src : entity work.clk_src port map (
 		CLK_IN1  => CLK_IN_27MHZ,
     
@@ -129,6 +148,7 @@ begin
     
 		LOCKED   => clk_locked
 	);
+
 
   -- connect GNSS router
   gnss_router : entity work.gnss_router port map (
@@ -155,32 +175,21 @@ begin
 
 
   -- connect PWM to memory space
-  pwm : entity work.pwm_wrapper
-    generic map (
-      CLKIN_FREQ => 90
-    )
-    port map (
-      clk  => clk_90mhz,
-      leds => LED_LINE,
-      
-      a       => wire_blinker_a,
-      di      => wire_blinker_di,
-      do      => wire_blinker_do,
-      en      => wire_blinker_en,
-      we      => wire_blinker_we,
-      bramclk => wire_blinker_clk
-    );
-
-
-
-
-
-
-
-
-
-
-
+--  pwm : entity work.pwm_wrapper
+--    generic map (
+--      CLKIN_FREQ => 90
+--    )
+--    port map (
+--      clk  => clk_90mhz,
+--      leds => LED_LINE,
+--      
+--      a       => wire_blinker_a,
+--      di      => wire_blinker_di,
+--      do      => wire_blinker_do,
+--      en      => wire_blinker_en,
+--      we      => wire_blinker_we,
+--      bramclk => wire_blinker_clk
+--    );
 
 
 	fsmc2bram : entity work.fsmc2bram 
@@ -239,24 +248,25 @@ begin
       fsmc_asample => wire_bram_asample,
     
       -- 
-      cmd_a   (71  downto 9)  => (others => '0'),
-      cmd_a   (8   downto 0)  => wire_blinker_a,
+--      cmd_a   (71  downto 9)  => (others => '0'),
+--      cmd_a   (8   downto 0)  => wire_blinker_a,
+--      cmd_di  (127 downto 16) => (others => '0'),
+--      cmd_di  (15 downto 0)   => wire_blinker_do,
+--      cmd_do  (127 downto 16) => open,
+--      cmd_do  (15 downto 0)   => wire_blinker_di,
+--      cmd_en  (7   downto 1)  => (others => '0'),
+--      cmd_en  (0)             => wire_blinker_en,
+--      cmd_we  (7   downto 1)  => (others => '0'),
+--      cmd_we  (0  downto 0)   => wire_blinker_we,
+--      cmd_clk (7   downto 1)  => (others => '0'),
+--      cmd_clk (0)             => wire_blinker_clk,
       
-      cmd_di  (127 downto 16) => (others => '0'),
-      cmd_di  (15 downto 0)   => wire_blinker_do,
-      
-      cmd_do  (127 downto 16) => open,
-      cmd_do  (15 downto 0)   => wire_blinker_di,
-      
-      cmd_en  (7   downto 1)  => (others => '0'),
-      cmd_en  (0)             => wire_blinker_en,
-      
-      cmd_we  (7   downto 1)  => (others => '0'),
-      cmd_we  (0  downto 0)   => wire_blinker_we,
-      
-      cmd_clk (7   downto 1)  => (others => '0'),
-      cmd_clk (0)             => wire_blinker_clk,
-      
+      cmd_a   => (others => '0'),
+      cmd_di  => (others => '0'),
+      cmd_do  => open,
+      cmd_en  => (others => '0'),
+      cmd_we  => (others => '0'),
+      cmd_clk => (others => '0'),
       
       
       -- matrix unused pool
@@ -274,7 +284,7 @@ begin
 	STM_IO_FPGA_READY <= not clk_locked;
 
   -- warning suppressors
-  --LED_LINE(5 downto 0) <= (others => '0');
+  LED_LINE(5 downto 0) <= (others => '0');
   
   DEV_NULL_BANK1 <= (
     STM_IO_OLD_FSMC_CLK or
