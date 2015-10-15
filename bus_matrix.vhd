@@ -33,14 +33,15 @@ use IEEE.NUMERIC_STD.ALL;
 
 entity bus_matrix is
   generic (
-    AW   : positive; -- address width in bits
-    ocnt : positive; -- output ports count
-    DW   : positive  -- data bus width 
+    AW   : positive; -- address width for multiplexers (select bits count)
+    DW   : positive; -- data bus width 
+    icnt : positive; -- input ports count
+    ocnt : positive  -- output ports count
   );
   port(
-    A : in  STD_LOGIC_VECTOR(AW*ocnt-1  downto 0);
-    i : in  STD_LOGIC_VECTOR(2**AW*DW-1 downto 0);
-    o : out STD_LOGIC_VECTOR(ocnt*DW-1  downto 0)
+    A : in  STD_LOGIC_VECTOR(AW*ocnt-1 downto 0);
+    i : in  STD_LOGIC_VECTOR(icnt*DW-1 downto 0);
+    o : out STD_LOGIC_VECTOR(ocn  t*DW-1 downto 0)
   );
 end bus_matrix;
 

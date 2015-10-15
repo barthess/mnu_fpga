@@ -32,13 +32,12 @@ use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
 entity muxer is
   generic (
-    AW : positive;    -- address width
+    AW : positive;    -- address width (select bits count)
     DW : positive;    -- data width 
     count : positive  -- actual inputs count
   );
   port(
     A : in  STD_LOGIC_VECTOR(AW-1 downto 0);
-    --i : in  STD_LOGIC_VECTOR(2**AW*DW-1 downto 0);
     i : in  STD_LOGIC_VECTOR(count*DW-1 downto 0);
     o : out STD_LOGIC_VECTOR(DW-1 downto 0)
   );
