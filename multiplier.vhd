@@ -36,29 +36,26 @@ entity multiplier is
     AW : positive
   );
   Port (
-    clk : in  STD_LOGIC;
+    clk : in STD_LOGIC;
     ce  : in std_logic;
+    rdy : out std_logic;
     
     -- opernads' sizes
-    len : in  std_logic_vector (15 downto 0);
-    height_op0 : in  std_logic_vector (15 downto 0);
-    height_op1 : in  std_logic_vector (15 downto 0);
+    row : in  std_logic_vector (7 downto 0);
+    col : in  std_logic_vector (7 downto 0);
     
     -- data buses
-    op0 : in  std_logic_vector (63 downto 0);
-    op1 : in  std_logic_vector (63 downto 0);
-    res : out std_logic_vector (63 downto 0) := (others => 'X');
+    op0_di : in  std_logic_vector (63 downto 0);
+    op1_di : in  std_logic_vector (63 downto 0);
+    res_do : out std_logic_vector (63 downto 0) := (others => 'X');
 
     -- address buses
-    a_op0 : out std_logic_vector (AW-1 downto 0);
-    a_op1 : out std_logic_vector (AW-1 downto 0);
-    a_res : out std_logic_vector (AW-1 downto 0);
+    op0_a : out std_logic_vector (AW-1 downto 0);
+    op1_a : out std_logic_vector (AW-1 downto 0);
+    res_a : out std_logic_vector (AW-1 downto 0);
     
-    -- bram WE pin
-    we : out std_logic_vector (7 downto 0) := (others => '0');
-    
-    pin_rdy : out std_logic;
-    pin_dv  : in std_logic
+    -- result bram WE pin
+    we : out std_logic
   );
 end multiplier;
 
@@ -70,125 +67,115 @@ architecture Behavioral of multiplier is
 
 type state_t is (
   IDLE,
-  LOAD0,  -- latency cycle for BRAM
-  LOAD1,  -- data valid on inputs
-  MUL,
-  WAIT_DRAIN,
-  NOTIFY
+  PRELOAD,  -- latency cycle for BRAM
+  LOAD,     -- load next data portion to pipeline
+  DRAIN
 );
 
 type out_state_t is (
-  OUT_IDLE,
-  WAIT_FIRST,
+  IDLE,
   DRAIN
 );
   
 signal state : state_t := IDLE;
-signal out_state : out_state_t := OUT_IDLE;
+signal out_state : out_state_t := IDLE;
 
-constant TOTAL_STEPS : integer := 2048;
-signal steps : integer := TOTAL_STEPS;
-
-constant start_address : std_logic_vector (AW-1 downto 0) := (others => '0');
-
-signal addr_read  : std_logic_vector (AW-1 downto 0) := (others => '0');
-signal addr_write : std_logic_vector (AW-1 downto 0) := (others => '0');
 signal mul_nd  : std_logic := '0';
 signal mul_ce  : std_logic := '0';
 signal mul_rdy : std_logic := '0';
 
+signal total_steps : std_logic_vector (AW-1 downto 0) := (others => '0');
+signal op0_ptr : std_logic_vector (AW-1 downto 0) := (others => '0');
+signal op1_ptr : std_logic_vector (AW-1 downto 0) := (others => '0');
+signal res_ptr : std_logic_vector (AW-1 downto 0) := (others => '0');
+
 begin
+
 
   double_mul : entity work.double_mul
   PORT MAP (
     clk => clk,
-    a => op0,
-    b => op1,
-    result => res,    
+    a => op0_di,
+    b => op1_di,
+    result => res_do,    
     ce => mul_ce,
     rdy => mul_rdy,
     operation_nd => mul_nd
   );
 
-  a_op0 <= addr_read;
-  a_op1 <= addr_read;
-  a_res <= addr_write;
-
-  -- output state machine
-  process(clk) begin
-    if rising_edge(clk) then
-      case out_state is
-      
-      when OUT_IDLE =>
-        addr_write <= start_address;
-        if (state = MUL) then
-          out_state <= WAIT_FIRST;
-        end if;
-        
-      when WAIT_FIRST =>
-        if (mul_rdy = '1') then
-          out_state <= DRAIN;
-          addr_write <= addr_write + 1;
-          we <= (others => '1');
-        end if;
-        
-      when DRAIN =>
-        addr_write <= addr_write + 1;
-        if (mul_rdy = '0') then
-          out_state <= OUT_IDLE;
-          we <= (others => '0');
-        end if;
-
-      end case;
-    end if;
-  end process;
+  op0_a <= op0_ptr;
+  op1_a <= op1_ptr;
+  res_a <= res_ptr;
 
 
   -- main state machine
   process(clk) begin
     if rising_edge(clk) then
-      case state is
+      if (ce = '0') then
+        state <= IDLE;
+        mul_ce <= '0';
+        rdy <= '0';
+        op0_ptr <= (others => '0');
+        op1_ptr <= (others => '0');
+        res_ptr <= (others => '0');
+      else
+        case state is
+        
+        when IDLE =>
+          op0_ptr <= op0_ptr + 1;
+          op1_ptr <= op1_ptr + 1;
+          total_steps <= row * col;
+          state <= PRELOAD;
+          
+        when PRELOAD =>
+          op0_ptr <= op0_ptr + 1;
+          op1_ptr <= op1_ptr + 1;
+          mul_ce <= '1';
+          mul_nd <= '1';
+          state <= LOAD;
+          
+        when LOAD =>
+          op0_ptr <= op0_ptr + 1;
+          op1_ptr <= op1_ptr + 1;
+          if (op0_ptr = total_steps + 2) then
+            state <= DRAIN;
+          end if;
+
+        when DRAIN =>
+          if (out_state = IDLE) then
+            mul_ce <= '0';
+            rdy <= '1';
+            state <= IDLE;
+          end if;
+        end case;
+        
+      end if; -- ce
+    end if;   -- clk
+  end process;
+  
+  
+  -- output draining state machine
+  process(clk) begin
+    if rising_edge(clk) then
+      case out_state is
       
       when IDLE =>
-        mul_ce <= '0';
-        addr_read <= start_address;
-        if (pin_dv = '1') then
-          addr_read <= addr_read + 1;
-          state <= LOAD0;
-        end if;
-        
-      when LOAD0 =>
-        addr_read <= addr_read + 1;
-        state <= LOAD1;
-        
-      when LOAD1 =>
-        addr_read <= addr_read + 1;
-        state <= MUL;
-        mul_nd <= '1';
-        mul_ce <= '1';
-
-      when MUL =>
-        addr_read <= addr_read + 1;
-        steps <= steps - 1;
-        if (steps = 0) then
-          mul_nd <= '0';
-          state <= WAIT_DRAIN;
-        end if;
-      
-      when WAIT_DRAIN =>
-        if (out_state = OUT_IDLE) then
-          state <= NOTIFY;
+        res_ptr <= (others => '0');
+        if (state = IDLE) then
+          out_state <= DRAIN;
+          we <= '1';
         end if;
 
-      -- hardware handshake with STM32
-      when NOTIFY =>
-        pin_rdy <= '1';
-        if (pin_dv = '0') then -- result acquired by master
-          state <= IDLE;
-          pin_rdy <= '0';
+      when DRAIN =>
+        if (mul_rdy = '1') then
+          res_ptr <= res_ptr + 1;
         end if;
-
+        if (res_ptr = total_steps + 1) then
+          we <= '0';
+          out_state <= IDLE;
+        end if;
       end case;
+
     end if;
   end process;
 end Behavioral;

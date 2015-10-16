@@ -41,7 +41,7 @@ entity bus_matrix is
   port(
     A : in  STD_LOGIC_VECTOR(AW*ocnt-1 downto 0);
     i : in  STD_LOGIC_VECTOR(icnt*DW-1 downto 0);
-    o : out STD_LOGIC_VECTOR(ocn  t*DW-1 downto 0)
+    o : out STD_LOGIC_VECTOR(ocnt*DW-1 downto 0)
   );
 end bus_matrix;
 
@@ -55,7 +55,8 @@ begin
     muxer_array : entity work.muxer
     generic map (
       AW => AW,
-      DW => DW
+      DW => DW,
+      count => icnt
     )
     PORT MAP (
       i => i,

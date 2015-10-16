@@ -35,7 +35,7 @@ entity mul_hive is
     cmddw  : positive; -- 16
     mtrxaw : positive; -- 12
     mtrxdw : positive; -- 64
-    count  : positive -- 7 total regions for matrices
+    mtrxcnt: positive  -- 7 total regions for matrices
   );
   Port (
     hclk : in STD_LOGIC;
@@ -45,29 +45,39 @@ entity mul_hive is
     cmd_do  : out STD_LOGIC_VECTOR (cmddw-1 downto 0);
     cmd_en  : out STD_LOGIC_vector (0 downto 0);
     cmd_we  : out std_logic_vector (0 downto 0);
-    cmd_clk : out std_logic_vector (0 downto 0)
+    cmd_clk : out std_logic_vector (0 downto 0);
 
-    mtrx_a   : out STD_LOGIC_VECTOR (count*mtrxaw-1 downto 0);
-    mtrx_di  : in  STD_LOGIC_VECTOR (count*mtrxdw-1 downto 0);
-    mtrx_do  : out STD_LOGIC_VECTOR (count*mtrxdw-1 downto 0);
-    mtrx_en  : out STD_LOGIC_vector (count-1        downto 0);
-    mtrx_we  : out std_logic_vector (count-1        downto 0);
-    mtrx_clk : out std_logic_vector (count-1        downto 0)
+    mtrx_a   : out STD_LOGIC_VECTOR (mtrxcnt*mtrxaw-1 downto 0);
+    mtrx_di  : in  STD_LOGIC_VECTOR (mtrxcnt*mtrxdw-1 downto 0);
+    mtrx_do  : out STD_LOGIC_VECTOR (mtrxcnt*mtrxdw-1 downto 0);
+    mtrx_en  : out STD_LOGIC_vector (mtrxcnt-1        downto 0);
+    mtrx_we  : out std_logic_vector (mtrxcnt-1        downto 0);
+    mtrx_clk : out std_logic_vector (mtrxcnt-1        downto 0)
   );
 end mul_hive;
 
 
 architecture Behavioral of mul_hive is
 
-signal operand_select : std_logic_vector (15 downto 0); -- spare & res & op1 & op0
-signal mul_di : STD_LOGIC_VECTOR (2*mtrxdw-1 downto 0);
+signal operand_select : std_logic_vector (8 downto 0); -- spare & res[3] & op1[3] & op0[3]
+signal mul_op  : STD_LOGIC_VECTOR (2*mtrxdw-1 downto 0);
+signal mul_res : STD_LOGIC_VECTOR (mtrxdw-1 downto 0);
+signal mul_rdy : STD_LOGIC := '0';
+signal row : STD_LOGIC_VECTOR (7 downto 0);
+signal col : STD_LOGIC_VECTOR (7 downto 0);
+signal mul_ce : STD_LOGIC := '0';
 
---signal mul_res : STD_LOGIC_VECTOR (DW-1 downto 0);
---signal a_res : STD_LOGIC_VECTOR (AW-1 downto 0);
---signal a_op0 : STD_LOGIC_VECTOR (AW-1 downto 0);
---signal a_op1 : STD_LOGIC_VECTOR (AW-1 downto 0);
---signal a_spare : STD_LOGIC_VECTOR (AW-1 downto 0) := (others => '0');
---signal we : std_logic_vector (7 downto 0);
+signal res_a : STD_LOGIC_VECTOR (mtrxaw-1 downto 0);
+signal op0_a : STD_LOGIC_VECTOR (mtrxaw-1 downto 0);
+signal op1_a : STD_LOGIC_VECTOR (mtrxaw-1 downto 0);
+signal bram_we : std_logic_vector(0 downto 0);
+
+constant command_addr : std_logic_vector(cmdaw-1 downto 0) := std_logic_vector(to_unsigned(0, cmdaw));
+constant size_addr : std_logic_vector(cmdaw-1 downto 0) := std_logic_vector(to_unsigned(1, cmdaw));
+
+type state_t is (IDLE, READ0, READ1, MUL);
+signal state : state_t := IDLE;
+
 
 begin
 
@@ -75,81 +85,98 @@ begin
   generic map (
     AW => 3,
     DW => mtrxdw,
-    count => 7
+    icnt => mtrxcnt,
+    ocnt => 2
   )
   PORT MAP (
-    A => operand_select(7 downto 0),
+    A => operand_select(5 downto 0),
     i => mtrx_di,
-    o => mul_di
+    o => mul_op
   );
-
-
-
-
-
-
-
-
 
 
   a_mux : entity work.bus_matrix
   generic map (
     AW => 3,
     DW => mtrxaw,
-    count => 4
+    icnt => 3,
+    ocnt => mtrxcnt
   )
   PORT MAP (
-    A => op_word,
-    i => a_spare & a_res & a_op1 & a_op0,
-    o => bram_a
+    A => operand_select,
+    i => res_a & op1_a & op0_a,
+    o => mtrx_a
   );
   
- 
+
   we_demux : entity work.demuxer
   generic map (
-    AW => 2,
-    DW => 8
+    AW => 3,
+    DW => 1,
+    count => mtrxcnt
   )
   PORT MAP (
-    A => op_word(5 downto 4),
-    i => we,
-    o => bram_we
+    A => operand_select(8 downto 6),
+    i => bram_we,
+    o => mtrx_we
   );
 
-  
-  
-  
 
   multiplier : entity work.multiplier
-  Generic map (
-    AW => AW
+  generic map (
+    AW => 12
   )
-  Port map (
+  PORT MAP (
     clk => hclk,
-    ce => '1',
+    ce  => mul_ce,
+    rdy => mul_rdy,
+  
+    row => row,
+    col => col,
+  
+    op0_di => mul_op(63 downto 0),
+    op1_di => mul_op(127 downto 64),
+    res_do => mul_res,
     
-    len => x"000F",
-    height_op0 => x"000F",
-    height_op1 => x"000F",
-    
-    op0 => mul_di(DW-1   downto 0),
-    op1 => mul_di(2*DW-1 downto DW),
-    res => mul_res,
+    op0_a => op0_a,
+    op1_a => op1_a,
+    res_a => res_a,
 
-    a_op0 => a_op0,
-    a_op1 => a_op1,
-    a_res => a_res,
-    we => we,
-
-    pin_rdy => pin_rdy,
-    pin_dv => pin_dv
+    we => bram_we(0)
   );
 
 
+  process(hclk) begin
+    if rising_edge(hclk) then
+      case state is
+      
+      when IDLE =>
+        cmd_a <= command_addr;
+        operand_select <= cmd_di(8 downto 0);
+        if (cmd_di(8) = '1') then -- check operation flag
+          cmd_a <= size_addr;
+          state <= READ0;
+        end if;
+      
+      when READ0 =>
+        state <= READ1;
+        cmd_a <= size_addr;
+        
+      when READ1 =>
+        state <= MUL;
+        row <= cmd_di(7  downto 0);
+        col <= cmd_di(15 downto 8);
+        mul_ce <= '1';
+      
+      when MUL =>
+        if (mul_rdy = '1') then
+          state  <= IDLE;
+          mul_ce <= '0';
+          cmd_a  <= command_addr;
+          cmd_do <= (others => '0'); -- clear operation flag 
+        end if;
+      
+      end case;
+    end if;
+  end process;
 end Behavioral;
-
-
-
-
-
-
