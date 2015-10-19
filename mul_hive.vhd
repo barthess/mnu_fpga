@@ -60,6 +60,9 @@ end mul_hive;
 architecture Behavioral of mul_hive is
 
 signal operand_select : std_logic_vector (8 downto 0); -- spare & res[3] & op1[3] & op0[3]
+-- stm32 assisted value for address busmatrix
+-- (0 << op0) | (1 << op1) | (2 << res)
+signal operand_addr_select : std_logic_vector (20 downto 0);
 signal mul_op  : STD_LOGIC_VECTOR (2*mtrxdw-1 downto 0);
 signal mul_res : STD_LOGIC_VECTOR (mtrxdw-1 downto 0);
 signal mul_rdy : STD_LOGIC := '0';
@@ -73,9 +76,11 @@ signal op1_a : STD_LOGIC_VECTOR (mtrxaw-1 downto 0);
 signal bram_we : std_logic_vector(0 downto 0);
 
 constant command_addr : std_logic_vector(cmdaw-1 downto 0) := std_logic_vector(to_unsigned(0, cmdaw));
-constant size_addr : std_logic_vector(cmdaw-1 downto 0) := std_logic_vector(to_unsigned(1, cmdaw));
+constant size_addr    : std_logic_vector(cmdaw-1 downto 0) := std_logic_vector(to_unsigned(1, cmdaw));
+constant assist0_addr : std_logic_vector(cmdaw-1 downto 0) := std_logic_vector(to_unsigned(2, cmdaw));
+constant assist1_addr : std_logic_vector(cmdaw-1 downto 0) := std_logic_vector(to_unsigned(3, cmdaw));
 
-type state_t is (IDLE, READ0, READ1, MUL);
+type state_t is (IDLE, READ0, READSIZE, READASS0, READASS1, MUL);
 signal state : state_t := IDLE;
 
 
@@ -103,8 +108,7 @@ begin
     ocnt => mtrxcnt
   )
   PORT MAP (
-    --A => (others => '0') & operand_select,
-    A => (others => '0'),
+    A => operand_addr_select,
     i => res_a & op1_a & op0_a,
     o => mtrx_a
   );
@@ -177,13 +181,23 @@ begin
         end if;
       
       when READ0 =>
-        state <= READ1;
+        state <= READSIZE;
         cmd_a <= size_addr;
         
-      when READ1 =>
-        state <= MUL;
+      when READSIZE =>
+        state <= READASS0;
         row <= cmd_di(4  downto 0); -- LSB
         col <= cmd_di(12 downto 8); -- MSB
+        cmd_a <= assist0_addr;
+        
+      when READASS0 =>
+        state <= READASS1;
+        operand_addr_select(15 downto 0) <= cmd_di;
+        cmd_a <= assist1_addr;
+
+      when READASS1 =>
+        state <= MUL;
+        operand_addr_select(20 downto 16) <= cmd_di(4 downto 0);
         mul_ce <= '1';
       
       when MUL =>
