@@ -41,7 +41,7 @@ entity cmd_space is
     a   : in  STD_LOGIC_VECTOR (AW-1 downto 0);
     di  : in  STD_LOGIC_VECTOR (DW-1 downto 0);
     do  : out STD_LOGIC_VECTOR (DW-1 downto 0);
-    en  : in  STD_LOGIC;
+    ce  : in  STD_LOGIC;
     we  : in  std_logic_vector (0 downto 0);
     clk : in  std_logic;
     asample : in STD_LOGIC;
@@ -50,7 +50,7 @@ entity cmd_space is
     cmd_a   : in  STD_LOGIC_VECTOR (cnt*(AW-sel)-1  downto 0);
     cmd_di  : in  STD_LOGIC_VECTOR (cnt*DW-1        downto 0);
     cmd_do  : out STD_LOGIC_VECTOR (cnt*DW-1        downto 0);
-    cmd_en  : in  STD_LOGIC_vector (cnt-1           downto 0);
+    cmd_ce  : in  STD_LOGIC_vector (cnt-1           downto 0);
     cmd_we  : in  std_logic_vector (cnt-1           downto 0);
     cmd_clk : in  std_logic_vector (cnt-1           downto 0)
   );
@@ -64,7 +64,7 @@ architecture Behavioral of cmd_space is
   signal wire_cmd_a   : STD_LOGIC_VECTOR (cnt*(AW-sel)-1 downto 0);
   signal wire_cmd_di  : STD_LOGIC_VECTOR (cnt*DW-1       downto 0);
   signal wire_cmd_do  : STD_LOGIC_VECTOR (cnt*DW-1       downto 0);
-  signal wire_cmd_en  : STD_LOGIC_vector (cnt-1          downto 0);
+  signal wire_cmd_ce  : STD_LOGIC_vector (cnt-1          downto 0);
   signal wire_cmd_we  : std_logic_vector (cnt-1          downto 0);
   signal wire_cmd_clk : std_logic_vector (cnt-1          downto 0);
   
@@ -79,7 +79,7 @@ begin
       addra => wire_cmd_a   ((n+1)*(AW-sel)-1 downto n*(AW-sel)),
       dina  => wire_cmd_di  ((n+1)*DW-1       downto n*DW),
       douta => wire_cmd_do  ((n+1)*DW-1       downto n*DW),
-      ena   => wire_cmd_en  (n),
+      ena   => wire_cmd_ce  (n),
       wea   => wire_cmd_we  (n downto n),
       clka  => wire_cmd_clk (n),
 
@@ -88,7 +88,7 @@ begin
       dinb  => cmd_di ((n+1)*DW-1       downto n*DW),
       doutb => cmd_do ((n+1)*DW-1       downto n*DW),
       web   => cmd_we (n downto n),
-      enb   => cmd_en (n),
+      enb   => cmd_ce (n),
       clkb  => cmd_clk(n)
     );
   end generate;
@@ -106,7 +106,7 @@ begin
       A   => a,
       DI  => di,
       DO  => do,
-      EN  => en,
+      CE  => ce,
       WE  => we,
       CLK => clk,
       ASAMPLE => asample,
@@ -114,7 +114,7 @@ begin
       slave_a   => wire_cmd_a,
       slave_di  => wire_cmd_do,
       slave_do  => wire_cmd_di,
-      slave_en  => wire_cmd_en,
+      slave_ce  => wire_cmd_ce,
       slave_we  => wire_cmd_we,
       slave_clk => wire_cmd_clk
     );

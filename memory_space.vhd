@@ -54,7 +54,7 @@ entity memory_space is
     fsmc_a   : in  STD_LOGIC_VECTOR (AWFSMC-1 downto 0);
     fsmc_di  : in  STD_LOGIC_VECTOR (DWFSMC-1 downto 0);
     fsmc_do  : out STD_LOGIC_VECTOR (DWFSMC-1 downto 0);
-    fsmc_en  : in  STD_LOGIC;
+    fsmc_ce  : in  STD_LOGIC;
     fsmc_we  : in  std_logic_vector (0 downto 0);
     fsmc_clk : in  std_logic;
     fsmc_asample : in STD_LOGIC;
@@ -63,7 +63,7 @@ entity memory_space is
     cmd_a   : in  STD_LOGIC_VECTOR (cntcmd*(AWCMD-selcmd)-1 downto 0);
     cmd_di  : in  STD_LOGIC_VECTOR (cntcmd*DWCMD-1 downto 0);
     cmd_do  : out STD_LOGIC_VECTOR (cntcmd*DWCMD-1 downto 0);
-    cmd_en  : in  STD_LOGIC_vector (cntcmd-1       downto 0);
+    cmd_ce  : in  STD_LOGIC_vector (cntcmd-1       downto 0);
     cmd_we  : in  std_logic_vector (cntcmd-1       downto 0);
     cmd_clk : in  std_logic_vector (cntcmd-1       downto 0);
     
@@ -71,7 +71,7 @@ entity memory_space is
     mtrx_a   : in  STD_LOGIC_VECTOR (cntmtrx*AWMTRXB-1 downto 0);
     mtrx_di  : in  STD_LOGIC_VECTOR (cntmtrx*DWMTRXB-1 downto 0);
     mtrx_do  : out STD_LOGIC_VECTOR (cntmtrx*DWMTRXB-1 downto 0);
-    mtrx_en  : in  STD_LOGIC_vector (cntmtrx-1         downto 0);
+    mtrx_ce  : in  STD_LOGIC_vector (cntmtrx-1         downto 0);
     mtrx_we  : in  std_logic_vector (cntmtrx-1         downto 0);
     mtrx_clk : in  std_logic_vector (cntmtrx-1         downto 0)
   );
@@ -85,14 +85,14 @@ architecture Behavioral of memory_space is
   signal wire_mtrx_a   : STD_LOGIC_VECTOR (cntmtrx*(AWMTRXA-selmtrx)-1 downto 0);
   signal wire_mtrx_di  : STD_LOGIC_VECTOR (cntmtrx*DWMTRXA-1 downto 0);
   signal wire_mtrx_do  : STD_LOGIC_VECTOR (cntmtrx*DWMTRXA-1 downto 0);
-  signal wire_mtrx_en  : STD_LOGIC_vector (cntmtrx-1         downto 0);
+  signal wire_mtrx_ce  : STD_LOGIC_vector (cntmtrx-1         downto 0);
   signal wire_mtrx_we  : std_logic_vector (cntmtrx-1         downto 0);
   signal wire_mtrx_clk : std_logic_vector (cntmtrx-1         downto 0);
   
   signal wire_cmd_a   : STD_LOGIC_VECTOR (AWCMD-1 downto 0);
   signal wire_cmd_di  : STD_LOGIC_VECTOR (DWCMD-1 downto 0);
   signal wire_cmd_do  : STD_LOGIC_VECTOR (DWCMD-1 downto 0);
-  signal wire_cmd_en  : STD_LOGIC;
+  signal wire_cmd_ce  : STD_LOGIC;
   signal wire_cmd_we  : std_logic_vector (0 downto 0);
   signal wire_cmd_clk : std_logic;
   
@@ -110,7 +110,7 @@ begin
     a   => wire_cmd_a,
     di  => wire_cmd_di,
     do  => wire_cmd_do,
-    en  => wire_cmd_en,
+    ce  => wire_cmd_ce,
     we  => wire_cmd_we,
     clk => wire_cmd_clk,
     asample => fsmc_asample,
@@ -119,7 +119,7 @@ begin
     cmd_a   => cmd_a,
     cmd_di  => cmd_di,
     cmd_do  => cmd_do,
-    cmd_en  => cmd_en,
+    cmd_ce  => cmd_ce,
     cmd_we  => cmd_we,
     cmd_clk => cmd_clk
   );
@@ -134,7 +134,7 @@ begin
       addra => wire_mtrx_a   ((n+1)*(AWMTRXA-selmtrx)-1 downto n*(AWMTRXA-selmtrx)),
       dina  => wire_mtrx_di  ((n+1)*DWMTRXA-1           downto n*DWMTRXA),
       douta => wire_mtrx_do  ((n+1)*DWMTRXA-1           downto n*DWMTRXA),
-      ena   => wire_mtrx_en  (n),
+      ena   => wire_mtrx_ce  (n),
       wea   => wire_mtrx_we  (n downto n),
       clka  => wire_mtrx_clk (n),
 
@@ -143,7 +143,7 @@ begin
       dinb  => mtrx_di ((n+1)*DWMTRXB-1 downto n*DWMTRXB),
       doutb => mtrx_do ((n+1)*DWMTRXB-1 downto n*DWMTRXB),
       web   => mtrx_we (n downto n),
-      enb   => mtrx_en (n),
+      enb   => mtrx_ce (n),
       clkb  => mtrx_clk(n)
     );
   end generate;
@@ -161,7 +161,7 @@ begin
       A   => fsmc_a,
       DI  => fsmc_di,
       DO  => fsmc_do,
-      EN  => fsmc_en,
+      CE  => fsmc_ce,
       WE  => fsmc_we,
       CLK => fsmc_clk,
       ASAMPLE => fsmc_asample,
@@ -175,8 +175,8 @@ begin
       slave_do(cntfsmc*DWFSMC-1 downto DWFSMC) => wire_mtrx_di,
       slave_do(DWFSMC-1         downto 0)      => wire_cmd_di,
       
-      slave_en(cntfsmc-1 downto 1)  => wire_mtrx_en,
-      slave_en(0)                   => wire_cmd_en,
+      slave_ce(cntfsmc-1 downto 1)  => wire_mtrx_ce,
+      slave_ce(0)                   => wire_cmd_ce,
       
       slave_we(cntfsmc-1 downto 1)  => wire_mtrx_we,
       slave_we(0 downto 0)          => wire_cmd_we,

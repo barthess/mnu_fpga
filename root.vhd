@@ -111,20 +111,31 @@ signal clk_180mhz : std_logic;
 signal clk_360mhz : std_logic;
 signal clk_locked : std_logic;
 
+-- wires for memspace to fsmc
 signal wire_bram_a   : std_logic_vector (14 downto 0); 
 signal wire_bram_di  : std_logic_vector (FSMC_D_WIDTH-1 downto 0); 
 signal wire_bram_do  : std_logic_vector (FSMC_D_WIDTH-1 downto 0); 
-signal wire_bram_en  : std_logic; 
+signal wire_bram_ce  : std_logic; 
 signal wire_bram_we  : std_logic_vector (0 downto 0);  
 signal wire_bram_clk : std_logic; 
 signal wire_bram_asample : std_logic; 
 
-signal wire_blinker_a   : std_logic_vector (8  downto 0); 
-signal wire_blinker_di  : std_logic_vector (15 downto 0); 
-signal wire_blinker_do  : std_logic_vector (15 downto 0); 
-signal wire_blinker_en  : std_logic; 
-signal wire_blinker_we  : std_logic_vector (0  downto 0);  
-signal wire_blinker_clk : std_logic; 
+-- wires for matrix_mul to memspace
+signal wire_mulcmd_a    : std_logic_vector (8  downto 0); 
+signal wire_mulcmd_di   : std_logic_vector (15 downto 0); 
+signal wire_mulcmd_do   : std_logic_vector (15 downto 0); 
+signal wire_mulcmd_ce   : std_logic_vector (0  downto 0);
+signal wire_mulcmd_we   : std_logic_vector (0  downto 0);  
+signal wire_mulcmd_clk  : std_logic_vector (0  downto 0);
+signal wire_mulmtrx_a   : std_logic_vector (69 downto 0); 
+signal wire_mulmtrx_di  : std_logic_vector (447 downto 0); 
+signal wire_mulmtrx_do  : std_logic_vector (447 downto 0); 
+signal wire_mulmtrx_ce  : std_logic_vector (6  downto 0); 
+signal wire_mulmtrx_we  : std_logic_vector (6  downto 0);  
+signal wire_mulmtrx_clk : std_logic_vector (6  downto 0);  
+
+
+
 
 begin
 
@@ -174,22 +185,39 @@ begin
 
 
 
-  -- connect PWM to memory space
---  pwm : entity work.pwm_wrapper
---    generic map (
---      CLKIN_FREQ => 90
---    )
---    port map (
---      clk  => clk_90mhz,
---      leds => LED_LINE,
---      
---      a       => wire_blinker_a,
---      di      => wire_blinker_di,
---      do      => wire_blinker_do,
---      en      => wire_blinker_en,
---      we      => wire_blinker_we,
---      bramclk => wire_blinker_clk
---    );
+  -- connect mul hive to memory space
+  mul_hive : entity work.mul_hive
+  Generic map (
+    cmdaw  => 9,  -- 9
+    cmddw  => 16, -- 16
+    mtrxaw => 10, -- 12
+    mtrxdw => 64, -- 64
+    mtrxcnt=> 7   -- 7
+  )
+  Port map (
+    hclk => clk_90mhz,
+
+    cmd_a   => wire_mulcmd_a,
+    cmd_di  => wire_mulcmd_di,
+    cmd_do  => wire_mulcmd_do,
+    cmd_ce  => wire_mulcmd_ce,
+    cmd_we  => wire_mulcmd_we,
+    cmd_clk => wire_mulcmd_clk,
+
+    mtrx_a   => wire_mulmtrx_a,
+    mtrx_di  => wire_mulmtrx_di,
+    mtrx_do  => wire_mulmtrx_do,
+    mtrx_ce  => wire_mulmtrx_ce,
+    mtrx_we  => wire_mulmtrx_we,
+    mtrx_clk => wire_mulmtrx_clk
+  );
+
+
+
+
+
+
+
 
 
 	fsmc2bram : entity work.fsmc2bram 
@@ -212,7 +240,7 @@ begin
       bram_a   => wire_bram_a,
       bram_di  => wire_bram_do,
       bram_do  => wire_bram_di,
-      bram_en  => wire_bram_en,
+      bram_ce  => wire_bram_ce,
       bram_we  => wire_bram_we,
       bram_clk => wire_bram_clk,
       bram_asample => wire_bram_asample
@@ -242,40 +270,43 @@ begin
       fsmc_a   => wire_bram_a,
       fsmc_di  => wire_bram_di,
       fsmc_do  => wire_bram_do,
-      fsmc_en  => wire_bram_en,
+      fsmc_ce  => wire_bram_ce,
       fsmc_we  => wire_bram_we,
       fsmc_clk => wire_bram_clk,
       fsmc_asample => wire_bram_asample,
     
-      -- 
---      cmd_a   (71  downto 9)  => (others => '0'),
---      cmd_a   (8   downto 0)  => wire_blinker_a,
---      cmd_di  (127 downto 16) => (others => '0'),
---      cmd_di  (15 downto 0)   => wire_blinker_do,
---      cmd_do  (127 downto 16) => open,
---      cmd_do  (15 downto 0)   => wire_blinker_di,
---      cmd_en  (7   downto 1)  => (others => '0'),
---      cmd_en  (0)             => wire_blinker_en,
---      cmd_we  (7   downto 1)  => (others => '0'),
---      cmd_we  (0  downto 0)   => wire_blinker_we,
---      cmd_clk (7   downto 1)  => (others => '0'),
---      cmd_clk (0)             => wire_blinker_clk,
+    
+    
+      -- stubs
+--      cmd_a   => (others => '0'),
+--      cmd_di  => (others => '0'),
+--      cmd_do  => open,
+--      cmd_en  => (others => '0'),
+--      cmd_we  => (others => '0'),
+--      cmd_clk => (others => '0'),
       
-      cmd_a   => (others => '0'),
-      cmd_di  => (others => '0'),
-      cmd_do  => open,
-      cmd_en  => (others => '0'),
-      cmd_we  => (others => '0'),
-      cmd_clk => (others => '0'),
-      
-      
-      -- matrix unused pool
-      mtrx_a   => (others => '0'),
-      mtrx_di  => (others => '0'),
-      mtrx_do  => open,
-      mtrx_en  => (others => '0'),
-      mtrx_we  => (others => '0'),
-      mtrx_clk => (others => '0')
+
+      -- cmd memory region
+      cmd_a   (71  downto 9)  => (others => '0'),
+      cmd_a   (8   downto 0)  => wire_mulcmd_a,
+      cmd_di  (127 downto 16) => (others => '0'),
+      cmd_di  (15 downto 0)   => wire_mulcmd_do,
+      cmd_do  (127 downto 16) => open,
+      cmd_do  (15 downto 0)   => wire_mulcmd_di,
+      cmd_ce  (7   downto 1)  => (others => '0'),
+      cmd_ce  (0)             => wire_mulcmd_ce(0),
+      cmd_we  (7   downto 1)  => (others => '0'),
+      cmd_we  (0  downto 0)   => wire_mulcmd_we,
+      cmd_clk (7   downto 1)  => (others => '0'),
+      cmd_clk (0)             => wire_mulcmd_clk(0),
+
+      -- multiplicator matrix memory region
+      mtrx_a   => wire_mulmtrx_a,
+      mtrx_di  => wire_mulmtrx_do,
+      mtrx_do  => wire_mulmtrx_di,
+      mtrx_ce  => wire_mulmtrx_ce,
+      mtrx_we  => wire_mulmtrx_we,
+      mtrx_clk => wire_mulmtrx_clk
     );
 
 

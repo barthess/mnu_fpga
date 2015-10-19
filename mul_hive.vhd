@@ -43,14 +43,14 @@ entity mul_hive is
     cmd_a   : out STD_LOGIC_VECTOR (cmdaw-1 downto 0);
     cmd_di  : in  STD_LOGIC_VECTOR (cmddw-1 downto 0);
     cmd_do  : out STD_LOGIC_VECTOR (cmddw-1 downto 0);
-    cmd_en  : out STD_LOGIC_vector (0 downto 0);
+    cmd_ce  : out STD_LOGIC_vector (0 downto 0);
     cmd_we  : out std_logic_vector (0 downto 0);
     cmd_clk : out std_logic_vector (0 downto 0);
 
     mtrx_a   : out STD_LOGIC_VECTOR (mtrxcnt*mtrxaw-1 downto 0);
     mtrx_di  : in  STD_LOGIC_VECTOR (mtrxcnt*mtrxdw-1 downto 0);
     mtrx_do  : out STD_LOGIC_VECTOR (mtrxcnt*mtrxdw-1 downto 0);
-    mtrx_en  : out STD_LOGIC_vector (mtrxcnt-1        downto 0);
+    mtrx_ce  : out STD_LOGIC_vector (mtrxcnt-1        downto 0);
     mtrx_we  : out std_logic_vector (mtrxcnt-1        downto 0);
     mtrx_clk : out std_logic_vector (mtrxcnt-1        downto 0)
   );
@@ -63,8 +63,8 @@ signal operand_select : std_logic_vector (8 downto 0); -- spare & res[3] & op1[3
 signal mul_op  : STD_LOGIC_VECTOR (2*mtrxdw-1 downto 0);
 signal mul_res : STD_LOGIC_VECTOR (mtrxdw-1 downto 0);
 signal mul_rdy : STD_LOGIC := '0';
-signal row : STD_LOGIC_VECTOR (7 downto 0);
-signal col : STD_LOGIC_VECTOR (7 downto 0);
+signal row : STD_LOGIC_VECTOR (4 downto 0);
+signal col : STD_LOGIC_VECTOR (4 downto 0);
 signal mul_ce : STD_LOGIC := '0';
 
 signal res_a : STD_LOGIC_VECTOR (mtrxaw-1 downto 0);
@@ -103,7 +103,8 @@ begin
     ocnt => mtrxcnt
   )
   PORT MAP (
-    A => operand_select,
+    --A => (others => '0') & operand_select,
+    A => (others => '0'),
     i => res_a & op1_a & op0_a,
     o => mtrx_a
   );
@@ -124,7 +125,7 @@ begin
 
   multiplier : entity work.multiplier
   generic map (
-    AW => 12
+    AW => 10
   )
   PORT MAP (
     clk => hclk,
@@ -146,11 +147,28 @@ begin
   );
 
 
+
+  -- hardwired lines 
+  cmd_clk(0) <= hclk;
+  cmd_ce  <= "1";
+  
+  mtrx_clk <= (others => hclk);
+  mtrx_ce  <= "1111111";
+  
+  do_assign : for n in 0 to mtrxcnt-1 generate 
+  begin
+    mtrx_do((n+1)*64-1 downto n*64) <= mul_res;
+  end generate;
+  
+  
+  
+  
   process(hclk) begin
     if rising_edge(hclk) then
       case state is
       
       when IDLE =>
+        cmd_we <= "0";
         cmd_a <= command_addr;
         operand_select <= cmd_di(8 downto 0);
         if (cmd_di(8) = '1') then -- check operation flag
@@ -164,8 +182,8 @@ begin
         
       when READ1 =>
         state <= MUL;
-        row <= cmd_di(7  downto 0);
-        col <= cmd_di(15 downto 8);
+        row <= cmd_di(4  downto 0); -- LSB
+        col <= cmd_di(12 downto 8); -- MSB
         mul_ce <= '1';
       
       when MUL =>
@@ -174,6 +192,7 @@ begin
           mul_ce <= '0';
           cmd_a  <= command_addr;
           cmd_do <= (others => '0'); -- clear operation flag 
+          cmd_we <= "1";
         end if;
       
       end case;

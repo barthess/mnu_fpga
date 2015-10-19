@@ -42,14 +42,14 @@ entity bram_aggregator is
     DO  : out STD_LOGIC_VECTOR (DW-1 downto 0);
     DI  : in  STD_LOGIC_VECTOR (DW-1 downto 0);
     WE  : in  STD_LOGIC_VECTOR (0 downto 0);
-    EN  : in  STD_LOGIC;
+    CE  : in  STD_LOGIC;
     CLK : in  std_logic;
     ASAMPLE : in STD_LOGIC; -- address sample strobe. Must be raised during 1 clock period
     
     slave_a   : out STD_LOGIC_VECTOR (slavecnt*(AW-sel)-1 downto 0);
     slave_di  : in  STD_LOGIC_VECTOR (slavecnt*DW-1       downto 0);
     slave_do  : out STD_LOGIC_VECTOR (slavecnt*DW-1       downto 0);
-    slave_en  : out STD_LOGIC_vector (slavecnt-1          downto 0);
+    slave_ce  : out STD_LOGIC_vector (slavecnt-1          downto 0);
     slave_we  : out std_logic_vector (slavecnt-1          downto 0);
     slave_clk : out std_logic_vector (slavecnt-1          downto 0)
   );
@@ -92,7 +92,7 @@ begin
   
   -- clock enable fanout
   --slave_en <= (others => EN);
-  en_demux : entity work.demuxer
+  ce_demux : entity work.demuxer
     generic map (
       AW => sel,
       DW => 1,
@@ -100,8 +100,8 @@ begin
     )
     PORT MAP (
       A    => select_tmp,
-      i(0) => EN,
-      o    => slave_en
+      i(0) => CE,
+      o    => slave_ce
     );
 
   -- write enable fanout

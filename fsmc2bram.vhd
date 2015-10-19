@@ -50,7 +50,7 @@ entity fsmc2bram is
     bram_a   : out STD_LOGIC_VECTOR (AW-AWSPARE-1 downto 0);
     bram_di  : in  STD_LOGIC_VECTOR (DW-1 downto 0);
     bram_do  : out STD_LOGIC_VECTOR (DW-1 downto 0);
-    bram_en  : out STD_LOGIC;
+    bram_ce  : out STD_LOGIC;
     bram_we  : out STD_LOGIC_VECTOR (0 downto 0);
     bram_clk : out std_logic;
     bram_asample : out STD_LOGIC
@@ -101,7 +101,7 @@ begin
   -- main process
   process(fsmc_clk, NCE) begin
     if (NCE = '1') then
-      bram_en <= '0';
+      bram_ce <= '0';
       bram_we <= "0";
       mmu_int <= '0';
       state <= IDLE;
@@ -123,12 +123,12 @@ begin
           state <= WRITE1;
         else
           state <= READ1;
-          bram_en <= '1';
+          bram_ce <= '1';
           a_cnt <= a_cnt + 1;
         end if;
 
       when WRITE1 =>
-        bram_en <= '1';
+        bram_ce <= '1';
         --bram_we <= not NBL;
         bram_we <= "1";
         a_cnt <= a_cnt + 1;

@@ -41,8 +41,8 @@ entity multiplier is
     rdy : out std_logic;
     
     -- opernads' sizes
-    row : in  std_logic_vector (7 downto 0);
-    col : in  std_logic_vector (7 downto 0);
+    row : in  std_logic_vector (4 downto 0);
+    col : in  std_logic_vector (4 downto 0);
     
     -- data buses
     op0_di : in  std_logic_vector (63 downto 0);
@@ -117,7 +117,6 @@ begin
         rdy <= '0';
         op0_ptr <= (others => '0');
         op1_ptr <= (others => '0');
-        res_ptr <= (others => '0');
       else
         case state is
         
