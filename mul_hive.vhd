@@ -62,7 +62,7 @@ architecture Behavioral of mul_hive is
 signal operand_select : std_logic_vector (8 downto 0); -- spare & res[3] & op1[3] & op0[3]
 -- stm32 assisted value for address busmatrix
 -- (0 << op0) | (1 << op1) | (2 << res)
-signal operand_addr_select : std_logic_vector (20 downto 0);
+signal operand_addr_select : std_logic_vector (20 downto 0) := (others => '0');
 signal mul_op  : STD_LOGIC_VECTOR (2*mtrxdw-1 downto 0);
 signal mul_res : STD_LOGIC_VECTOR (mtrxdw-1 downto 0);
 signal mul_rdy : STD_LOGIC := '0';
@@ -80,7 +80,7 @@ constant size_addr    : std_logic_vector(cmdaw-1 downto 0) := std_logic_vector(t
 constant assist0_addr : std_logic_vector(cmdaw-1 downto 0) := std_logic_vector(to_unsigned(2, cmdaw));
 constant assist1_addr : std_logic_vector(cmdaw-1 downto 0) := std_logic_vector(to_unsigned(3, cmdaw));
 
-type state_t is (IDLE, READ0, READSIZE, READASS0, READASS1, MUL);
+type state_t is (IDLE, READ0, READ1, MUL);
 signal state : state_t := IDLE;
 
 
@@ -100,7 +100,7 @@ begin
   );
 
 
-  a_mux : entity work.bus_matrix
+  a_demux : entity work.bus_matrix
   generic map (
     AW => 3,
     DW => mtrxaw,
@@ -163,6 +163,28 @@ begin
   begin
     mtrx_do((n+1)*64-1 downto n*64) <= mul_res;
   end generate;
+  
+  
+  
+  
+  
+  
+  process(operand_select) 
+    variable op0 : positive;
+    variable op1 : positive;
+    variable res : positive;
+  begin
+    op0 <= operand_select(2 downto 0);
+    op1 <= operand_select(5 downto 2);
+    res <= operand_select(8 downto 6);
+    
+    operand_addr_select <= (0 srl op0) or (1 srl op1) or (2 srl res);
+  end process;
+  
+  
+  
+  
+  
   
   
   
