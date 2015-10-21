@@ -16,6 +16,7 @@ sch2HdlBatchFile
 *.cmd_log
 *.cpj
 *.csv
+*.debug
 *.drc
 *.en
 *.exe
