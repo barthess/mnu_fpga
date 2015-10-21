@@ -23,6 +23,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 -- Uncomment the following library declaration if using
 -- arithmetic functions with Signed or Unsigned values
 use IEEE.NUMERIC_STD.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
 -- Uncomment the following library declaration if instantiating
 -- any Xilinx primitives in this code.
@@ -40,9 +41,9 @@ entity mul_hive is
   Port (
     hclk : in STD_LOGIC;
 
-    cmd_a   : out STD_LOGIC_VECTOR (cmdaw-1 downto 0);
+    cmd_a   : out STD_LOGIC_VECTOR (cmdaw-1 downto 0) := (others => '0');
     cmd_di  : in  STD_LOGIC_VECTOR (cmddw-1 downto 0);
-    cmd_do  : out STD_LOGIC_VECTOR (cmddw-1 downto 0);
+    cmd_do  : out STD_LOGIC_VECTOR (cmddw-1 downto 0) := (others => '0');
     cmd_ce  : out STD_LOGIC_vector (0 downto 0);
     cmd_we  : out std_logic_vector (0 downto 0);
     cmd_clk : out std_logic_vector (0 downto 0);
@@ -165,30 +166,42 @@ begin
   end generate;
   
   
+  -- helper process. Converts 9 bits of operands numbers
+  -- to 21 bits of address bus matrix
+--  process(operand_select) 
+--    variable op0 : integer;
+--    variable op1 : integer;
+--    variable res : integer;
+--    variable tmp0 : std_logic_vector(20 downto 0);
+--    variable tmp1 : std_logic_vector(20 downto 0);
+--    variable tmp2 : std_logic_vector(20 downto 0);
+--  begin
+--    op0 := conv_integer(operand_select(2 downto 0));
+--    op1 := conv_integer(operand_select(4 downto 2));
+--    res := conv_integer(operand_select(6 downto 4));
+--
+--    tmp0 := std_logic_vector(shift_left(to_unsigned(0, 21), op0));
+--    tmp1 := std_logic_vector(shift_left(to_unsigned(1, 21), op1));
+--    tmp2 := std_logic_vector(shift_left(to_unsigned(2, 21), res));
+--    
+--    operand_addr_select <= tmp0 or tmp1 or tmp2;
+--  end process;
+  
+  
+  bus_matrix_helper : entity work.bus_matrix_helper
+  generic map (
+    AW => 3,
+    icnt => 3,
+    ocnt => 7
+  )
+  port map (
+    i => operand_select,
+    o => operand_addr_select
+  );
   
   
   
-  
-  process(operand_select) 
-    variable op0 : positive;
-    variable op1 : positive;
-    variable res : positive;
-  begin
-    op0 <= operand_select(2 downto 0);
-    op1 <= operand_select(5 downto 2);
-    res <= operand_select(8 downto 6);
-    
-    operand_addr_select <= (0 srl op0) or (1 srl op1) or (2 srl res);
-  end process;
-  
-  
-  
-  
-  
-  
-  
-  
-  
+  -- main process
   process(hclk) begin
     if rising_edge(hclk) then
       case state is
@@ -203,23 +216,13 @@ begin
         end if;
       
       when READ0 =>
-        state <= READSIZE;
+        state <= READ1;
         cmd_a <= size_addr;
         
-      when READSIZE =>
-        state <= READASS0;
+      when READ1 =>
+        state <= MUL;
         row <= cmd_di(4  downto 0); -- LSB
         col <= cmd_di(12 downto 8); -- MSB
-        cmd_a <= assist0_addr;
-        
-      when READASS0 =>
-        state <= READASS1;
-        operand_addr_select(15 downto 0) <= cmd_di;
-        cmd_a <= assist1_addr;
-
-      when READASS1 =>
-        state <= MUL;
-        operand_addr_select(20 downto 16) <= cmd_di(4 downto 0);
         mul_ce <= '1';
       
       when MUL =>
@@ -230,7 +233,7 @@ begin
           cmd_do <= (others => '0'); -- clear operation flag 
           cmd_we <= "1";
         end if;
-      
+
       end case;
     end if;
   end process;
