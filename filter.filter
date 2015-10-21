@@ -4,5 +4,10 @@
 <!--advised that users do not directly edit the contents of this file.                               -->
 <!--                                                                                                 -->
 <filters xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation='filter.xsd'>
+<filter task="xst" file="HDLCompiler" num="701" type="warning"></filter>
+<filter task="xst" file="Xst" num="647" type="warning"><arg index="1">cmd_di&lt;15:13&gt;</arg></filter>
 <filter task="bitgen" file="PhysDesignRules" num="2410" type="warning"></filter>
+<filter task="xst" file="Xst" num="1293" type="warning"></filter>
+<filter task="xst" file="HDLCompiler" num="946" type="warning"></filter>
+<filter task="xst" file="Xst" num="1896" type="warning"></filter>
 </filters>
