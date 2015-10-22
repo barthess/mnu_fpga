@@ -216,10 +216,6 @@ begin
 
 
 
-
-
-
-
 	fsmc2bram : entity work.fsmc2bram 
     generic map (
       AW => FSMC_A_WIDTH,
@@ -281,7 +277,7 @@ begin
 --      cmd_a   => (others => '0'),
 --      cmd_di  => (others => '0'),
 --      cmd_do  => open,
---      cmd_en  => (others => '0'),
+--      cmd_ce  => (others => '0'),
 --      cmd_we  => (others => '0'),
 --      cmd_clk => (others => '0'),
       
@@ -290,13 +286,13 @@ begin
       cmd_a   (71  downto 9)  => (others => '0'),
       cmd_a   (8   downto 0)  => wire_mulcmd_a,
       cmd_di  (127 downto 16) => (others => '0'),
-      cmd_di  (15 downto 0)   => wire_mulcmd_do,
+      cmd_di  (15  downto 0)  => wire_mulcmd_do,
       cmd_do  (127 downto 16) => open,
-      cmd_do  (15 downto 0)   => wire_mulcmd_di,
+      cmd_do  (15  downto 0)  => wire_mulcmd_di,
       cmd_ce  (7   downto 1)  => (others => '0'),
       cmd_ce  (0)             => wire_mulcmd_ce(0),
       cmd_we  (7   downto 1)  => (others => '0'),
-      cmd_we  (0  downto 0)   => wire_mulcmd_we,
+      cmd_we  (0   downto 0)  => wire_mulcmd_we,
       cmd_clk (7   downto 1)  => (others => '0'),
       cmd_clk (0)             => wire_mulcmd_clk(0),
 
@@ -307,6 +303,14 @@ begin
       mtrx_ce  => wire_mulmtrx_ce,
       mtrx_we  => wire_mulmtrx_we,
       mtrx_clk => wire_mulmtrx_clk
+      
+      -- stubs
+--      mtrx_a   => (others => '0'),
+--      mtrx_di  => (others => '0'),
+--      mtrx_do  => open,
+--      mtrx_ce  => (others => '0'),
+--      mtrx_we  => (others => '0'),
+--      mtrx_clk => (others => '0')
     );
 
 
