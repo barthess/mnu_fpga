@@ -78,8 +78,6 @@ signal bram_we : std_logic_vector(0 downto 0);
 
 constant command_addr : std_logic_vector(cmdaw-1 downto 0) := std_logic_vector(to_unsigned(0, cmdaw));
 constant size_addr    : std_logic_vector(cmdaw-1 downto 0) := std_logic_vector(to_unsigned(1, cmdaw));
-constant assist0_addr : std_logic_vector(cmdaw-1 downto 0) := std_logic_vector(to_unsigned(2, cmdaw));
-constant assist1_addr : std_logic_vector(cmdaw-1 downto 0) := std_logic_vector(to_unsigned(3, cmdaw));
 
 type state_t is (IDLE, READ0, READ1, MUL);
 signal state : state_t := IDLE;
@@ -210,7 +208,7 @@ begin
         cmd_we <= "0";
         cmd_a <= command_addr;
         operand_select <= cmd_di(8 downto 0);
-        if (cmd_di(8) = '1') then -- check operation flag
+        if (cmd_di(15) = '1') then -- check operation flag
           cmd_a <= size_addr;
           state <= READ0;
         end if;

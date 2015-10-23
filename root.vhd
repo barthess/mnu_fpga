@@ -195,7 +195,7 @@ begin
     mtrxcnt=> 7   -- 7
   )
   Port map (
-    hclk => clk_90mhz,
+    hclk => clk_10mhz,
 
     cmd_a   => wire_mulcmd_a,
     cmd_di  => wire_mulcmd_di,
@@ -273,14 +273,14 @@ begin
     
     
     
-      -- stubs
+      -- stubs for memtest
 --      cmd_a   => (others => '0'),
 --      cmd_di  => (others => '0'),
 --      cmd_do  => open,
 --      cmd_ce  => (others => '0'),
 --      cmd_we  => (others => '0'),
 --      cmd_clk => (others => '0'),
-      
+  
 
       -- cmd memory region
       cmd_a   (71  downto 9)  => (others => '0'),
@@ -304,7 +304,7 @@ begin
       mtrx_we  => wire_mulmtrx_we,
       mtrx_clk => wire_mulmtrx_clk
       
-      -- stubs
+      -- stubs for memtest
 --      mtrx_a   => (others => '0'),
 --      mtrx_di  => (others => '0'),
 --      mtrx_do  => open,
