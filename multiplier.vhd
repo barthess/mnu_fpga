@@ -68,8 +68,8 @@ architecture Behavioral of multiplier is
 type state_t is (
   IDLE,
   PRELOAD,  -- latency cycle for BRAM
-  LOAD,     -- load next data portion to pipeline
-  DRAIN
+  MUL,      -- load next data portion to pipeline
+  WAIT_DRAIN
 );
 
 type out_state_t is (
@@ -80,9 +80,9 @@ type out_state_t is (
 signal state : state_t := IDLE;
 signal out_state : out_state_t := IDLE;
 
-signal mul_nd  : std_logic := '0';
-signal mul_ce  : std_logic := '0';
-signal mul_rdy : std_logic := '0';
+signal mul_nd  : std_logic;
+signal mul_ce  : std_logic;
+signal mul_rdy : std_logic;
 
 signal total_steps : std_logic_vector (AW-1 downto 0) := (others => '0');
 signal op0_ptr : std_logic_vector (AW-1 downto 0) := (others => '0');
@@ -114,12 +114,12 @@ begin
       if (ce = '0') then
         state <= IDLE;
         mul_ce <= '0';
+        mul_nd <= '0';
         rdy <= '0';
         op0_ptr <= (others => '0');
         op1_ptr <= (others => '0');
       else
-        case state is
-        
+        case state is  
         when IDLE =>
           op0_ptr <= op0_ptr + 1;
           op1_ptr <= op1_ptr + 1;
@@ -129,21 +129,23 @@ begin
         when PRELOAD =>
           op0_ptr <= op0_ptr + 1;
           op1_ptr <= op1_ptr + 1;
+          state <= MUL;
+          
+        when MUL =>
           mul_ce <= '1';
           mul_nd <= '1';
-          state <= LOAD;
-          
-        when LOAD =>
           op0_ptr <= op0_ptr + 1;
           op1_ptr <= op1_ptr + 1;
           if (op0_ptr = total_steps + 2) then
-            state <= DRAIN;
+            state <= WAIT_DRAIN;
+            mul_nd <= '0';
           end if;
 
-        when DRAIN =>
+        when WAIT_DRAIN =>
           if (out_state = IDLE) then
             mul_ce <= '0';
             rdy <= '1';
+            mul_ce <= '0';
             state <= IDLE;
           end if;
         end case;
@@ -153,28 +155,32 @@ begin
   end process;
   
   
+  -- hardwired memory WE to multiplier ready output
+  we <= mul_rdy;
+  
   -- output draining state machine
   process(clk) begin
     if rising_edge(clk) then
-      case out_state is
-      
-      when IDLE =>
+      if (ce = '0') then
+        out_state <= IDLE;
         res_ptr <= (others => '0');
-        if (state = IDLE) then
-          out_state <= DRAIN;
-          we <= '1';
-        end if;
-
-      when DRAIN =>
-        if (mul_rdy = '1') then
-          res_ptr <= res_ptr + 1;
-        end if;
-        if (res_ptr = total_steps + 1) then
-          we <= '0';
-          out_state <= IDLE;
-        end if;
-      end case;
-
+      else
+        case out_state is
+        when IDLE =>
+          if (state = MUL) then
+            out_state <= DRAIN;
+          end if;
+          
+        when DRAIN =>
+          if (mul_rdy = '1') then
+            res_ptr <= res_ptr + 1;
+          end if;
+          if (res_ptr = total_steps + 1) then
+            out_state <= IDLE;
+          end if;
+        end case;
+        
+      end if;
     end if;
   end process;
 end Behavioral;

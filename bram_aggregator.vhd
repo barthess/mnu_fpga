@@ -44,7 +44,7 @@ entity bram_aggregator is
     WE  : in  STD_LOGIC_VECTOR (0 downto 0);
     CE  : in  STD_LOGIC;
     CLK : in  std_logic;
-    ASAMPLE : in STD_LOGIC; -- address sample strobe. Must be raised during 1 clock period
+    ASAMPLE : in STD_LOGIC; -- address sample strobe. Must be high during 1 clock period
     
     slave_a   : out STD_LOGIC_VECTOR (slavecnt*(AW-sel)-1 downto 0);
     slave_di  : in  STD_LOGIC_VECTOR (slavecnt*DW-1       downto 0);

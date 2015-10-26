@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="/home/barthess/projects/xilinx/mnu/multiplier_testbench_isim_beh.wdb" id="1" type="auto">
+         <top_modules>
+            <top_module name="bip_utils_pkg_v2_0" />
+            <top_module name="floating_point_pkg_v5_0" />
+            <top_module name="floating_point_v5_0_consts" />
+            <top_module name="multiplier_testbench" />
+            <top_module name="numeric_std" />
+            <top_module name="std_logic_1164" />
+            <top_module name="std_logic_arith" />
+            <top_module name="std_logic_unsigned" />
+            <top_module name="textio" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <WVObjectSize size="16" />
+   <wvobject fp_name="/multiplier_testbench/clk" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/multiplier_testbench/ce" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">ce</obj_property>
+      <obj_property name="ObjectShortName">ce</obj_property>
+   </wvobject>
+   <wvobject fp_name="/multiplier_testbench/op0_di" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">op0_di[63:0]</obj_property>
+      <obj_property name="ObjectShortName">op0_di[63:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/multiplier_testbench/op1_di" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">op1_di[63:0]</obj_property>
+      <obj_property name="ObjectShortName">op1_di[63:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/multiplier_testbench/rdy" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">rdy</obj_property>
+      <obj_property name="ObjectShortName">rdy</obj_property>
+   </wvobject>
+   <wvobject fp_name="/multiplier_testbench/res_do" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">res_do[63:0]</obj_property>
+      <obj_property name="ObjectShortName">res_do[63:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/multiplier_testbench/op0_a" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">op0_a[9:0]</obj_property>
+      <obj_property name="ObjectShortName">op0_a[9:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/multiplier_testbench/op1_a" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">op1_a[9:0]</obj_property>
+      <obj_property name="ObjectShortName">op1_a[9:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/multiplier_testbench/res_a" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">res_a[9:0]</obj_property>
+      <obj_property name="ObjectShortName">res_a[9:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/multiplier_testbench/we" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">we</obj_property>
+      <obj_property name="ObjectShortName">we</obj_property>
+   </wvobject>
+   <wvobject fp_name="/multiplier_testbench/uut/double_mul/operation_nd" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">operation_nd</obj_property>
+      <obj_property name="ObjectShortName">operation_nd</obj_property>
+   </wvobject>
+   <wvobject fp_name="/multiplier_testbench/uut/state" type="other" db_ref_id="1">
+      <obj_property name="ElementShortName">state</obj_property>
+      <obj_property name="ObjectShortName">state</obj_property>
+   </wvobject>
+   <wvobject fp_name="/multiplier_testbench/uut/out_state" type="other" db_ref_id="1">
+      <obj_property name="ElementShortName">out_state</obj_property>
+      <obj_property name="ObjectShortName">out_state</obj_property>
+   </wvobject>
+   <wvobject fp_name="/multiplier_testbench/uut/mul_rdy" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">mul_rdy</obj_property>
+      <obj_property name="ObjectShortName">mul_rdy</obj_property>
+   </wvobject>
+   <wvobject fp_name="/multiplier_testbench/uut/mul_nd" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">mul_nd</obj_property>
+      <obj_property name="ObjectShortName">mul_nd</obj_property>
+   </wvobject>
+   <wvobject fp_name="/multiplier_testbench/uut/mul_ce" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">mul_ce</obj_property>
+      <obj_property name="ObjectShortName">mul_ce</obj_property>
+   </wvobject>
+</wave_config>
