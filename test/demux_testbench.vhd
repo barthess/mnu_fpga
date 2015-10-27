@@ -32,14 +32,14 @@ USE ieee.std_logic_1164.ALL;
 -- arithmetic functions with Signed or Unsigned values
 USE ieee.numeric_std.ALL;
  
-ENTITY bus_matrix_helper_testbench IS
-END bus_matrix_helper_testbench;
+ENTITY busmatrix_helper_tb IS
+END busmatrix_helper_tb;
  
-ARCHITECTURE behavior OF bus_matrix_helper_testbench IS 
+ARCHITECTURE behavior OF busmatrix_helper_tb IS 
  
     -- Component Declaration for the Unit Under Test (UUT)
  
-    COMPONENT bus_matrix_helper
+    COMPONENT busmatrix_helper
     generic (
       AW   : positive; -- address width for multiplexers (select bits count)
       icnt : positive; -- input ports count
@@ -61,7 +61,7 @@ ARCHITECTURE behavior OF bus_matrix_helper_testbench IS
 BEGIN
  
 	-- Instantiate the Unit Under Test (UUT)
-   uut: bus_matrix_helper 
+   uut: busmatrix_helper 
    generic map (
     AW => 3,
     icnt => 3,

@@ -85,7 +85,7 @@ signal state : state_t := IDLE;
 
 begin
 
-  di_mux : entity work.bus_matrix
+  di_mux : entity work.busmatrix
   generic map (
     AW => 3,
     DW => mtrxdw,
@@ -99,7 +99,7 @@ begin
   );
 
 
-  a_demux : entity work.bus_matrix
+  a_demux : entity work.busmatrix
   generic map (
     AW => 3,
     DW => mtrxaw,
@@ -186,7 +186,7 @@ begin
 --  end process;
   
   
-  bus_matrix_helper : entity work.bus_matrix_helper
+  busmatrix_helper : entity work.busmatrix_helper
   generic map (
     AW => 3,
     icnt => 3,

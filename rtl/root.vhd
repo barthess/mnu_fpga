@@ -296,18 +296,7 @@ begin
       fsmc_we  => wire_bram_we,
       fsmc_clk => wire_bram_clk,
       fsmc_asample => wire_bram_asample,
-    
-    
-    
-      -- stubs for memtest
---      cmd_a   => (others => '0'),
---      cmd_di  => (others => '0'),
---      cmd_do  => open,
---      cmd_ce  => (others => '0'),
---      cmd_we  => (others => '0'),
---      cmd_clk => (others => '0'),
   
-
       -- cmd memory region
       cmd_a   (71  downto 9)  => (others => '0'),
       cmd_a   (8   downto 0)  => wire_mulcmd_a,
@@ -321,7 +310,15 @@ begin
       cmd_we  (0   downto 0)  => wire_mulcmd_we,
       cmd_clk (7   downto 1)  => (others => '0'),
       cmd_clk (0)             => wire_mulcmd_clk(0),
-
+  
+      -- stubs for memtest
+--      cmd_a   => (others => '0'),
+--      cmd_di  => (others => '0'),
+--      cmd_do  => open,
+--      cmd_ce  => (others => '0'),
+--      cmd_we  => (others => '0'),
+--      cmd_clk => (others => '0'),
+  
       -- multiplicator matrix memory region
       mtrx_a   => wire_mulmtrx_a,
       mtrx_di  => wire_mulmtrx_do,

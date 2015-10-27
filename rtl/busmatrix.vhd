@@ -31,34 +31,40 @@ use IEEE.NUMERIC_STD.ALL;
 --use UNISIM.VComponents.all;
 
 
--- helper for bus matrix with more outputs than inputs
-entity bus_matrix_helper is
+entity busmatrix is
   generic (
     AW   : positive; -- address width for multiplexers (select bits count)
+    DW   : positive; -- data bus width 
     icnt : positive; -- input ports count
     ocnt : positive  -- output ports count
   );
   port(
-    i : in  STD_LOGIC_VECTOR(icnt*AW-1 downto 0);
-    o : out STD_LOGIC_VECTOR(ocnt*AW-1 downto 0)
+    A : in  STD_LOGIC_VECTOR(AW*ocnt-1 downto 0);
+    i : in  STD_LOGIC_VECTOR(icnt*DW-1 downto 0);
+    o : out STD_LOGIC_VECTOR(ocnt*DW-1 downto 0)
   );
-end bus_matrix_helper;
+end busmatrix;
 
 
-architecture Behavioral of bus_matrix_helper is
-  
+architecture Behavioral of busmatrix is
+
 begin
-  process(i) 
-    variable tmp : std_logic_vector (ocnt*AW-1 downto 0) := (others => '0');
-    variable shift : integer;
+  
+  muxer_assign : for n in 0 to ocnt-1 generate 
   begin
-    tmp := (others => '0');
-    mylabel : for n in 0 to icnt-1 loop 
-      shift := AW * conv_integer(i ((n+1)*AW-1 downto n*AW));
-      tmp := tmp or std_logic_vector(shift_left(to_unsigned(n, ocnt*AW), shift));
-    end loop;
-    o <= tmp;  
-  end process;
+    muxer_array : entity work.muxer
+    generic map (
+      AW => AW,
+      DW => DW,
+      count => icnt
+    )
+    PORT MAP (
+      i => i,
+      o => o((n+1)*DW-1 downto n*DW),
+      A => A((n+1)*AW-1 downto n*AW)
+    );
+  end generate;
+
 end Behavioral;
 
 
