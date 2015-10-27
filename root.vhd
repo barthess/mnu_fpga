@@ -161,6 +161,37 @@ begin
 	);
 
 
+
+  ram_to_uart_pwm : entity work.ram_to_uart_pwm 
+  generic map (
+    UART_CHANNELS => 1
+  )
+  port map (
+    clk_fpga => clk_180mhz,
+    rst      => '0',
+
+    CLK_FSMC => FSMC_CLK,
+    A_IN     => '0' & x"20",
+    D_IN     => x"55aa",
+    D_OUT    => open,
+    EN_IN    => '1',
+    WE_IN    => '1',
+
+    UART_RX  => (others => '1'),
+    UART_CTS => (others => '1'),
+    UART_TX(0)  => LED_LINE(0),
+    UART_RTS => open,
+
+    PWM_DATA_IN  => (others => '0'),
+    PWM_EN_IN    => '0',
+    PWM_DATA_OUT => open,
+    PWM_EN_OUT   => open
+  );
+
+
+
+
+
   -- connect GNSS router
   gnss_router : entity work.gnss_router port map (
     sel => STM_IO_GNSS_SELECT,
@@ -180,9 +211,6 @@ begin
 
     ubx_nrst => UBLOX_NRST
   );
-
-  STM_IO_MUL_RDY <= '0'; -- warning suppressor
-
 
 
   -- connect mul hive to memory space
@@ -211,8 +239,6 @@ begin
     mtrx_we  => wire_mulmtrx_we,
     mtrx_clk => wire_mulmtrx_clk
   );
-
-
 
 
 
@@ -318,8 +344,12 @@ begin
 	-- raize ready flag
 	STM_IO_FPGA_READY <= not clk_locked;
 
+
+
   -- warning suppressors
-  LED_LINE(5 downto 0) <= (others => '0');
+  LED_LINE(5 downto 1) <= (others => '0');
+
+  STM_IO_MUL_RDY <= '0'; -- warning suppressor
   
   DEV_NULL_BANK1 <= (
     STM_IO_OLD_FSMC_CLK or
