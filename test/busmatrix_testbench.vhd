@@ -33,20 +33,20 @@ use IEEE.STD_LOGIC_UNSIGNED.ALL;
 -- arithmetic functions with Signed or Unsigned values
 USE ieee.numeric_std.ALL;
  
-ENTITY busmatrix_testbench IS
+ENTITY busmatrix_tb IS
   generic (
     AW   : positive := 3; -- address width for multiplexers (select bits count)
     DW   : positive := 2; -- data bus width 
     icnt : positive := 3; -- input ports count
     ocnt : positive := 7  -- output ports count
   );
-END busmatrix_testbench;
+END busmatrix_tb;
  
-ARCHITECTURE behavior OF busmatrix_testbench IS 
+ARCHITECTURE behavior OF busmatrix_tb IS 
  
     -- Component Declaration for the Unit Under Test (UUT)
  
-    COMPONENT bus_matrix
+    COMPONENT busmatrix
     generic (
       AW   : positive; -- address width for multiplexers (select bits count)
       DW   : positive; -- data bus width 
@@ -71,7 +71,7 @@ ARCHITECTURE behavior OF busmatrix_testbench IS
 BEGIN
  
 	-- Instantiate the Unit Under Test (UUT)
-   uut: bus_matrix 
+   uut: busmatrix 
    generic map (
      AW   => AW,
      DW   => DW,
