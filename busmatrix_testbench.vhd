@@ -27,10 +27,11 @@
 --------------------------------------------------------------------------------
 LIBRARY ieee;
 USE ieee.std_logic_1164.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
  
 -- Uncomment the following library declaration if using
 -- arithmetic functions with Signed or Unsigned values
---USE ieee.numeric_std.ALL;
+USE ieee.numeric_std.ALL;
  
 ENTITY busmatrix_testbench IS
   generic (
@@ -87,17 +88,19 @@ BEGIN
    stim_proc: process
    begin		
       -- hold reset state for 100 ns.
+      wait for 10 ns;	
       i <= (others => '1');
       A <= (others => '0');
-
+      wait for 10 ns;	
+      
       -- insert stimulus here 
-
+--      A <= (others => '1');
+--      wait for 10 ns;
       
-      wait for 100 ns;	
-      i <= (others => '0');
-      A <= (others => '0');
+--      A <= (3 => '0', others => '1');
+--      wait for 10 ns;
       
-      wait for 100 ns;
+      
       wait;
    end process;
 

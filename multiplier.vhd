@@ -170,7 +170,6 @@ begin
           if (state = MUL) then
             out_state <= DRAIN;
           end if;
-          
         when DRAIN =>
           if (mul_rdy = '1') then
             res_ptr <= res_ptr + 1;
@@ -179,10 +178,10 @@ begin
             out_state <= IDLE;
           end if;
         end case;
-        
       end if;
     end if;
   end process;
+  
 end Behavioral;
 
 
