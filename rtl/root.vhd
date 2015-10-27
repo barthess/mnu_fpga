@@ -162,31 +162,31 @@ begin
 
 
 
-  ram_to_uart_pwm : entity work.ram_to_uart_pwm 
-  generic map (
-    UART_CHANNELS => 1
-  )
-  port map (
-    clk_fpga => clk_180mhz,
-    rst      => '0',
-
-    CLK_FSMC => FSMC_CLK,
-    A_IN     => '0' & x"20",
-    D_IN     => x"55aa",
-    D_OUT    => open,
-    EN_IN    => '1',
-    WE_IN    => '1',
-
-    UART_RX  => (others => '1'),
-    UART_CTS => (others => '1'),
-    UART_TX(0)  => LED_LINE(0),
-    UART_RTS => open,
-
-    PWM_DATA_IN  => (others => '0'),
-    PWM_EN_IN    => '0',
-    PWM_DATA_OUT => open,
-    PWM_EN_OUT   => open
-  );
+--  ram_to_uart_pwm : entity work.ram_to_uart_pwm 
+--  generic map (
+--    UART_CHANNELS => 1
+--  )
+--  port map (
+--    clk_fpga => clk_180mhz,
+--    rst      => '0',
+--
+--    CLK_FSMC => FSMC_CLK,
+--    A_IN     => FSMC_A(8 downto 0),
+--    D_IN     => FSMC_D,
+--    D_OUT    => open,
+--    EN_IN    => not FSMC_NCE,
+--    WE_IN    => not FSMC_NWE,
+--
+--    UART_RX  => (others => '1'),
+--    UART_CTS => (others => '1'),
+--    UART_TX(0)  => LED_LINE(0),
+--    UART_RTS => open,
+--
+--    PWM_DATA_IN  => (others => '0'),
+--    PWM_EN_IN    => '0',
+--    PWM_DATA_OUT => open,
+--    PWM_EN_OUT   => open
+--  );
 
 
 
@@ -347,7 +347,7 @@ begin
 
 
   -- warning suppressors
-  LED_LINE(5 downto 1) <= (others => '0');
+  LED_LINE(5 downto 0) <= (others => '0');
 
   STM_IO_MUL_RDY <= '0'; -- warning suppressor
   
