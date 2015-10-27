@@ -32,10 +32,10 @@ USE ieee.std_logic_1164.ALL;
 -- arithmetic functions with Signed or Unsigned values
 USE ieee.numeric_std.ALL;
  
-ENTITY demux_testbench IS
-END demux_testbench;
+ENTITY bus_matrix_helper_testbench IS
+END bus_matrix_helper_testbench;
  
-ARCHITECTURE behavior OF demux_testbench IS 
+ARCHITECTURE behavior OF bus_matrix_helper_testbench IS 
  
     -- Component Declaration for the Unit Under Test (UUT)
  
@@ -68,9 +68,9 @@ BEGIN
     ocnt => 7
    )
    PORT MAP (
-          i => i,
-          o => o
-        );
+      i => i,
+      o => o
+    );
 
    -- Stimulus process
    stim_proc: process

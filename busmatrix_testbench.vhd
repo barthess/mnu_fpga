@@ -33,6 +33,12 @@ USE ieee.std_logic_1164.ALL;
 --USE ieee.numeric_std.ALL;
  
 ENTITY busmatrix_testbench IS
+  generic (
+    AW   : positive := 3; -- address width for multiplexers (select bits count)
+    DW   : positive := 2; -- data bus width 
+    icnt : positive := 3; -- input ports count
+    ocnt : positive := 7  -- output ports count
+  );
 END busmatrix_testbench;
  
 ARCHITECTURE behavior OF busmatrix_testbench IS 
@@ -44,7 +50,7 @@ ARCHITECTURE behavior OF busmatrix_testbench IS
       AW   : positive; -- address width for multiplexers (select bits count)
       DW   : positive; -- data bus width 
       icnt : positive; -- input ports count
-      ocnt : positive   -- output ports count
+      ocnt : positive  -- output ports count
     );
     PORT(
         A : in  STD_LOGIC_VECTOR(AW*ocnt-1 downto 0);
@@ -55,21 +61,21 @@ ARCHITECTURE behavior OF busmatrix_testbench IS
     
 
    --Inputs
-   signal  A : STD_LOGIC_VECTOR(3*7-1 downto 0);
-   signal  i : STD_LOGIC_VECTOR(3*2-1 downto 0);
+   signal  A : STD_LOGIC_VECTOR(AW*ocnt-1 downto 0);
+   signal  i : STD_LOGIC_VECTOR(icnt*DW-1 downto 0);
 
  	--Outputs
-   signal  o : STD_LOGIC_VECTOR(7*2-1 downto 0);
+   signal  o : STD_LOGIC_VECTOR(ocnt*DW-1 downto 0);
  
 BEGIN
  
 	-- Instantiate the Unit Under Test (UUT)
    uut: bus_matrix 
    generic map (
-     AW   => 3,
-     DW   => 2,
-     icnt => 3,
-     ocnt => 7
+     AW   => AW,
+     DW   => DW,
+     icnt => icnt,
+     ocnt => ocnt
    )
    PORT MAP (
       A => A,
