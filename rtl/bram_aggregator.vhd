@@ -122,7 +122,7 @@ begin
   generic map (
     AW => sel,
     DW => DW,
-    count => slavecnt
+    cnt => slavecnt
   )
   PORT MAP (
     A => select_tmp,

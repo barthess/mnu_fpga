@@ -27,16 +27,17 @@
 --------------------------------------------------------------------------------
 LIBRARY ieee;
 USE ieee.std_logic_1164.ALL;
+USE ieee.std_logic_unsigned.ALL;
  
 -- Uncomment the following library declaration if using
 -- arithmetic functions with Signed or Unsigned values
---USE ieee.numeric_std.ALL;
+USE ieee.numeric_std.ALL;
  
 ENTITY muxer_tb IS
   generic (
-    AW   : positive := 4; -- address width for multiplexers (select bits count)
-    DW   : positive := 2; -- data bus width 
-    cnt  : positive := 16  -- output ports count
+    AW   : positive := 3; -- address width for multiplexers (select bits count)
+    DW   : positive := 1; -- data bus width 
+    cnt  : positive := 7  -- output ports count
   );
 END muxer_tb;
  
@@ -66,22 +67,49 @@ BEGIN
 
    -- Stimulus process
    stim_proc: process
+     variable from : integer;
+     variable dt : integer;
+     variable ref : std_logic_vector(DW-1 downto 0);
    begin		
 
-      i <= (2 downto 0 => '1', others => '0');
-      wait for 10 ns;
+
+    for n in 0 to cnt-1 loop
+      A <= std_logic_vector(to_unsigned(n, AW));
       
-      A <= "0001";
-      wait for 10 ns;
+      from := DW*(n+1)-1;
+      dt := DW*n;
       
-      i <= (others => '1');
+      i <= (from downto dt => '1', others => '0');
       wait for 10 ns;
-      
-      A <= "1111";
+      ref := (others => '1');
+      assert o = ref
+        report "asdfasdfsad"
+        severity Failure;
+        
+      i <= (from downto dt => '0', others => '1');
       wait for 10 ns;
-      
-      i <= (1 downto 0 => '0', others => '1');
-      wait for 10 ns;
+      ref := (others => '0');
+      assert o = ref
+        report "asdfasdfsad"
+        severity Failure;
+
+    end loop;
+
+
+--      i <= (2 downto 0 => '1', others => '0');
+--      wait for 10 ns;
+--      
+--      A <= "001";
+--      wait for 10 ns;
+--      
+--      i <= (others => '1');
+--      wait for 10 ns;
+--      
+--      A <= "111";
+--      wait for 10 ns;
+--      
+--      i <= (1 downto 0 => '0', others => '1');
+--      wait for 10 ns;
       
       wait;
    end process;

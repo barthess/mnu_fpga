@@ -52,21 +52,18 @@ begin
     report "Not enough address bits"
     severity Failure;
 
-  assert cnt*2 >= 2**AW+1
-    report "Too many address bits"
-    severity Failure;
+--  assert cnt*2 >= 2**AW+1
+--    report "Too many address bits"
+--    severity Failure;
 
-  process(A) begin
-    if (A >= cnt) then
-      addr <= conv_integer(A) - cnt;
+  addr <= conv_integer(A);
+  process(addr, i) begin
+    if (addr+1 > cnt) then -- overflow handler
+      --o <= i((addr-cnt+1)*DW-1 downto (addr-cnt)*DW); -- wrap data
+      o <= (others => '0'); -- just zero outputs
     else
-      addr <= conv_integer(A);
+      o <= i((addr+1)*DW-1 downto addr*DW);
     end if;
   end process;
-
-  process(addr, i) begin
-    o <= i((addr+1)*DW-1 downto addr*DW);
-  end process;
-
 end Behavioral;
 

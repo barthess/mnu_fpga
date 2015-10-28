@@ -56,7 +56,7 @@ begin
     generic map (
       AW => AW,
       DW => DW,
-      count => icnt
+      cnt => icnt
     )
     PORT MAP (
       i => i,
