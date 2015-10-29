@@ -39,7 +39,9 @@ entity mul_hive is
     mtrxcnt: positive  -- 7 total regions for matrices
   );
   Port (
-    hclk : in STD_LOGIC;
+    --dbg : out std_logic;
+    
+    clk : in STD_LOGIC;
 
     cmd_a   : out STD_LOGIC_VECTOR (cmdaw-1 downto 0) := (others => '0');
     cmd_di  : in  STD_LOGIC_VECTOR (cmddw-1 downto 0);
@@ -93,9 +95,9 @@ begin
     ocnt => 2
   )
   PORT MAP (
-    A => operand_select(5 downto 0),
-    i => mtrx_di,
-    o => mul_op
+    A  => operand_select(5 downto 0),
+    di => mtrx_di,
+    do => mul_op
   );
 
 
@@ -107,9 +109,9 @@ begin
     ocnt => mtrxcnt
   )
   PORT MAP (
-    A => operand_addr_select,
-    i => res_a & op1_a & op0_a,
-    o => mtrx_a
+    A  => operand_addr_select,
+    di => res_a & op1_a & op0_a,
+    do => mtrx_a
   );
   
 
@@ -117,12 +119,12 @@ begin
   generic map (
     AW => 3,
     DW => 1,
-    count => mtrxcnt
+    cnt => mtrxcnt
   )
   PORT MAP (
-    A => operand_select(8 downto 6),
-    i => bram_we,
-    o => mtrx_we
+    A  => operand_select(8 downto 6),
+    di => bram_we,
+    do => mtrx_we
   );
 
 
@@ -131,7 +133,7 @@ begin
     AW => 10
   )
   PORT MAP (
-    clk => hclk,
+    clk => clk,
     ce  => mul_ce,
     rdy => mul_rdy,
   
@@ -152,10 +154,10 @@ begin
 
 
   -- hardwired lines 
-  cmd_clk(0) <= hclk;
+  cmd_clk(0) <= clk;
   cmd_ce  <= "1";
   
-  mtrx_clk <= (others => hclk);
+  mtrx_clk <= (others => clk);
   mtrx_ce  <= "1111111";
   
   do_assign : for n in 0 to mtrxcnt-1 generate 
@@ -196,12 +198,21 @@ begin
     i => operand_select,
     o => operand_addr_select
   );
-  
-  
-  
+
+
+
+--  process(clk) begin
+--    if rising_edge(clk) then
+--      cmd_a <= (others => '0');
+--      dbg <= cmd_di(0);
+--    end if;
+--  end process;
+
+
+
   -- main process
-  process(hclk) begin
-    if rising_edge(hclk) then
+  process(clk) begin
+    if rising_edge(clk) then
       case state is
       
       when IDLE =>

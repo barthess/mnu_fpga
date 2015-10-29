@@ -2,15 +2,15 @@
 -- Company: 
 -- Engineer:
 --
--- Create Date:   15:07:05 10/27/2015
+-- Create Date:   11:00:08 10/29/2015
 -- Design Name:   
--- Module Name:   /home/barthess/projects/xilinx/mnu/test/muxer_tb.vhd
+-- Module Name:   /home/barthess/projects/xilinx/mnu/test/demuxer_tb.vhd
 -- Project Name:  mnu
 -- Target Device:  
 -- Tool versions:  
 -- Description:   
 -- 
--- VHDL Test Bench Created by ISE for module: muxer
+-- VHDL Test Bench Created by ISE for module: demuxer
 -- 
 -- Dependencies:
 -- 
@@ -32,48 +32,48 @@ USE ieee.std_logic_1164.ALL;
 -- arithmetic functions with Signed or Unsigned values
 USE ieee.numeric_std.ALL;
  
-ENTITY muxer_tb IS
-  generic (
-    AW  : positive := 3; -- address width for multiplexers (select bits count)
-    DW  : positive := 2; -- data bus width 
-    cnt : positive := 7  -- output ports count
-  );
-END muxer_tb;
+ENTITY demuxer_tb IS
+generic (
+  AW : positive := 3;  -- address width (select bits count)
+  DW : positive := 2;  -- data width 
+  cnt : positive := 8  -- actual outputs count
+);
+END demuxer_tb;
  
-ARCHITECTURE behavior OF muxer_tb IS 
-
-   --Inputs
-   signal A  : std_logic_vector(AW-1 downto 0)     := (others => '0');
-   signal di : std_logic_vector(DW*cnt-1 downto 0) := (others => '0');
+ 
+ARCHITECTURE behavior OF demuxer_tb IS 
+    --Inputs
+   signal A  : std_logic_vector(AW-1 downto 0) := (others => '0');
+   signal di : std_logic_vector(DW-1 downto 0) := (others => '0');
 
  	--Outputs
-   signal do : std_logic_vector(DW-1 downto 0);
+   signal do : std_logic_vector(cnt*DW-1 downto 0);
  
 BEGIN
  
 	-- Instantiate the Unit Under Test (UUT)
-   uut: entity work.muxer 
+   uut: entity work.demuxer 
    generic map (
       AW => AW,
       DW => DW,
       cnt => cnt
    )
    PORT MAP (
-          A  => A,
-          di => di,
-          do => do
-        );
+      A  => A,
+      di => di,
+      do => do
+    );
 
    -- Stimulus process
   stim_proc: process
     variable from : integer;
     variable down : integer;
-    variable ref : std_logic_vector(DW-1 downto 0);
+    variable ref : std_logic_vector(cnt*DW-1 downto 0);
   begin		
     for n in 0 to 2**AW-1 loop
-    
+      
       A <= std_logic_vector(to_unsigned(n, AW));
-  
+      
       if (n > cnt-1) then -- overflow test
         di <= (others => '1');
         wait for 10 ns;
@@ -85,16 +85,16 @@ BEGIN
         from := DW*(n+1)-1;
         down := DW*n;
 
-        di <= (from downto down => '1', others => '0');
-        wait for 10 ns;
-        ref := (others => '1');
-        assert do = ref
-          report "zeroes test failed"
-          severity Failure;
-
-        di <= (from downto down => '0', others => '1');
+        di <= (others => '0');
         wait for 10 ns;
         ref := (others => '0');
+        assert do = ref
+          report "zero test failed"
+          severity Failure;
+
+        di <= (others => '1');
+        wait for 10 ns;
+        ref := (from downto down => '1', others => '0');
         assert do = ref
           report "ones test failed"
           severity Failure;

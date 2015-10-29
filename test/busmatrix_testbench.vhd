@@ -54,19 +54,19 @@ ARCHITECTURE behavior OF busmatrix_tb IS
       ocnt : positive  -- output ports count
     );
     PORT(
-        A : in  STD_LOGIC_VECTOR(AW*ocnt-1 downto 0);
-        i : in  STD_LOGIC_VECTOR(icnt*DW-1 downto 0);
-        o : out STD_LOGIC_VECTOR(ocnt*DW-1 downto 0)
+        A  : in  STD_LOGIC_VECTOR(AW*ocnt-1 downto 0);
+        di : in  STD_LOGIC_VECTOR(icnt*DW-1 downto 0);
+        do : out STD_LOGIC_VECTOR(ocnt*DW-1 downto 0)
         );
     END COMPONENT;
     
 
    --Inputs
-   signal  A : STD_LOGIC_VECTOR(AW*ocnt-1 downto 0);
-   signal  i : STD_LOGIC_VECTOR(icnt*DW-1 downto 0);
+   signal  A  : STD_LOGIC_VECTOR(AW*ocnt-1 downto 0);
+   signal  di : STD_LOGIC_VECTOR(icnt*DW-1 downto 0);
 
  	--Outputs
-   signal  o : STD_LOGIC_VECTOR(ocnt*DW-1 downto 0);
+   signal  do : STD_LOGIC_VECTOR(ocnt*DW-1 downto 0);
  
 BEGIN
  
@@ -79,9 +79,9 @@ BEGIN
      ocnt => ocnt
    )
    PORT MAP (
-      A => A,
-      i => i,
-      o => o
+      A  => A,
+      di => di,
+      do => do
     );
 
    -- Stimulus process
@@ -89,7 +89,7 @@ BEGIN
    begin		
       -- hold reset state for 100 ns.
       wait for 10 ns;	
-      i <= (others => '1');
+      di <= (others => '1');
       A <= (others => '0');
       wait for 10 ns;	
       

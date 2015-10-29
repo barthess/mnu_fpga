@@ -34,7 +34,7 @@ entity bram_aggregator is
   Generic (
     AW : positive; -- input address width
     DW : positive; -- data witdth
-    sel : positive; -- number bits used for slave addressing
+    sel : positive; -- number of bits used for slave addressing
     slavecnt : positive -- number of actually realized outputs
   );
   Port (
@@ -78,7 +78,7 @@ end bram_aggregator;
 architecture beh of bram_aggregator is
 
 constant slaveaw : positive := AW - sel;
-signal select_tmp : std_logic_vector(sel-1 downto 0);
+signal select_sample : std_logic_vector(sel-1 downto 0);
 
 begin
   
@@ -91,17 +91,16 @@ begin
   slave_clk <= (others => CLK);
   
   -- clock enable fanout
-  --slave_en <= (others => EN);
   ce_demux : entity work.demuxer
     generic map (
       AW => sel,
       DW => 1,
-      count => slavecnt
+      cnt => slavecnt
     )
     PORT MAP (
-      A    => select_tmp,
-      i(0) => CE,
-      o    => slave_ce
+      A     => select_sample,
+      di(0) => CE,
+      do    => slave_ce
     );
 
   -- write enable fanout
@@ -109,12 +108,12 @@ begin
   generic map (
     AW => sel,
     DW => 1,
-    count => slavecnt
+    cnt => slavecnt
   )
   PORT MAP (
-    A => select_tmp,
-    i => WE,
-    o => slave_we
+    A  => select_sample,
+    di => WE,
+    do => slave_we
   );
 
   -- data bus output fanout
@@ -125,16 +124,16 @@ begin
     cnt => slavecnt
   )
   PORT MAP (
-    A => select_tmp,
-    i => slave_di,
-    o => DO
+    A => select_sample,
+    di => slave_di,
+    do => DO
   );
 
   -- 
   process(CLK) begin
     if rising_edge(CLK) then
       if (ASAMPLE = '1') then
-        select_tmp <= get_select(A);
+        select_sample <= get_select(A);
       end if;
     end if;
   end process;

@@ -39,9 +39,9 @@ entity busmatrix is
     ocnt : positive  -- output ports count
   );
   port(
-    A : in  STD_LOGIC_VECTOR(AW*ocnt-1 downto 0);
-    i : in  STD_LOGIC_VECTOR(icnt*DW-1 downto 0);
-    o : out STD_LOGIC_VECTOR(ocnt*DW-1 downto 0)
+    A  : in  STD_LOGIC_VECTOR(AW*ocnt-1 downto 0);
+    di : in  STD_LOGIC_VECTOR(icnt*DW-1 downto 0);
+    do : out STD_LOGIC_VECTOR(ocnt*DW-1 downto 0)
   );
 end busmatrix;
 
@@ -59,9 +59,9 @@ begin
       cnt => icnt
     )
     PORT MAP (
-      i => i,
-      o => o((n+1)*DW-1 downto n*DW),
-      A => A((n+1)*AW-1 downto n*AW)
+      di => di,
+      do => do((n+1)*DW-1 downto n*DW),
+      A  => A((n+1)*AW-1 downto n*AW)
     );
   end generate;
 

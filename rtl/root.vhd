@@ -223,7 +223,9 @@ begin
     mtrxcnt=> 7   -- 7
   )
   Port map (
-    hclk => clk_10mhz,
+    --dbg => STM_IO_MUL_RDY,
+    
+    clk => clk_10mhz,
 
     cmd_a   => wire_mulcmd_a,
     cmd_di  => wire_mulcmd_di,

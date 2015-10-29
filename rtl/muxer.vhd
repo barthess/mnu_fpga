@@ -37,15 +37,15 @@ entity muxer is
     cnt : positive  -- actual inputs count
   );
   port(
-    A : in  STD_LOGIC_VECTOR(AW-1     downto 0);
-    i : in  STD_LOGIC_VECTOR(cnt*DW-1 downto 0);
-    o : out STD_LOGIC_VECTOR(DW-1     downto 0)
+    A  : in  STD_LOGIC_VECTOR(AW-1     downto 0);
+    di : in  STD_LOGIC_VECTOR(cnt*DW-1 downto 0);
+    do : out STD_LOGIC_VECTOR(DW-1     downto 0)
   );
 end muxer;
 
 
 architecture Behavioral of muxer is
-  signal addr : integer;
+  signal addr : integer range 0 to 2**AW;
 begin
 
   assert cnt <= 2**AW
@@ -57,12 +57,13 @@ begin
 --    severity Failure;
 
   addr <= conv_integer(A);
-  process(addr, i) begin
-    if (addr+1 > cnt) then -- overflow handler
-      --o <= i((addr-cnt+1)*DW-1 downto (addr-cnt)*DW); -- wrap data
-      o <= (others => '0'); -- just zero outputs
+  process(addr, di) begin
+    if (addr > cnt-1) then
+      -- overflow handler
+      do <= (others => '0'); -- just zero outputs
+      --do <= di((addr-cnt+1)*DW-1 downto (addr-cnt)*DW); -- wrap data
     else
-      o <= i((addr+1)*DW-1 downto addr*DW);
+      do <= di((addr+1)*DW-1 downto addr*DW);
     end if;
   end process;
 end Behavioral;

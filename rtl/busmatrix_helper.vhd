@@ -49,11 +49,11 @@ architecture Behavioral of busmatrix_helper is
   
 begin
   process(i) 
-    variable tmp : std_logic_vector (ocnt*AW-1 downto 0) := (others => '0');
+    variable tmp : std_logic_vector (ocnt*AW-1 downto 0);
     variable shift : integer;
   begin
     tmp := (others => '0');
-    mylabel : for n in 0 to icnt-1 loop 
+    for n in 0 to icnt-1 loop 
       shift := AW * conv_integer(i ((n+1)*AW-1 downto n*AW));
       tmp := tmp or std_logic_vector(shift_left(to_unsigned(n, ocnt*AW), shift));
     end loop;

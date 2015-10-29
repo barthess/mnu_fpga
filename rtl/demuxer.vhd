@@ -35,26 +35,34 @@ entity demuxer is
   generic (
     AW : positive;  -- address width (select bits count)
     DW : positive;  -- data width 
-    count : positive -- actual outputs count
+    cnt : positive  -- actual outputs count
   );
   port(
-    A : in  STD_LOGIC_VECTOR(AW-1 downto 0);
-    i : in  STD_LOGIC_VECTOR(DW-1 downto 0);
-    o : out STD_LOGIC_VECTOR(count*DW-1 downto 0)
+    A  : in  STD_LOGIC_VECTOR(AW-1 downto 0);
+    di : in  STD_LOGIC_VECTOR(DW-1 downto 0);
+    do : out STD_LOGIC_VECTOR(cnt*DW-1 downto 0)
   );
 end demuxer;
 
 
 architecture Behavioral of demuxer is
-  signal addr : positive;
+  signal addr : integer range 0 to 2**AW;
 begin
-  
-  addr <= conv_integer(A);
-  
-  process(addr, i) begin
-    o <= (others => '0');
-    o((addr+1)*DW-1 downto addr*DW) <= i;
-  end process;
 
+  assert cnt <= 2**AW
+    report "Not enough address bits"
+    severity Failure;
+    
+  addr <= conv_integer(A);
+  process(addr, di) begin
+    do <= (others => '0');
+    
+    if (addr > cnt-1) then -- overflow handling
+      --do <= (others => '0');
+    else
+      do((addr+1)*DW-1 downto addr*DW) <= di;
+    end if;
+    
+  end process;
 end Behavioral;
 
