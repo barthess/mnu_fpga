@@ -135,8 +135,6 @@ signal wire_mulmtrx_we  : std_logic_vector (6  downto 0);
 signal wire_mulmtrx_clk : std_logic_vector (6  downto 0);  
 
 
-
-
 begin
 
   -- connect debug modem
