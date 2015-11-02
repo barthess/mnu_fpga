@@ -188,6 +188,36 @@
       <association xil_pn:name="Implementation" xil_pn:seqID="12"/>
       <library xil_pn:name="uart_lib"/>
     </file>
+    <file xil_pn:name="lib/gtp_lib/sp6_gtp.vhd" xil_pn:type="FILE_VHDL">
+      <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="121"/>
+      <association xil_pn:name="Implementation" xil_pn:seqID="121"/>
+      <library xil_pn:name="gtp_lib"/>
+    </file>
+    <file xil_pn:name="lib/gtp_lib/sp6_gtp_tile.vhd" xil_pn:type="FILE_VHDL">
+      <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="122"/>
+      <association xil_pn:name="Implementation" xil_pn:seqID="122"/>
+      <library xil_pn:name="gtp_lib"/>
+    </file>
+    <file xil_pn:name="lib/gtp_lib/mgt_usrclk_source_pll.vhd" xil_pn:type="FILE_VHDL">
+      <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="123"/>
+      <association xil_pn:name="Implementation" xil_pn:seqID="123"/>
+      <library xil_pn:name="gtp_lib"/>
+    </file>
+    <file xil_pn:name="lib/gtp_lib/sp6_gtp_top.vhd" xil_pn:type="FILE_VHDL">
+      <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="124"/>
+      <association xil_pn:name="Implementation" xil_pn:seqID="124"/>
+      <library xil_pn:name="gtp_lib"/>
+    </file>
+    <file xil_pn:name="lib/i2c_lib/i2c_clkgen_prog.vhd" xil_pn:type="FILE_VHDL">
+      <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="125"/>
+      <association xil_pn:name="Implementation" xil_pn:seqID="125"/>
+      <library xil_pn:name="i2c_lib"/>
+    </file>
+    <file xil_pn:name="lib/i2c_lib/i2c_master.vhd" xil_pn:type="FILE_VHDL">
+      <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="126"/>
+      <association xil_pn:name="Implementation" xil_pn:seqID="126"/>
+      <library xil_pn:name="i2c_lib"/>
+    </file>
     <file xil_pn:name="ipcore_dir/clk_src.xise" xil_pn:type="FILE_COREGENISE">
       <association xil_pn:name="Implementation" xil_pn:seqID="0"/>
     </file>
@@ -536,6 +566,8 @@
   <bindings/>
 
   <libraries>
+    <library xil_pn:name="gtp_lib"/>
+    <library xil_pn:name="i2c_lib"/>
     <library xil_pn:name="uart_lib"/>
   </libraries>
 

@@ -33,6 +33,7 @@ use IEEE.NUMERIC_STD.ALL;
 -- Non standard library from synopsis (for dev_null functions)
 use ieee.std_logic_misc.all;
 
+
 entity root is
   generic (
     FSMC_A_WIDTH : positive := 23;
@@ -95,6 +96,27 @@ entity root is
 --    SPI1_NSS : in std_logic;
 --    SPI1_SCK : in std_logic;
 
+
+
+    -- GTP connect
+    REFCLK0_N_IN : in    std_logic;     -- GTP refclk
+    REFCLK0_P_IN : in    std_logic;
+    FCLK         : in    std_logic;     -- fpga clock 24.84 MHz
+    CSDA         : inout std_logic;     -- i2c to clock gen
+    CSCL         : inout std_logic;
+
+    RXN_IN  : in  std_logic_vector(3 downto 0);
+    RXP_IN  : in  std_logic_vector(3 downto 0);
+    TXN_OUT : out std_logic_vector(3 downto 0);
+    TXP_OUT : out std_logic_vector(3 downto 0);
+
+
+
+
+
+
+
+
     DEV_NULL_BANK1 : out std_logic -- warning suppressor
     --DEV_NULL_BANK0 : out std_logic -- warning suppressor
 	);
@@ -146,10 +168,10 @@ signal wire_pwm_clk  : std_logic_vector (0  downto 0);
 begin
 
   -- connect debug modem
-  STM_UART6_RX  <= XBEE_TX;
-  STM_UART6_CTS <= XBEE_RTS;
-  XBEE_RX       <= STM_UART6_TX;
-  XBEE_CTS      <= STM_UART6_RTS;
+--  STM_UART6_RX  <= XBEE_TX;
+--  STM_UART6_CTS <= XBEE_RTS;
+--  XBEE_RX       <= STM_UART6_TX;
+--  XBEE_CTS      <= STM_UART6_RTS;
 
 
   -- clocking sources
@@ -193,6 +215,43 @@ begin
 
 
 
+
+  mnu_gtp_sp6 : entity work.mnu_sp6_top
+  port map (
+    REFCLK0_N_IN => REFCLK0_N_IN,     -- GTP refclk
+    REFCLK0_P_IN => REFCLK0_P_IN,
+    FCLK         => FCLK,     -- fpga clock 24.84 MHz
+    CSDA         => CSDA,     -- i2c to clock gen
+    CSCL         => CSCL,
+
+    RST_IN => '1',              -- active low
+
+    -- Transceiver signals
+    RXN_IN  => RXN_IN,
+    RXP_IN  => RXP_IN,
+    TXN_OUT => TXN_OUT,
+    TXP_OUT => TXP_OUT,
+
+    -- MCU signals
+    UART6_TX        => STM_UART6_RX,
+    UART6_RX        => STM_UART6_TX,
+    UART6_CTS       => STM_UART6_RTS,
+    UART6_RTS       => STM_UART6_CTS,
+
+    -- BRAM bus
+    FSMC_A_IN   => wire_pwm_a,
+    FSMC_D_IN   => wire_pwm_di,
+    FSMC_D_OUT  => wire_pwm_do,
+    FSMC_EN_IN  => wire_pwm_ce,
+    FSMC_WE_OUT => wire_pwm_we,
+    CLK_SMP_OUT => wire_pwm_clk    -- 3x sampling clock
+  );
+  
+
+
+
+
+
   -- connect GNSS router
   gnss_router : entity work.gnss_router port map (
     sel => STM_IO_GNSS_SELECT,
@@ -214,18 +273,7 @@ begin
   );
 
 
-  -- connect PWM and ICU to memory space
---  pwm : entity work.pwm
---  Port map (
---    clki => clk_180mhz,
---
---    a    => wire_pwm_a,
---    di   => wire_pwm_di,
---    do   => wire_pwm_do,
---    ce   => wire_pwm_ce,
---    we   => wire_pwm_we,
---    clko => wire_pwm_clk,
---  );
+
 
 
   -- connect mul hive to memory space
@@ -240,7 +288,7 @@ begin
   Port map (
     --dbg => STM_IO_MUL_RDY,
     
-    clk => clk_10mhz,
+    clk => clk_90mhz,
 
     cmd_a   => wire_mulcmd_a,
     cmd_di  => wire_mulcmd_di,
