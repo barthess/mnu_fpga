@@ -134,6 +134,14 @@ signal wire_mulmtrx_ce  : std_logic_vector (6  downto 0);
 signal wire_mulmtrx_we  : std_logic_vector (6  downto 0);  
 signal wire_mulmtrx_clk : std_logic_vector (6  downto 0);  
 
+-- wires for pwm-icu to memspace
+signal wire_pwm_a    : std_logic_vector (8  downto 0); 
+signal wire_pwm_di   : std_logic_vector (15 downto 0); 
+signal wire_pwm_do   : std_logic_vector (15 downto 0); 
+signal wire_pwm_ce   : std_logic_vector (0  downto 0);
+signal wire_pwm_we   : std_logic_vector (0  downto 0);  
+signal wire_pwm_clk  : std_logic_vector (0  downto 0);
+
 
 begin
 
@@ -160,31 +168,26 @@ begin
 
 
 
---  ram_to_uart_pwm : entity work.ram_to_uart_pwm 
---  generic map (
---    UART_CHANNELS => 1
---  )
---  port map (
---    clk_fpga => clk_180mhz,
---    rst      => '0',
---
---    CLK_FSMC => FSMC_CLK,
---    A_IN     => FSMC_A(8 downto 0),
---    D_IN     => FSMC_D,
---    D_OUT    => open,
---    EN_IN    => not FSMC_NCE,
---    WE_IN    => not FSMC_NWE,
---
---    UART_RX  => (others => '1'),
---    UART_CTS => (others => '1'),
---    UART_TX(0)  => LED_LINE(0),
---    UART_RTS => open,
---
---    PWM_DATA_IN  => (others => '0'),
---    PWM_EN_IN    => '0',
---    PWM_DATA_OUT => open,
---    PWM_EN_OUT   => open
---  );
+  ram_to_uart : entity work.ram_to_uart 
+  generic map (
+    UART_CHANNELS => 1
+  )
+  port map (
+    clk_smp  => clk_180mhz,
+    rst      => '0',
+
+    CLK_FSMC => FSMC_CLK,
+    A_IN     => FSMC_A(8 downto 0),
+    D_IN     => FSMC_D,
+    D_OUT    => open,
+    EN_IN    => not FSMC_NCE,
+    WE_IN    => not FSMC_NWE,
+
+    UART_RX  => (others => '1'),
+    UART_CTS => (others => '1'),
+    UART_TX(0) => LED_LINE(0),
+    UART_RTS => open
+  );
 
 
 
@@ -209,6 +212,20 @@ begin
 
     ubx_nrst => UBLOX_NRST
   );
+
+
+  -- connect PWM and ICU to memory space
+--  pwm : entity work.pwm
+--  Port map (
+--    clki => clk_180mhz,
+--
+--    a    => wire_pwm_a,
+--    di   => wire_pwm_di,
+--    do   => wire_pwm_do,
+--    ce   => wire_pwm_ce,
+--    we   => wire_pwm_we,
+--    clko => wire_pwm_clk,
+--  );
 
 
   -- connect mul hive to memory space
@@ -242,7 +259,7 @@ begin
 
 
 
-	fsmc2bram : entity work.fsmc2bram 
+  fsmc2bram : entity work.fsmc2bram 
     generic map (
       AW => FSMC_A_WIDTH,
       DW => FSMC_D_WIDTH,
@@ -344,7 +361,7 @@ begin
 
 
   -- warning suppressors
-  LED_LINE(5 downto 0) <= (others => '0');
+  LED_LINE(5 downto 1) <= (others => '0');
 
   STM_IO_MUL_RDY <= '0'; -- warning suppressor
   
