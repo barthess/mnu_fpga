@@ -60,16 +60,6 @@ entity bram_aggregator is
     return A(AW-1 downto AW-sel);
   end get_select;
 
-  --
-  function mmu_check(A : in std_logic_vector(AW-1 downto 0)) return std_logic is
-  begin
-    if get_select(A) + 1 > slavecnt then
-      return '1';
-    else
-      return '0';
-    end if;
-  end mmu_check;
-
 end bram_aggregator;
 
 
