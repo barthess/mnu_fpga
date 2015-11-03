@@ -160,9 +160,9 @@ signal wire_mulmtrx_clk : std_logic_vector (6  downto 0);
 signal wire_pwm_a    : std_logic_vector (8  downto 0); 
 signal wire_pwm_di   : std_logic_vector (15 downto 0); 
 signal wire_pwm_do   : std_logic_vector (15 downto 0); 
-signal wire_pwm_ce   : std_logic_vector (0  downto 0);
-signal wire_pwm_we   : std_logic_vector (0  downto 0);  
-signal wire_pwm_clk  : std_logic_vector (0  downto 0);
+signal wire_pwm_ce   : std_logic;
+signal wire_pwm_we   : std_logic;  
+signal wire_pwm_clk  : std_logic;
 
 
 begin
@@ -233,18 +233,20 @@ begin
     TXP_OUT => TXP_OUT,
 
     -- MCU signals
-    UART6_TX        => STM_UART6_RX,
-    UART6_RX        => STM_UART6_TX,
-    UART6_CTS       => STM_UART6_RTS,
-    UART6_RTS       => STM_UART6_CTS,
+    UART6_TX        => STM_UART6_TX,
+    UART6_RX        => STM_UART6_RX,
+    UART6_CTS       => STM_UART6_CTS,
+    UART6_RTS       => STM_UART6_RTS,
+    
+    BRAM_CLK => wire_pwm_clk, -- memory clock
+    BRAM_A   => wire_pwm_a,   -- memory address
+    BRAM_DI  => wire_pwm_do,  -- memory data in
+    BRAM_DO  => wire_pwm_di,  -- memory data out
+    BRAM_EN  => wire_pwm_ce,  -- memory enable
+    BRAM_WE  => wire_pwm_we,  -- memory write enable
 
-    -- BRAM bus
-    FSMC_A_IN   => wire_pwm_a,
-    FSMC_D_IN   => wire_pwm_di,
-    FSMC_D_OUT  => wire_pwm_do,
-    FSMC_EN_IN  => wire_pwm_ce,
-    FSMC_WE_OUT => wire_pwm_we,
-    CLK_SMP_OUT => wire_pwm_clk    -- 3x sampling clock
+    MODTELEM_RX_MNU => open,
+    FPGA_NREADY     => open    -- debug
   );
   
 

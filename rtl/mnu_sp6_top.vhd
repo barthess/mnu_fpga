@@ -31,15 +31,16 @@ entity mnu_sp6_top is
     UART6_RX        : out std_logic;
     UART6_RTS       : in  std_logic;
     UART6_CTS       : out std_logic;
+    MODTELEM_RX_MNU : out std_logic;
+    FPGA_NREADY     : out std_logic;    -- debug
 
-    -- FSMC bus
-    FSMC_CLK_IN : in  std_logic;
-    CLK_SMP_IN  : in  std_logic;        -- 3x sampling clock
-    FSMC_A_IN   : in  std_logic_vector (8 downto 0);
-    FSMC_D_IN   : in  std_logic_vector (15 downto 0);
-    FSMC_D_OUT  : out std_logic_vector (15 downto 0);
-    FSMC_EN_IN  : in  std_logic;
-    FSMC_WE_IN  : in  std_logic
+    -- BRAM port
+    BRAM_CLK : out std_logic;                       -- memory clock
+    BRAM_A   : out std_logic_vector (8 downto 0);   -- memory address
+    BRAM_DI  : out std_logic_vector (15 downto 0);  -- memory data in
+    BRAM_DO  : in  std_logic_vector (15 downto 0);  -- memory data out
+    BRAM_EN  : out std_logic;                       -- memory enable
+    BRAM_WE  : out std_logic                        -- memory write enable
     );
 
 end entity mnu_sp6_top;
@@ -91,6 +92,8 @@ begin
 
   rst             <= not RST_IN;        -- active low button
   clk             <= FCLK;
+  FPGA_NREADY     <= '0';
+  MODTELEM_RX_MNU <= UART6_TX;
 
   gtpreset_in_i <= (others => rst);
 
@@ -142,20 +145,19 @@ begin
       GTP_CHARISK   => txcharisk_in_i(0));
 
   -- TX frontend gtp2
-  ram_to_pwm_2 : entity work.ram_to_pwm
+  ram_to_pwm_2: entity work.ram_to_pwm
     generic map (
       PWM_CHANNELS      => 16,
       PWM_SEND_INTERVAL => 1024)
     port map (
-      clk_smp      => CLK_SMP_IN,
       clk_gtp      => txusrclk8_23,
       rst          => rst,
-      CLK_FSMC     => FSMC_CLK_IN,
-      A_IN         => FSMC_A_IN,
-      D_IN         => FSMC_D_IN,
-      D_OUT        => FSMC_D_OUT,
-      EN_IN        => FSMC_EN_IN,
-      WE_IN        => FSMC_WE_IN,
+      BRAM_CLK     => BRAM_CLK,
+      BRAM_A       => BRAM_A,
+      BRAM_DI      => BRAM_DI,
+      BRAM_DO      => BRAM_DO,
+      BRAM_EN      => BRAM_EN,
+      BRAM_WE      => BRAM_WE,
       PWM_DATA_IN  => pwm_data_rx_i,    -- from MSI
       PWM_EN_IN    => pwm_en_rx_i,      -- from MSI
       PWM_DATA_OUT => pwm_data_tx_i,    -- to MSI
