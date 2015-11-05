@@ -114,7 +114,7 @@ begin
       SCL => CSCL
       );
 
-  -- RX frontend
+  -- RX frontend gtp0
   post_rx_mnu_0 : entity work.post_rx_mnu(gtp0)
     port map (
       clk               => rxusrclk8_0,
@@ -123,7 +123,30 @@ begin
       GTP_CHARISK       => rxcharisk_out_i(0),
       GTP_BYTEISALIGNED => rxbyteisaligned_out_i(0),
       USART1_RX         => UART6_RX,
-      USART1_CTS        => UART6_CTS);
+      USART1_CTS        => UART6_CTS,
+      PWM_DATA_OUT      => open,
+      PWM_EN_OUT        => open,
+      UART_RX           => open,
+      UART_CTS          => open);
+
+  -- RX frontend gtp2
+  post_rx_mnu_2 : entity work.post_rx_mnu(gtp2)
+    generic map (
+      PWM_START_CHAR => X"1C",
+      PWM_CHANNELS   => 16,
+      UART_CHANNELS  => 16)
+    port map (
+      clk               => rxusrclk8_2,
+      rst               => rst,
+      GTP_RXDATA        => rxdata2_out_i,
+      GTP_CHARISK       => rxcharisk_out_i(2),
+      GTP_BYTEISALIGNED => rxbyteisaligned_out_i(2),
+      USART1_RX         => open,
+      USART1_CTS        => open,
+      PWM_DATA_OUT      => pwm_data_rx_i,
+      PWM_EN_OUT        => pwm_en_rx_i,
+      UART_RX           => uart_rx_i,
+      UART_CTS          => uart_cts_i);
 
   -- TX frontend gtp0
   pre_tx_mnu_0 : entity work.pre_tx_mnu(gtp0)
@@ -144,11 +167,10 @@ begin
       GTP_TXDATA    => txdata0_in_i,
       GTP_CHARISK   => txcharisk_in_i(0));
 
-  -- TX frontend gtp2
-  ram_to_pwm_2: entity work.ram_to_pwm
+  -- BRAM-PWM interface
+  ram_to_pwm_2 : entity work.ram_to_pwm
     generic map (
-      PWM_CHANNELS      => 16,
-      PWM_SEND_INTERVAL => 1024)
+      PWM_CHANNELS      => 16)
     port map (
       clk_gtp      => txusrclk8_23,
       rst          => rst,
@@ -163,6 +185,7 @@ begin
       PWM_DATA_OUT => pwm_data_tx_i,    -- to MSI
       PWM_EN_OUT   => pwm_en_tx_i);     -- to MSI
 
+  -- TX frontend gtp2
   pre_tx_mnu_2 : entity work.pre_tx_mnu(gtp2)
     generic map (
       COMMA_8B       => COMMA_8B,

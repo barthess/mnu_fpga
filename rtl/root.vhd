@@ -109,7 +109,7 @@ entity root is
     RXP_IN  : in  std_logic_vector(3 downto 0);
     TXN_OUT : out std_logic_vector(3 downto 0);
     TXP_OUT : out std_logic_vector(3 downto 0);
-
+    MODTELEM_RX_MNU : out std_logic;
 
 
 
@@ -157,12 +157,12 @@ signal wire_mulmtrx_we  : std_logic_vector (6  downto 0);
 signal wire_mulmtrx_clk : std_logic_vector (6  downto 0);  
 
 -- wires for pwm-icu to memspace
-signal wire_pwm_a    : std_logic_vector (8  downto 0); 
-signal wire_pwm_di   : std_logic_vector (15 downto 0); 
-signal wire_pwm_do   : std_logic_vector (15 downto 0); 
-signal wire_pwm_ce   : std_logic;
-signal wire_pwm_we   : std_logic;  
-signal wire_pwm_clk  : std_logic;
+signal wire_pwmcmd_a    : std_logic_vector (8  downto 0); 
+signal wire_pwmcmd_di   : std_logic_vector (15 downto 0); 
+signal wire_pwmcmd_do   : std_logic_vector (15 downto 0); 
+signal wire_pwmcmd_ce   : std_logic;
+signal wire_pwmcmd_we   : std_logic;  
+signal wire_pwmcmd_clk  : std_logic;
 
 
 begin
@@ -172,6 +172,8 @@ begin
 --  STM_UART6_CTS <= XBEE_RTS;
 --  XBEE_RX       <= STM_UART6_TX;
 --  XBEE_CTS      <= STM_UART6_RTS;
+  XBEE_RX       <= XBEE_TX; -- warning suppressor
+  XBEE_CTS      <= XBEE_RTS; -- warning suppressor
 
 
   -- clocking sources
@@ -190,33 +192,30 @@ begin
 
 
 
-  ram_to_uart : entity work.ram_to_uart 
-  generic map (
-    UART_CHANNELS => 1
-  )
-  port map (
-    clk_smp  => clk_180mhz,
-    rst      => '0',
-
-    CLK_FSMC => FSMC_CLK,
-    A_IN     => FSMC_A(8 downto 0),
-    D_IN     => FSMC_D,
-    D_OUT    => open,
-    EN_IN    => not FSMC_NCE,
-    WE_IN    => not FSMC_NWE,
-
-    UART_RX  => (others => '1'),
-    UART_CTS => (others => '1'),
-    UART_TX(0) => LED_LINE(0),
-    UART_RTS => open
-  );
-
-
+--  ram_to_uart : entity work.ram_to_uart 
+--  generic map (
+--    UART_CHANNELS => 1
+--  )
+--  port map (
+--    clk_smp  => clk_45mhz,
+--    rst      => '0',
+--
+--    CLK_FSMC => FSMC_CLK,
+--    A_IN     => FSMC_A(8 downto 0),
+--    D_IN     => FSMC_D,
+--    D_OUT    => open,
+--    EN_IN    => not FSMC_NCE,
+--    WE_IN    => not FSMC_NWE,
+--
+--    UART_RX  => (others => '1'),
+--    UART_CTS => (others => '1'),
+--    UART_TX(0) => LED_LINE(0),
+--    UART_RTS => open
+--  );
 
 
 
-
-  mnu_gtp_sp6 : entity work.mnu_sp6_top
+  mnu_sp6_top : entity work.mnu_sp6_top
   port map (
     REFCLK0_N_IN => REFCLK0_N_IN,     -- GTP refclk
     REFCLK0_P_IN => REFCLK0_P_IN,
@@ -238,14 +237,14 @@ begin
     UART6_CTS       => STM_UART6_CTS,
     UART6_RTS       => STM_UART6_RTS,
     
-    BRAM_CLK => wire_pwm_clk, -- memory clock
-    BRAM_A   => wire_pwm_a,   -- memory address
-    BRAM_DI  => wire_pwm_do,  -- memory data in
-    BRAM_DO  => wire_pwm_di,  -- memory data out
-    BRAM_EN  => wire_pwm_ce,  -- memory enable
-    BRAM_WE  => wire_pwm_we,  -- memory write enable
+    BRAM_CLK => wire_pwmcmd_clk, -- memory clock
+    BRAM_A   => wire_pwmcmd_a,   -- memory address
+    BRAM_DI  => wire_pwmcmd_do,  -- memory data in
+    BRAM_DO  => wire_pwmcmd_di,  -- memory data out
+    BRAM_EN  => wire_pwmcmd_ce,  -- memory enable
+    BRAM_WE  => wire_pwmcmd_we,  -- memory write enable
 
-    MODTELEM_RX_MNU => open,
+    MODTELEM_RX_MNU => MODTELEM_RX_MNU,
     FPGA_NREADY     => open    -- debug
   );
   
@@ -290,7 +289,7 @@ begin
   Port map (
     --dbg => STM_IO_MUL_RDY,
     
-    clk => clk_90mhz,
+    clk => clk_10mhz,
 
     cmd_a   => wire_mulcmd_a,
     cmd_di  => wire_mulcmd_di,
@@ -365,17 +364,28 @@ begin
       fsmc_asample => wire_bram_asample,
   
       -- cmd memory region
-      cmd_a   (71  downto 9)  => (others => '0'),
+      cmd_a   (71  downto 18) => (others => '0'),
+      cmd_a   (17  downto 9)  => wire_pwmcmd_a,
       cmd_a   (8   downto 0)  => wire_mulcmd_a,
-      cmd_di  (127 downto 16) => (others => '0'),
+      
+      cmd_di  (127 downto 32) => (others => '0'),
+      cmd_di  (31  downto 16) => wire_pwmcmd_do,
       cmd_di  (15  downto 0)  => wire_mulcmd_do,
-      cmd_do  (127 downto 16) => open,
+      
+      cmd_do  (127 downto 32) => open,
+      cmd_do  (31  downto 16) => wire_pwmcmd_di,
       cmd_do  (15  downto 0)  => wire_mulcmd_di,
-      cmd_ce  (7   downto 1)  => (others => '0'),
+      
+      cmd_ce  (7   downto 2)  => (others => '0'),
+      cmd_ce  (1)             => wire_pwmcmd_ce,
       cmd_ce  (0)             => wire_mulcmd_ce(0),
-      cmd_we  (7   downto 1)  => (others => '0'),
+      
+      cmd_we  (7   downto 2)  => (others => '0'),
+      cmd_we  (1)             => wire_pwmcmd_we,
       cmd_we  (0   downto 0)  => wire_mulcmd_we,
-      cmd_clk (7   downto 1)  => (others => '0'),
+      
+      cmd_clk (7   downto 2)  => (others => '0'),
+      cmd_clk (1)             => wire_pwmcmd_clk,
       cmd_clk (0)             => wire_mulcmd_clk(0),
   
       -- stubs for memtest
@@ -411,7 +421,7 @@ begin
 
 
   -- warning suppressors
-  LED_LINE(5 downto 1) <= (others => '0');
+  LED_LINE(5 downto 0) <= (others => '0');
 
   STM_IO_MUL_RDY <= '0'; -- warning suppressor
   

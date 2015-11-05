@@ -9,5 +9,6 @@
 <filter task="bitgen" file="PhysDesignRules" num="2410" type="warning"></filter>
 <filter task="xst" file="Xst" num="1293" type="warning"></filter>
 <filter task="xst" file="HDLCompiler" num="946" type="warning"></filter>
+<filter task="xst" file="Xst" num="2677" type="warning"><arg index="1">mnu_sp6_top/i2c_clkgen_prog_1/i2c_master_1/data_rd_7</arg><arg index="2">root</arg></filter>
 <filter task="xst" file="Xst" num="1896" type="warning"></filter>
 </filters>
