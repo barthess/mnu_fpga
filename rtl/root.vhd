@@ -237,18 +237,40 @@ begin
     UART6_CTS       => STM_UART6_CTS,
     UART6_RTS       => STM_UART6_RTS,
     
-    BRAM_CLK => wire_pwmcmd_clk, -- memory clock
-    BRAM_A   => wire_pwmcmd_a,   -- memory address
-    BRAM_DI  => wire_pwmcmd_do,  -- memory data in
-    BRAM_DO  => wire_pwmcmd_di,  -- memory data out
-    BRAM_EN  => wire_pwmcmd_ce,  -- memory enable
+    BRAM_CLK => wire_pwmcmd_clk,    -- memory clock
+    BRAM_A   => wire_pwmcmd_a,      -- memory address
+    BRAM_DI  => wire_pwmcmd_do,     -- memory data in
+    BRAM_DO  => wire_pwmcmd_di,     -- memory data out
+    BRAM_EN  => wire_pwmcmd_ce,     -- memory enable
     BRAM_WE  => wire_pwmcmd_we(0),  -- memory write enable
+
+--    BRAM_CLK => open,
+--    BRAM_A   => open,
+--    BRAM_DI  => open,
+--    BRAM_DO  => (others => '0'),
+--    BRAM_EN  => open,
+--    BRAM_WE  => open,
 
     MODTELEM_RX_MNU => MODTELEM_RX_MNU,
     FPGA_NREADY     => open    -- debug
   );
-  
+ 
 
+
+
+
+--  ram_addr_test : entity work.ram_addr_test
+--  port map (
+--    clk_i    => clk_180mhz,
+--    BRAM_DBG => STM_IO_MUL_RDY,
+--    BRAM_CLK => wire_pwmcmd_clk, -- memory clock
+--    BRAM_A   => wire_pwmcmd_a,   -- memory address
+--    BRAM_DI  => wire_pwmcmd_di,  -- memory data in
+--    BRAM_DO  => wire_pwmcmd_do,  -- memory data out
+--    BRAM_EN  => wire_pwmcmd_ce,  -- memory enable
+--    BRAM_WE  => wire_pwmcmd_we(0) -- memory write enable
+--  );
+  
 
 
 
@@ -349,7 +371,7 @@ begin
       dinb  => wire_pwmcmd_do,
       doutb => wire_pwmcmd_di,
       enb   => wire_pwmcmd_ce,
-      web   => "0",--wire_pwmcmd_we,
+      web   => wire_pwmcmd_we,
       clkb  => wire_pwmcmd_clk
     );
     
@@ -439,7 +461,6 @@ begin
 
 	-- raize ready flag
 	STM_IO_FPGA_READY <= not clk_locked;
-
 
 
   -- warning suppressors

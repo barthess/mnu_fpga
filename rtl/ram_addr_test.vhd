@@ -24,13 +24,19 @@ architecture rtl of ram_addr_test is
 
 begin
 	BRAM_CLK <= clk_i;
-	BRAM_A   <= (others => '0');
-
+	--BRAM_A   <= (others => '0');
+  BRAM_A   <= "111111111";
+  BRAM_WE  <= '0';
+  BRAM_EN  <= '1';
+  BRAM_DO  <= (others => '0');
+  
 	process(clk_i) is
 	begin
     if rising_edge(clk_i) then
       if (BRAM_DI = x"55AA") then
         BRAM_DBG <= '1';
+      else
+        BRAM_DBG <= '0';
       end if;
     end if;
 	end process;

@@ -81,6 +81,9 @@ architecture rtl of mnu_sp6_top is
   -- Interconnect signals
   signal pwm_data_tx_i : std_logic_vector (15 downto 0);  -- to MSI
   signal pwm_en_tx_i   : std_logic;                       -- to MSI
+  attribute mark_debug : string;
+  attribute mark_debug of pwm_data_tx_i : signal is "TRUE";
+  attribute mark_debug of pwm_en_tx_i : signal is "TRUE";
   signal uart_tx_i     : std_logic_vector (15 downto 0);  -- to MSI
   signal uart_rts_i    : std_logic_vector (15 downto 0);  -- to MSI
   signal pwm_data_rx_i : std_logic_vector (15 downto 0);  -- from MSI
