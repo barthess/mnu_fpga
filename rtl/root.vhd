@@ -134,7 +134,7 @@ signal clk_360mhz : std_logic;
 signal clk_locked : std_logic;
 
 -- wires for memspace to fsmc
-signal wire_bram_a   : std_logic_vector (14 downto 0); 
+signal wire_bram_a   : std_logic_vector (8 downto 0); 
 signal wire_bram_di  : std_logic_vector (FSMC_D_WIDTH-1 downto 0); 
 signal wire_bram_do  : std_logic_vector (FSMC_D_WIDTH-1 downto 0); 
 signal wire_bram_ce  : std_logic; 
@@ -161,7 +161,7 @@ signal wire_pwmcmd_a    : std_logic_vector (8  downto 0);
 signal wire_pwmcmd_di   : std_logic_vector (15 downto 0); 
 signal wire_pwmcmd_do   : std_logic_vector (15 downto 0); 
 signal wire_pwmcmd_ce   : std_logic;
-signal wire_pwmcmd_we   : std_logic;  
+signal wire_pwmcmd_we   : std_logic_vector (0 downto 0);  
 signal wire_pwmcmd_clk  : std_logic;
 
 
@@ -242,7 +242,7 @@ begin
     BRAM_DI  => wire_pwmcmd_do,  -- memory data in
     BRAM_DO  => wire_pwmcmd_di,  -- memory data out
     BRAM_EN  => wire_pwmcmd_ce,  -- memory enable
-    BRAM_WE  => wire_pwmcmd_we,  -- memory write enable
+    BRAM_WE  => wire_pwmcmd_we(0),  -- memory write enable
 
     MODTELEM_RX_MNU => MODTELEM_RX_MNU,
     FPGA_NREADY     => open    -- debug
@@ -277,34 +277,34 @@ begin
 
 
 
-  -- connect mul hive to memory space
-  mul_hive : entity work.mul_hive
-  Generic map (
-    cmdaw  => 9,  -- 9
-    cmddw  => 16, -- 16
-    mtrxaw => 10, -- 12
-    mtrxdw => 64, -- 64
-    mtrxcnt=> 7   -- 7
-  )
-  Port map (
-    --dbg => STM_IO_MUL_RDY,
-    
-    clk => clk_10mhz,
-
-    cmd_a   => wire_mulcmd_a,
-    cmd_di  => wire_mulcmd_di,
-    cmd_do  => wire_mulcmd_do,
-    cmd_ce  => wire_mulcmd_ce,
-    cmd_we  => wire_mulcmd_we,
-    cmd_clk => wire_mulcmd_clk,
-
-    mtrx_a   => wire_mulmtrx_a,
-    mtrx_di  => wire_mulmtrx_di,
-    mtrx_do  => wire_mulmtrx_do,
-    mtrx_ce  => wire_mulmtrx_ce,
-    mtrx_we  => wire_mulmtrx_we,
-    mtrx_clk => wire_mulmtrx_clk
-  );
+--  -- connect mul hive to memory space
+--  mul_hive : entity work.mul_hive
+--  Generic map (
+--    cmdaw  => 9,  -- 9
+--    cmddw  => 16, -- 16
+--    mtrxaw => 10, -- 12
+--    mtrxdw => 64, -- 64
+--    mtrxcnt=> 7   -- 7
+--  )
+--  Port map (
+--    --dbg => STM_IO_MUL_RDY,
+--    
+--    clk => clk_10mhz,
+--
+--    cmd_a   => wire_mulcmd_a,
+--    cmd_di  => wire_mulcmd_di,
+--    cmd_do  => wire_mulcmd_do,
+--    cmd_ce  => wire_mulcmd_ce,
+--    cmd_we  => wire_mulcmd_we,
+--    cmd_clk => wire_mulcmd_clk,
+--
+--    mtrx_a   => wire_mulmtrx_a,
+--    mtrx_di  => wire_mulmtrx_di,
+--    mtrx_do  => wire_mulmtrx_do,
+--    mtrx_ce  => wire_mulmtrx_ce,
+--    mtrx_we  => wire_mulmtrx_we,
+--    mtrx_clk => wire_mulmtrx_clk
+--  );
 
 
 
@@ -312,7 +312,7 @@ begin
     generic map (
       AW => FSMC_A_WIDTH,
       DW => FSMC_D_WIDTH,
-      AWSPARE => FSMC_A_WIDTH - (12 + 3)
+      AWUSED => 9
     )
     port map (
       fsmc_clk => FSMC_CLK,
@@ -334,84 +334,106 @@ begin
       bram_asample => wire_bram_asample
     );
     
-    
-  memory_space : entity work.memory_space
-    generic map (
-      AWFSMC => 15, -- 15 (4096 * 8)
-      DWFSMC => 16, -- 16
-      selfsmc => 3, -- 3
-      cntfsmc => 8, -- 8
-      
-      AWCMD => 12, -- 12 (512 * 8)
-      DWCMD => 16, -- 16
-      selcmd => 3, -- 3
-      cntcmd => 8, -- 8
+  bram_pwm_cmd : entity work.bram_cmd
+    PORT MAP (
+      -- port A connected to FSMC adapter
+      addra => wire_bram_a,
+      dina  => wire_bram_di,
+      douta => wire_bram_do,
+      wea   => wire_bram_we,
+      ena   => wire_bram_ce,
+      clka  => wire_bram_clk,
 
-      AWMTRXA => 15,
-      DWMTRXA => 16,
-      AWMTRXB => 10,
-      DWMTRXB => 64,
-      selmtrx => 3,
-      cntmtrx => 7
-    )
-    port map (
-      fsmc_a   => wire_bram_a,
-      fsmc_di  => wire_bram_di,
-      fsmc_do  => wire_bram_do,
-      fsmc_ce  => wire_bram_ce,
-      fsmc_we  => wire_bram_we,
-      fsmc_clk => wire_bram_clk,
-      fsmc_asample => wire_bram_asample,
-  
-      -- cmd memory region
-      cmd_a   (71  downto 18) => (others => '0'),
-      cmd_a   (17  downto 9)  => wire_pwmcmd_a,
-      cmd_a   (8   downto 0)  => wire_mulcmd_a,
-      
-      cmd_di  (127 downto 32) => (others => '0'),
-      cmd_di  (31  downto 16) => wire_pwmcmd_do,
-      cmd_di  (15  downto 0)  => wire_mulcmd_do,
-      
-      cmd_do  (127 downto 32) => open,
-      cmd_do  (31  downto 16) => wire_pwmcmd_di,
-      cmd_do  (15  downto 0)  => wire_mulcmd_di,
-      
-      cmd_ce  (7   downto 2)  => (others => '0'),
-      cmd_ce  (1)             => wire_pwmcmd_ce,
-      cmd_ce  (0)             => wire_mulcmd_ce(0),
-      
-      cmd_we  (7   downto 2)  => (others => '0'),
-      cmd_we  (1)             => wire_pwmcmd_we,
-      cmd_we  (0   downto 0)  => wire_mulcmd_we,
-      
-      cmd_clk (7   downto 2)  => (others => '0'),
-      cmd_clk (1)             => wire_pwmcmd_clk,
-      cmd_clk (0)             => wire_mulcmd_clk(0),
-  
-      -- stubs for memtest
---      cmd_a   => (others => '0'),
---      cmd_di  => (others => '0'),
---      cmd_do  => open,
---      cmd_ce  => (others => '0'),
---      cmd_we  => (others => '0'),
---      cmd_clk => (others => '0'),
-  
-      -- multiplicator matrix memory region
-      mtrx_a   => wire_mulmtrx_a,
-      mtrx_di  => wire_mulmtrx_do,
-      mtrx_do  => wire_mulmtrx_di,
-      mtrx_ce  => wire_mulmtrx_ce,
-      mtrx_we  => wire_mulmtrx_we,
-      mtrx_clk => wire_mulmtrx_clk
-      
-      -- stubs for memtest
---      mtrx_a   => (others => '0'),
---      mtrx_di  => (others => '0'),
---      mtrx_do  => open,
---      mtrx_ce  => (others => '0'),
---      mtrx_we  => (others => '0'),
---      mtrx_clk => (others => '0')
+      -- port B connected to PWM      
+      addrb => wire_pwmcmd_a,
+      dinb  => wire_pwmcmd_do,
+      doutb => wire_pwmcmd_di,
+      enb   => wire_pwmcmd_ce,
+      web   => "0",--wire_pwmcmd_we,
+      clkb  => wire_pwmcmd_clk
     );
+    
+    
+    
+    
+    
+--  memory_space : entity work.memory_space
+--    generic map (
+--      AWFSMC => 15, -- 15 (4096 * 8)
+--      DWFSMC => 16, -- 16
+--      selfsmc => 3, -- 3
+--      cntfsmc => 8, -- 8
+--      
+--      AWCMD => 12, -- 12 (512 * 8)
+--      DWCMD => 16, -- 16
+--      selcmd => 3, -- 3
+--      cntcmd => 8, -- 8
+--
+--      AWMTRXA => 15,
+--      DWMTRXA => 16,
+--      AWMTRXB => 10,
+--      DWMTRXB => 64,
+--      selmtrx => 3,
+--      cntmtrx => 7
+--    )
+--    port map (
+--      fsmc_a   => wire_bram_a,
+--      fsmc_di  => wire_bram_di,
+--      fsmc_do  => wire_bram_do,
+--      fsmc_ce  => wire_bram_ce,
+--      fsmc_we  => wire_bram_we,
+--      fsmc_clk => wire_bram_clk,
+--      fsmc_asample => wire_bram_asample,
+--  
+--      -- cmd memory region
+--      cmd_a   (71  downto 18) => (others => '0'),
+--      cmd_a   (17  downto 9)  => wire_pwmcmd_a,
+--      cmd_a   (8   downto 0)  => wire_mulcmd_a,
+--      
+--      cmd_di  (127 downto 32) => (others => '0'),
+--      cmd_di  (31  downto 16) => wire_pwmcmd_do,
+--      cmd_di  (15  downto 0)  => wire_mulcmd_do,
+--      
+--      cmd_do  (127 downto 32) => open,
+--      cmd_do  (31  downto 16) => wire_pwmcmd_di,
+--      cmd_do  (15  downto 0)  => wire_mulcmd_di,
+--      
+--      cmd_ce  (7   downto 2)  => (others => '0'),
+--      cmd_ce  (1)             => wire_pwmcmd_ce,
+--      cmd_ce  (0)             => wire_mulcmd_ce(0),
+--      
+--      cmd_we  (7   downto 2)  => (others => '0'),
+--      cmd_we  (1)             => wire_pwmcmd_we,
+--      cmd_we  (0   downto 0)  => wire_mulcmd_we,
+--      
+--      cmd_clk (7   downto 2)  => (others => '0'),
+--      cmd_clk (1)             => wire_pwmcmd_clk,
+--      cmd_clk (0)             => wire_mulcmd_clk(0),
+--  
+--      -- stubs for memtest
+----      cmd_a   => (others => '0'),
+----      cmd_di  => (others => '0'),
+----      cmd_do  => open,
+----      cmd_ce  => (others => '0'),
+----      cmd_we  => (others => '0'),
+----      cmd_clk => (others => '0'),
+--  
+--      -- multiplicator matrix memory region
+--      mtrx_a   => wire_mulmtrx_a,
+--      mtrx_di  => wire_mulmtrx_do,
+--      mtrx_do  => wire_mulmtrx_di,
+--      mtrx_ce  => wire_mulmtrx_ce,
+--      mtrx_we  => wire_mulmtrx_we,
+--      mtrx_clk => wire_mulmtrx_clk
+--      
+--      -- stubs for memtest
+----      mtrx_a   => (others => '0'),
+----      mtrx_di  => (others => '0'),
+----      mtrx_do  => open,
+----      mtrx_ce  => (others => '0'),
+----      mtrx_we  => (others => '0'),
+----      mtrx_clk => (others => '0')
+--    );
 
 
 
