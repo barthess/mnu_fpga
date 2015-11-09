@@ -111,7 +111,7 @@ begin
       
       when IDLE =>
         if (NCE = '0') then 
-          a_cnt <= address2cnt(A);
+          a_cnt <= address2cnt(A) - 1;
           bram_asample <= '1';
           mmu_int <= mmu_check(A, NBL);
           state <= ADDR;
