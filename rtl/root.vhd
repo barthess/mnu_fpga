@@ -156,7 +156,7 @@ signal wire_mulmtrx_ce  : std_logic_vector (6  downto 0);
 signal wire_mulmtrx_we  : std_logic_vector (6  downto 0);  
 signal wire_mulmtrx_clk : std_logic_vector (6  downto 0);  
 
--- wires for pwm-icu to memspace
+-- wires for pwm to memspace
 signal wire_pwmcmd_a    : std_logic_vector (8  downto 0); 
 signal wire_pwmcmd_di   : std_logic_vector (15 downto 0); 
 signal wire_pwmcmd_do   : std_logic_vector (15 downto 0); 
@@ -164,6 +164,13 @@ signal wire_pwmcmd_ce   : std_logic;
 signal wire_pwmcmd_we   : std_logic_vector (0 downto 0);  
 signal wire_pwmcmd_clk  : std_logic;
 
+-- wires for pwm to memspace
+signal wire_icucmd_a    : std_logic_vector (8  downto 0); 
+signal wire_icucmd_di   : std_logic_vector (15 downto 0); 
+signal wire_icucmd_do   : std_logic_vector (15 downto 0); 
+signal wire_icucmd_ce   : std_logic;
+signal wire_icucmd_we   : std_logic_vector (0 downto 0);  
+signal wire_icucmd_clk  : std_logic;
 
 begin
 
@@ -237,19 +244,19 @@ begin
     UART6_CTS       => STM_UART6_CTS,
     UART6_RTS       => STM_UART6_RTS,
     
-    BRAM_CLK => wire_pwmcmd_clk,    -- memory clock
-    BRAM_A   => wire_pwmcmd_a,      -- memory address
-    BRAM_DI  => wire_pwmcmd_do,     -- memory data in
-    BRAM_DO  => wire_pwmcmd_di,     -- memory data out
-    BRAM_EN  => wire_pwmcmd_ce,     -- memory enable
-    BRAM_WE  => wire_pwmcmd_we(0),  -- memory write enable
+    BRAM_TX_CLK => wire_pwmcmd_clk,    -- memory clock
+    BRAM_TX_A   => wire_pwmcmd_a,      -- memory address
+    BRAM_TX_DI  => wire_pwmcmd_di,     -- memory data in
+    BRAM_TX_DO  => wire_pwmcmd_do,     -- memory data out
+    BRAM_TX_EN  => wire_pwmcmd_ce,     -- memory enable
+    BRAM_TX_WE  => wire_pwmcmd_we(0),  -- memory write enable
 
---    BRAM_CLK => open,
---    BRAM_A   => open,
---    BRAM_DI  => open,
---    BRAM_DO  => (others => '0'),
---    BRAM_EN  => open,
---    BRAM_WE  => open,
+    BRAM_RX_CLK => wire_icucmd_clk,    -- memory clock
+    BRAM_RX_A   => wire_icucmd_a,      -- memory address
+    BRAM_RX_DI  => wire_icucmd_di,     -- memory data in
+    BRAM_RX_DO  => wire_icucmd_do,     -- memory data out
+    BRAM_RX_EN  => wire_icucmd_ce,     -- memory enable
+    BRAM_RX_WE  => wire_icucmd_we(0),  -- memory write enable
 
     MODTELEM_RX_MNU => MODTELEM_RX_MNU,
     FPGA_NREADY     => open    -- debug
@@ -361,9 +368,9 @@ begin
       -- port A connected to FSMC adapter
       addra => wire_bram_a,
       dina  => wire_bram_di,
-      douta => wire_bram_do,
+      douta => open,
       wea   => wire_bram_we,
-      ena   => wire_bram_ce,
+      ena   => not FSMC_A(9) and wire_bram_ce,
       clka  => wire_bram_clk,
 
       -- port B connected to PWM      
@@ -375,7 +382,24 @@ begin
       clkb  => wire_pwmcmd_clk
     );
     
-    
+  bram_icu_cmd : entity work.bram_cmd
+    PORT MAP (
+      -- port A connected to FSMC adapter
+      addra => wire_bram_a,
+      dina  => (others => '0'),
+      douta => wire_bram_do,
+      wea   => "0",
+      ena   => FSMC_A(9) and wire_bram_ce,
+      clka  => wire_bram_clk,
+
+      -- port B connected to ICU     
+      addrb => wire_icucmd_a,
+      dinb  => wire_icucmd_do,
+      doutb => wire_icucmd_di,
+      enb   => wire_icucmd_ce,
+      web   => wire_icucmd_we,
+      clkb  => wire_icucmd_clk
+    ); 
     
     
     

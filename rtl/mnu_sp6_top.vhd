@@ -34,13 +34,21 @@ entity mnu_sp6_top is
     MODTELEM_RX_MNU : out std_logic;
     FPGA_NREADY     : out std_logic;    -- debug
 
-    -- BRAM port
-    BRAM_CLK : out std_logic;                       -- memory clock
-    BRAM_A   : out std_logic_vector (8 downto 0);   -- memory address
-    BRAM_DI  : out std_logic_vector (15 downto 0);  -- memory data in
-    BRAM_DO  : in  std_logic_vector (15 downto 0);  -- memory data out
-    BRAM_EN  : out std_logic;                       -- memory enable
-    BRAM_WE  : out std_logic                        -- memory write enable
+    -- BRAM port PWM
+    BRAM_TX_CLK : out std_logic;                       -- memory clock
+    BRAM_TX_A   : out std_logic_vector (8 downto 0);   -- memory address
+    BRAM_TX_DI  : in  std_logic_vector (15 downto 0);  -- memory data in
+    BRAM_TX_DO  : out std_logic_vector (15 downto 0);  -- memory data out
+    BRAM_TX_EN  : out std_logic;                       -- memory enable
+    BRAM_TX_WE  : out std_logic;                       -- memory write enable
+    
+    -- BRAM port ICU
+    BRAM_RX_CLK : out std_logic;                       -- memory clock
+    BRAM_RX_A   : out std_logic_vector (8 downto 0);   -- memory address
+    BRAM_RX_DI  : in  std_logic_vector (15 downto 0);  -- memory data in
+    BRAM_RX_DO  : out std_logic_vector (15 downto 0);  -- memory data out
+    BRAM_RX_EN  : out std_logic;                       -- memory enable
+    BRAM_RX_WE  : out std_logic                        -- memory write enable
     );
 
 end entity mnu_sp6_top;
@@ -171,18 +179,26 @@ begin
       GTP_CHARISK   => txcharisk_in_i(0));
 
   -- BRAM-PWM interface
-  ram_to_pwm_2 : entity work.ram_to_pwm
-    generic map (
-      PWM_CHANNELS      => 16)
+  ram_to_pwm_se_2 : entity work.ram_to_pwm_se
     port map (
-      clk_gtp      => txusrclk8_23,
+      clk_tx       => txusrclk8_23,
+      clk_rx       => rxusrclk8_2,
       rst          => rst,
-      BRAM_CLK     => BRAM_CLK,
-      BRAM_A       => BRAM_A,
-      BRAM_DI      => BRAM_DI,
-      BRAM_DO      => BRAM_DO,
-      BRAM_EN      => BRAM_EN,
-      BRAM_WE      => BRAM_WE,
+      
+      BRAM_TX_CLK  => BRAM_TX_CLK,
+      BRAM_TX_A    => BRAM_TX_A,
+      BRAM_TX_DI   => BRAM_TX_DI,
+      BRAM_TX_DO   => BRAM_TX_DO,
+      BRAM_TX_EN   => BRAM_TX_EN,
+      BRAM_TX_WE   => BRAM_TX_WE,
+      
+      BRAM_RX_CLK  => BRAM_RX_CLK,
+      BRAM_RX_A    => BRAM_RX_A,
+      BRAM_RX_DI   => BRAM_RX_DI,
+      BRAM_RX_DO   => BRAM_RX_DO,
+      BRAM_RX_EN   => BRAM_RX_EN,
+      BRAM_RX_WE   => BRAM_RX_WE,
+      
       PWM_DATA_IN  => pwm_data_rx_i,    -- from MSI
       PWM_EN_IN    => pwm_en_rx_i,      -- from MSI
       PWM_DATA_OUT => pwm_data_tx_i,    -- to MSI
