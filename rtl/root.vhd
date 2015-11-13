@@ -73,15 +73,13 @@ entity root is
     STM_IO_MMU_INT : out std_logic;
     STM_IO_OLD_FSMC_CLK : in std_logic;
 
-    STM_IO_8  : in std_logic;
     STM_IO_9  : in std_logic;
     STM_IO_10 : in std_logic;
     STM_IO_11 : in std_logic;
     STM_IO_12 : in std_logic;
     STM_IO_13 : in std_logic;
 
-    -- bridge between Xbee modem and UART6
-    -- needs only during hardware debug
+    -- bridge between Xbee/Mors and UART6
     STM_UART6_TX  : in  std_logic;
     STM_UART6_RX  : out std_logic;
     STM_UART6_CTS : out std_logic;
@@ -90,6 +88,7 @@ entity root is
     XBEE_RX       : out std_logic;
     XBEE_CTS      : out std_logic;
     XBEE_RTS      : in  std_logic;
+    STM_IO_MODEM_SELECT : in std_logic;
     
 --    SPI1_MISO : out std_logic;
 --    SPI1_MOSI : in std_logic;		  
@@ -110,9 +109,6 @@ entity root is
     TXN_OUT : out std_logic_vector(3 downto 0);
     TXP_OUT : out std_logic_vector(3 downto 0);
     MODTELEM_RX_MNU : out std_logic;
-
-
-
 
 
 
@@ -142,20 +138,6 @@ signal wire_bram_we  : std_logic_vector (0 downto 0);
 signal wire_bram_clk : std_logic; 
 signal wire_bram_asample : std_logic; 
 
--- wires for matrix_mul to memspace
-signal wire_mulcmd_a    : std_logic_vector (8  downto 0); 
-signal wire_mulcmd_di   : std_logic_vector (15 downto 0); 
-signal wire_mulcmd_do   : std_logic_vector (15 downto 0); 
-signal wire_mulcmd_ce   : std_logic_vector (0  downto 0);
-signal wire_mulcmd_we   : std_logic_vector (0  downto 0);  
-signal wire_mulcmd_clk  : std_logic_vector (0  downto 0);
-signal wire_mulmtrx_a   : std_logic_vector (69 downto 0); 
-signal wire_mulmtrx_di  : std_logic_vector (447 downto 0); 
-signal wire_mulmtrx_do  : std_logic_vector (447 downto 0); 
-signal wire_mulmtrx_ce  : std_logic_vector (6  downto 0); 
-signal wire_mulmtrx_we  : std_logic_vector (6  downto 0);  
-signal wire_mulmtrx_clk : std_logic_vector (6  downto 0);  
-
 -- wires for pwm to memspace
 signal wire_pwmcmd_a    : std_logic_vector (8  downto 0); 
 signal wire_pwmcmd_di   : std_logic_vector (15 downto 0); 
@@ -172,16 +154,32 @@ signal wire_icucmd_ce   : std_logic;
 signal wire_icucmd_we   : std_logic_vector (0 downto 0);  
 signal wire_icucmd_clk  : std_logic;
 
+signal mors_uart_tx   : std_logic;
+signal mors_uart_rx   : std_logic;
+signal mors_uart_cts  : std_logic;
+signal mors_uart_rts  : std_logic;
+
 begin
 
   -- connect debug modem
---  STM_UART6_RX  <= XBEE_TX;
---  STM_UART6_CTS <= XBEE_RTS;
---  XBEE_RX       <= STM_UART6_TX;
---  XBEE_CTS      <= STM_UART6_RTS;
-  XBEE_RX       <= XBEE_TX; -- warning suppressor
-  XBEE_CTS      <= XBEE_RTS; -- warning suppressor
-
+  modem_router : entity work.modem_router port map (
+    STM_DI  => STM_UART6_TX,
+    STM_DO  => STM_UART6_RX,
+    STM_CSI => STM_UART6_RTS,
+    STM_CSO => STM_UART6_CTS,
+    
+    DI(0)  => XBEE_TX,
+    DI(1)  => mors_uart_tx,
+    DO(0)  => XBEE_RX,
+    DO(1)  => mors_uart_rx,
+    CSI(0) => XBEE_RTS,
+    CSI(1) => mors_uart_rts,
+    CSO(0) => XBEE_CTS,
+    CSO(1) => mors_uart_cts,
+    
+    sel => STM_IO_MODEM_SELECT
+  );
+  
 
   -- clocking sources
 	clk_src : entity work.clk_src port map (
@@ -238,11 +236,11 @@ begin
     TXN_OUT => TXN_OUT,
     TXP_OUT => TXP_OUT,
 
-    -- MCU signals
-    UART6_TX        => STM_UART6_TX,
-    UART6_RX        => STM_UART6_RX,
-    UART6_CTS       => STM_UART6_CTS,
-    UART6_RTS       => STM_UART6_RTS,
+    -- MCU signalssignal mors_uart_tx   : std_logic;
+    UART6_TX    => mors_uart_rx,
+    UART6_RX    => mors_uart_tx,
+    UART6_CTS   => mors_uart_rts,
+    UART6_RTS   => mors_uart_cts,
     
     BRAM_TX_CLK => wire_pwmcmd_clk,    -- memory clock
     BRAM_TX_A   => wire_pwmcmd_a,      -- memory address
@@ -495,7 +493,6 @@ begin
   DEV_NULL_BANK1 <= (
     STM_IO_OLD_FSMC_CLK or
     STM_IO_MUL_DV or
-    STM_IO_8 or
     STM_IO_9 or
     STM_IO_10 or 
     STM_IO_11 or
