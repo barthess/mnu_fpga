@@ -197,29 +197,6 @@ begin
 
 
 
---  ram_to_uart : entity work.ram_to_uart 
---  generic map (
---    UART_CHANNELS => 1
---  )
---  port map (
---    clk_smp  => clk_45mhz,
---    rst      => '0',
---
---    CLK_FSMC => FSMC_CLK,
---    A_IN     => FSMC_A(8 downto 0),
---    D_IN     => FSMC_D,
---    D_OUT    => open,
---    EN_IN    => not FSMC_NCE,
---    WE_IN    => not FSMC_NWE,
---
---    UART_RX  => (others => '1'),
---    UART_CTS => (others => '1'),
---    UART_TX(0) => LED_LINE(0),
---    UART_RTS => open
---  );
-
-
-
   mnu_sp6_top : entity work.mnu_sp6_top
   port map (
     REFCLK0_N_IN => REFCLK0_N_IN,     -- GTP refclk
@@ -262,24 +239,6 @@ begin
  
 
 
-
-
---  ram_addr_test : entity work.ram_addr_test
---  port map (
---    clk_i    => clk_180mhz,
---    BRAM_DBG => STM_IO_MUL_RDY,
---    BRAM_CLK => wire_pwmcmd_clk, -- memory clock
---    BRAM_A   => wire_pwmcmd_a,   -- memory address
---    BRAM_DI  => wire_pwmcmd_di,  -- memory data in
---    BRAM_DO  => wire_pwmcmd_do,  -- memory data out
---    BRAM_EN  => wire_pwmcmd_ce,  -- memory enable
---    BRAM_WE  => wire_pwmcmd_we(0) -- memory write enable
---  );
-  
-
-
-
-
   -- connect GNSS router
   gnss_router : entity work.gnss_router port map (
     sel => STM_IO_GNSS_SELECT,
@@ -299,39 +258,6 @@ begin
 
     ubx_nrst => UBLOX_NRST
   );
-
-
-
-
-
---  -- connect mul hive to memory space
---  mul_hive : entity work.mul_hive
---  Generic map (
---    cmdaw  => 9,  -- 9
---    cmddw  => 16, -- 16
---    mtrxaw => 10, -- 12
---    mtrxdw => 64, -- 64
---    mtrxcnt=> 7   -- 7
---  )
---  Port map (
---    --dbg => STM_IO_MUL_RDY,
---    
---    clk => clk_10mhz,
---
---    cmd_a   => wire_mulcmd_a,
---    cmd_di  => wire_mulcmd_di,
---    cmd_do  => wire_mulcmd_do,
---    cmd_ce  => wire_mulcmd_ce,
---    cmd_we  => wire_mulcmd_we,
---    cmd_clk => wire_mulcmd_clk,
---
---    mtrx_a   => wire_mulmtrx_a,
---    mtrx_di  => wire_mulmtrx_di,
---    mtrx_do  => wire_mulmtrx_do,
---    mtrx_ce  => wire_mulmtrx_ce,
---    mtrx_we  => wire_mulmtrx_we,
---    mtrx_clk => wire_mulmtrx_clk
---  );
 
 
 

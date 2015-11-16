@@ -56,8 +56,8 @@ begin
     i   => from_stm
 	);
     
-    -- release reset on ublox when selected
-	with sel select ubx_nrst <=
+  -- release reset on ublox when selected
+  with sel select ubx_nrst <=
 		'1' when "10",
 		'0' when others;
         
