@@ -32,14 +32,13 @@ use IEEE.NUMERIC_STD.ALL;
 
 entity muxer is
   generic (
-    AW  : positive; -- address width (select bits count)
-    DW  : positive; -- data width 
-    cnt : positive  -- actual inputs count
+    AW  : positive; -- address width
+    DW  : positive  -- data width 
   );
   port(
-    A  : in  STD_LOGIC_VECTOR(AW-1     downto 0);
-    di : in  STD_LOGIC_VECTOR(cnt*DW-1 downto 0);
-    do : out STD_LOGIC_VECTOR(DW-1     downto 0)
+    A  : in  STD_LOGIC_VECTOR(AW-1       downto 0);
+    di : in  STD_LOGIC_VECTOR(2**AW*DW-1 downto 0);
+    do : out STD_LOGIC_VECTOR(DW-1       downto 0)
   );
 end muxer;
 
@@ -48,23 +47,11 @@ architecture Behavioral of muxer is
   signal addr : integer range 0 to 2**AW;
 begin
 
-  assert cnt <= 2**AW
-    report "Not enough address bits"
-    severity Failure;
-
---  assert cnt*2 >= 2**AW+1
---    report "Too many address bits"
---    severity Failure;
-
   addr <= conv_integer(A);
+
   process(addr, di) begin
-    if (addr > cnt-1) then
-      -- overflow handler
-      do <= (others => '0'); -- just zero outputs
-      --do <= di((addr-cnt+1)*DW-1 downto (addr-cnt)*DW); -- wrap data
-    else
-      do <= di((addr+1)*DW-1 downto addr*DW);
-    end if;
+    do <= di((addr+1)*DW-1 downto addr*DW);
   end process;
+  
 end Behavioral;
 

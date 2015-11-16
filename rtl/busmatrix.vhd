@@ -52,7 +52,7 @@ begin
   
   muxer_assign : for n in 0 to ocnt-1 generate 
   begin
-    muxer_array : entity work.muxer
+    muxer_array : entity work.muxer_incomplete
     generic map (
       AW => AW,
       DW => DW,

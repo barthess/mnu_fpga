@@ -30,15 +30,15 @@ use IEEE.STD_LOGIC_1164.ALL;
 --use UNISIM.VComponents.all;
 
 entity modem_router is
-    Port ( STM_DI : in  STD_LOGIC;
-           STM_DO : out  STD_LOGIC;
+    Port ( STM_DI  : in  STD_LOGIC;
+           STM_DO  : out STD_LOGIC;
            STM_CSI : in  STD_LOGIC;
-           STM_CSO : out  STD_LOGIC;
+           STM_CSO : out STD_LOGIC;
            
-           DI : in  STD_LOGIC_VECTOR (1 downto 0);
-           DO : out  STD_LOGIC_VECTOR (1 downto 0);
+           DI :  in  STD_LOGIC_VECTOR (1 downto 0);
+           DO :  out STD_LOGIC_VECTOR (1 downto 0);
            CSI : in  STD_LOGIC_VECTOR (1 downto 0);
-           CSO : out  STD_LOGIC_VECTOR (1 downto 0);
+           CSO : out STD_LOGIC_VECTOR (1 downto 0);
            
            SEL : in  STD_LOGIC);
 end modem_router;
@@ -53,8 +53,7 @@ begin
   d_mux : entity work.muxer
   generic map (
     AW => 1,
-    DW => 1,
-    cnt => 2
+    DW => 1
   )
   port map (
     di    => DI,
@@ -65,8 +64,7 @@ begin
   cs_mux : entity work.muxer
   generic map (
     AW => 1,
-    DW => 1,
-    cnt => 2
+    DW => 1
   )
   port map (
     di    => CSI,

@@ -30,31 +30,36 @@ use IEEE.NUMERIC_STD.ALL;
 --library UNISIM;
 --use UNISIM.VComponents.all;
 
-
-entity demuxer is
+entity muxer_incomplete is
   generic (
-    AW : positive;  -- address width (select bits count)
-    DW : positive;  -- data width 
-    default : std_logic  -- actual outputs count
+    AW  : positive; -- address width (select bits count)
+    DW  : positive; -- data width 
+    cnt : positive; -- actual inputs count
+    default : std_logic_vector; -- default value for unused inputs
   );
   port(
-    A  : in  STD_LOGIC_VECTOR(AW-1 downto 0);
-    di : in  STD_LOGIC_VECTOR(DW-1 downto 0);
-    do : out STD_LOGIC_VECTOR(2**AW*DW-1 downto 0)
+    A  : in  STD_LOGIC_VECTOR(AW-1     downto 0);
+    di : in  STD_LOGIC_VECTOR(cnt*DW-1 downto 0);
+    do : out STD_LOGIC_VECTOR(DW-1     downto 0)
   );
-end demuxer;
+end muxer_incomplete;
 
 
-architecture Behavioral of demuxer is
+architecture Behavioral of muxer_incomplete is
   signal addr : integer range 0 to 2**AW;
 begin
-  
+
+  assert cnt <= 2**AW
+    report "Not enough address bits"
+    severity Failure;
+
   addr <= conv_integer(A);
-  
   process(addr, di) begin
-    do <= (others => default);
-    do((addr+1)*DW-1 downto addr*DW) <= di;
+    if (addr > cnt-1) then
+      do <= (others => default); -- overflow handler
+    else
+      do <= di((addr+1)*DW-1 downto addr*DW);
+    end if;
   end process;
-  
 end Behavioral;
 
