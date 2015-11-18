@@ -144,7 +144,7 @@ begin
   post_rx_mnu_2 : entity work.post_rx_mnu(gtp2)
     generic map (
       PWM_START_CHAR => X"1C",
-      PWM_CHANNELS   => 16,
+      PWM_CHANNELS   => 19,
       UART_CHANNELS  => 16)
     port map (
       clk               => rxusrclk8_2,

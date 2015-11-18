@@ -6,7 +6,7 @@ use ieee.std_logic_unsigned.all;
 entity post_rx_mnu is
   generic (
     PWM_START_CHAR : std_logic_vector (7 downto 0) := X"1C";  -- K28.0
-    PWM_CHANNELS   : integer                       := 16;
+    PWM_CHANNELS   : integer                       := 17;
     UART_CHANNELS  : integer                       := 16
     );
   port (
@@ -17,7 +17,7 @@ entity post_rx_mnu is
     GTP_BYTEISALIGNED : in  std_logic;
     USART1_RX         : out std_logic;  -- MCU UART (telemetry)
     USART1_CTS        : out std_logic;
-    PWM_DATA_OUT      : out std_logic_vector (PWM_CHANNELS-1 downto 0);
+    PWM_DATA_OUT      : out std_logic_vector (15 downto 0);
     PWM_EN_OUT        : out std_logic;
     UART_RX           : out std_logic_vector (UART_CHANNELS-1 downto 0);
     UART_CTS          : out std_logic_vector (UART_CHANNELS-1 downto 0)
@@ -117,7 +117,7 @@ begin
           PWM_DATA_OUT <= GTP_RXDATA & pwm_byte0;
           PWM_EN_OUT   <= '1';
         when s_pwmb1 =>
-          if pwm_data_cnt /= 15 then
+          if pwm_data_cnt /= PWM_CHANNELS-1 then
             state        <= s_pwmb0;
             pwm_byte0    <= GTP_RXDATA;
             pwm_data_cnt <= pwm_data_cnt + 1;

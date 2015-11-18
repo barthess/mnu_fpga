@@ -28,8 +28,8 @@ entity ram_to_pwm_se is
 
       BRAM_RX_CLK : out std_logic;
       BRAM_RX_A   : out std_logic_vector(8 downto 0);
-      BRAM_RX_DO  : out std_logic_vector(15 downto 0);
       BRAM_RX_DI  : in std_logic_vector(15 downto 0);
+      BRAM_RX_DO  : out std_logic_vector(15 downto 0);
       BRAM_RX_EN  : out std_logic;
       BRAM_RX_WE  : out std_logic;
 
@@ -51,12 +51,15 @@ ARCHITECTURE behav OF ram_to_pwm_se IS
   signal cnt_rx : std_logic_vector(5 downto 0);
   signal cnt_tx : std_logic_vector(7 downto 0) := (others =>'0');
   signal cnt_lim_tx : std_logic_vector(7 downto 0) := (others =>'0');
-  constant cnt_lim_rx : std_logic_vector(5 downto 0) := "100001";
+  constant cnt_lim_rx : std_logic_vector(5 downto 0) := "100101";
 
 BEGIN
  
-  BRAM_RX_A <= "00000"&cnt_rx(4 downto 1) when cnt_rx < "100000" else
-               "100000000";
+  BRAM_RX_A <= "00000"&cnt_rx(4 downto 1) when cnt_rx <= std_logic_vector(to_unsigned(31,6)) else
+               "100000000" when cnt_rx >= std_logic_vector(to_unsigned(32,6)) and cnt_rx <= std_logic_vector(to_unsigned(33,6)) else
+               "100000010" when cnt_rx >= std_logic_vector(to_unsigned(34,6)) and cnt_rx <= std_logic_vector(to_unsigned(35,6)) else
+               "100000011" when cnt_rx >= std_logic_vector(to_unsigned(36,6)) and cnt_rx <= std_logic_vector(to_unsigned(37,6)) else
+               "000000000";
                
   BRAM_TX_A <= "00"&cnt_tx(7 downto 1);
    
