@@ -20,6 +20,7 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.STD_LOGIC_UNSIGNED.ALL;
+use IEEE.std_logic_misc.ALL;
 
 -- Uncomment the following library declaration if using
 -- arithmetic functions with Signed or Unsigned values
@@ -34,6 +35,7 @@ entity fsmc2bram is
   Generic (
     AW : positive; -- total FSMC address width
     DW : positive; -- data witdth
+    USENBL : std_logic; -- set to '1' if you want NBL (byte select) pin support
     AWUSED : positive -- actually used address lines
   );
 	Port (
@@ -52,8 +54,7 @@ entity fsmc2bram is
     bram_do  : out STD_LOGIC_VECTOR (DW-1 downto 0);
     bram_ce  : out STD_LOGIC;
     bram_we  : out STD_LOGIC_VECTOR (0 downto 0);
-    bram_clk : out std_logic;
-    bram_asample : out STD_LOGIC
+    bram_clk : out std_logic
   );
   
 
@@ -68,7 +69,7 @@ entity fsmc2bram is
                      NBL : in std_logic_vector(1 downto 0)) 
                      return std_logic is
   begin
-    if (A(AW-1 downto AWUSED) /= 0) or (NBL(0) /= NBL(1)) then
+    if (A(AW-1 downto AWUSED) /= 0) or ((NBL(0) /= NBL(1) and USENBL = '0')) then
       return '1';
     else
       return '0';
@@ -83,10 +84,10 @@ end fsmc2bram;
 
 architecture beh of fsmc2bram is
 
-type state_t is (IDLE, ADDR, WRITE1, READ1);
-signal state : state_t := IDLE;
+type state_t is (IDLE, WRITE0, WRITE1, READ0);
 
-signal a_cnt : STD_LOGIC_VECTOR (AWUSED-1 downto 0) := (others => '0');
+  signal state : state_t := IDLE;
+  signal a_cnt : STD_LOGIC_VECTOR (AWUSED-1 downto 0) := (others => '0');
 
 begin
 
@@ -97,7 +98,7 @@ begin
   -- coonect 3-state data bus
   D <= bram_di when (NCE = '0' and NOE = '0') else (others => 'Z');
   bram_do <= D;
-
+  
   -- main process
   process(fsmc_clk, NCE) begin
     if (NCE = '1') then
@@ -105,35 +106,36 @@ begin
       bram_we <= "0";
       mmu_int <= '0';
       state <= IDLE;
-      
+
     elsif rising_edge(fsmc_clk) then
       case state is
       
       when IDLE =>
-        if (NCE = '0') then 
-          a_cnt <= address2cnt(A) - 1;
-          bram_asample <= '1';
+        if (NCE = '0') then
           mmu_int <= mmu_check(A, NBL);
-          state <= ADDR;
-        end if;
-        
-      when ADDR =>
-        bram_asample <= '0';
-        if (NWE = '0') then
-          state <= WRITE1;
-        else
-          state <= READ1;
-          bram_ce <= '1';
-          a_cnt <= a_cnt + 1;
+          if (NWE = '0') then
+            a_cnt <= address2cnt(A) - 1;
+            state <= WRITE0;
+          else
+            state <= READ0;
+            bram_ce <= '1';
+            a_cnt <= address2cnt(A);
+          end if;
         end if;
 
-      when WRITE1 =>
-        bram_ce <= '1';
-        --bram_we <= not NBL;
-        bram_we <= "1";
+      when READ0 =>
         a_cnt <= a_cnt + 1;
 
-      when READ1 =>
+      when WRITE0 =>
+        state <= WRITE1;
+  
+      when WRITE1 =>
+        bram_ce <= '1';
+        if USENBL = '1' then
+          bram_we <= not NBL;
+        else
+          bram_we <= "1";
+        end if;
         a_cnt <= a_cnt + 1;
 
       end case;

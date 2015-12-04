@@ -168,7 +168,6 @@ architecture RTL of sp6_gtp_top is
   signal tile0_gtpclkout1_i    : std_logic_vector(1 downto 0);
 
   ----------------------------- User Clocks ---------------------------------
-  signal tile0_gtp0_refclk_i          : std_logic;
   signal tile0_txusrclk0_i            : std_logic;
   signal tile0_rxusrclk0_i            : std_logic;
   signal tile0_rxusrclk1_i            : std_logic;
@@ -195,7 +194,7 @@ begin
       )
     port map
     (
-      I            => tile0_gtpclkout0_i(0),
+      I            => tile0_gtpclkout0_i(0),  --refclk from gtp0 (txusrclk for tile)
       DIVCLK       => tile0_gtpclkout0_0_to_cmt_i,
       IOCLK        => open,
       SERDESSTROBE => open

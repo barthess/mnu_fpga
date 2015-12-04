@@ -91,31 +91,7 @@ begin
     (
         O      =>    CLK0_OUT, 
         I      =>    clkout0_i
-    ); 
-
-
-    clkout1_bufg_i  :  BUFG   
-    port map
-    (
-        O      =>    CLK1_OUT,
-        I      =>    clkout1_i
-    );
-    
-    
-    clkout2_bufg_i  :  BUFG   
-    port map
-    (
-        O      =>    CLK2_OUT, 
-        I      =>    clkout2_i
-    ); 
-
-
-    clkout3_bufg_i  :  BUFG   
-    port map
-    (
-        O      =>    CLK3_OUT,
-        I      =>    clkout3_i
-    );    
+    );   
 
 end RTL;
  

@@ -27,8 +27,8 @@ use IEEE.NUMERIC_STD.ALL;
 
 -- Uncomment the following library declaration if instantiating
 -- any Xilinx primitives in this code.
---library UNISIM;
---use UNISIM.VComponents.all;
+library UNISIM;
+use UNISIM.VComponents.all;
 
 -- Non standard library from synopsis (for dev_null functions)
 use ieee.std_logic_misc.all;
@@ -197,6 +197,7 @@ begin
 
 
 
+
   mnu_sp6_top : entity work.mnu_sp6_top
   port map (
     REFCLK0_N_IN => REFCLK0_N_IN,     -- GTP refclk
@@ -259,12 +260,12 @@ begin
     ubx_nrst => UBLOX_NRST
   );
 
-
-
+   
   fsmc2bram : entity work.fsmc2bram 
     generic map (
       AW => FSMC_A_WIDTH,
       DW => FSMC_D_WIDTH,
+      USENBL => '0',
       AWUSED => 9
     )
     port map (
@@ -283,8 +284,7 @@ begin
       bram_do  => wire_bram_di,
       bram_ce  => wire_bram_ce,
       bram_we  => wire_bram_we,
-      bram_clk => wire_bram_clk,
-      bram_asample => wire_bram_asample
+      bram_clk => wire_bram_clk
     );
     
   bram_pwm_cmd : entity work.bram_cmd
