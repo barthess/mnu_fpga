@@ -61,6 +61,7 @@ architecture rtl of i2c_clkgen_prog is
   end component i2c_master;
 
 begin  -- architecture rtl
+  
   i2c_data_wr <= i2c_data (i2c_data_ptr);
 
   i2c_master_1 : i2c_master
