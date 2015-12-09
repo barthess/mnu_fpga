@@ -126,32 +126,6 @@ architecture RTL of sp6_gtp_top is
         );
   end component;
 
-  component MGT_USRCLK_SOURCE_PLL
-    generic
-      (
-        MULT        : integer := 2;
-        DIVIDE      : integer := 2;
-        FEEDBACK    : string  := "CLKFBOUT";
-        CLK_PERIOD  : real    := 6.26;
-        OUT0_DIVIDE : integer := 2;
-        OUT1_DIVIDE : integer := 2;
-        OUT2_DIVIDE : integer := 2;
-        OUT3_DIVIDE : integer := 2
-        );
-    port
-      (
-        CLK0_OUT       : out std_logic;
-        CLK1_OUT       : out std_logic;
-        CLK2_OUT       : out std_logic;
-        CLK3_OUT       : out std_logic;
-        CLK_IN         : in  std_logic;
-        CLKFB_IN       : in  std_logic;
-        CLKFB_OUT      : out std_logic;
-        PLL_LOCKED_OUT : out std_logic;
-        PLL_RESET_IN   : in  std_logic
-        );
-  end component;
-
   -- PLL
   signal tile0_plllkdet0_i     : std_logic;
   signal tile0_plllkdet1_i     : std_logic;
@@ -168,6 +142,7 @@ architecture RTL of sp6_gtp_top is
   signal tile0_gtpclkout1_i    : std_logic_vector(1 downto 0);
 
   ----------------------------- User Clocks ---------------------------------
+  signal tile0_gtp0_refclk_i          : std_logic;
   signal tile0_txusrclk0_i            : std_logic;
   signal tile0_rxusrclk0_i            : std_logic;
   signal tile0_rxusrclk1_i            : std_logic;
@@ -194,37 +169,20 @@ begin
       )
     port map
     (
-      I            => tile0_gtpclkout0_i(0),  --refclk from gtp0 (txusrclk for tile)
+      I            => tile0_gtpclkout0_i(0),
       DIVCLK       => tile0_gtpclkout0_0_to_cmt_i,
       IOCLK        => open,
       SERDESSTROBE => open
       );
 
-  gtpclkout0_0_pll0_reset_i <= not tile0_plllkdet0_i;
-  gtpclkout0_0_pll0_i : MGT_USRCLK_SOURCE_PLL
-    generic map
-    (
-      MULT        => 4,
-      DIVIDE      => 1,
-      FEEDBACK    => "CLKFBOUT",
-      CLK_PERIOD  => 6.25,
-      OUT0_DIVIDE => 8,
-      OUT1_DIVIDE => 2,
-      OUT2_DIVIDE => 1,
-      OUT3_DIVIDE => 1
-      )
+  gtpclkout0_0_bufg0_i : BUFG           -- no clock division
     port map
     (
-      CLK0_OUT       => tile0_txusrclk0_i,
-      CLK1_OUT       => open,
-      CLK2_OUT       => open,
-      CLK3_OUT       => open,
-      CLK_IN         => tile0_gtpclkout0_0_to_cmt_i,
-      CLKFB_IN       => pll0_fb_out_i,
-      CLKFB_OUT      => pll0_fb_out_i,
-      PLL_LOCKED_OUT => gtpclkout0_0_pll0_locked_i,
-      PLL_RESET_IN   => gtpclkout0_0_pll0_reset_i
+      I => tile0_gtpclkout0_0_to_cmt_i,
+      O => tile0_txusrclk0_i
       );
+
+  gtpclkout0_0_pll0_reset_i <= not tile0_plllkdet0_i;
 
   gtpclkout0_1_bufg1_bufio2_i : BUFIO2
     generic map

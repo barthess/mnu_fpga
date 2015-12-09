@@ -12,8 +12,8 @@ generic
 (
     -- Simulation attributes
     TILE_SIM_GTPRESET_SPEEDUP    : integer   := 0; -- Set to 1 to speed up sim reset
-    TILE_CLK25_DIVIDER_0         : integer   := 10; 
-    TILE_CLK25_DIVIDER_1         : integer   := 10;
+    TILE_CLK25_DIVIDER_0         : integer   := 4; 
+    TILE_CLK25_DIVIDER_1         : integer   := 4;
     TILE_PLL_DIVSEL_FB_0         : integer   := 2;
     TILE_PLL_DIVSEL_FB_1         : integer   := 2;
     TILE_PLL_DIVSEL_REF_0        : integer   := 1;
@@ -188,25 +188,25 @@ begin
        --PLL Attributes
         CLKINDC_B_0                             =>     (TRUE),
         CLKRCV_TRST_0                           =>     (TRUE),
-        OOB_CLK_DIVIDER_0                       =>     (6),
+        OOB_CLK_DIVIDER_0                       =>     (4),
         PLL_COM_CFG_0                           =>     (x"21680a"),
         PLL_CP_CFG_0                            =>     (x"00"),
-        PLL_RXDIVSEL_OUT_0                      =>     (4),
+        PLL_RXDIVSEL_OUT_0                      =>     (2),
         PLL_SATA_0                              =>     (FALSE),
         PLL_SOURCE_0                            =>     (TILE_PLL_SOURCE_0),
-        PLL_TXDIVSEL_OUT_0                      =>     (4),
+        PLL_TXDIVSEL_OUT_0                      =>     (2),
         PLLLKDET_CFG_0                          =>     ("111"),
 
        --
         CLKINDC_B_1                             =>     (TRUE),
         CLKRCV_TRST_1                           =>     (TRUE),
-        OOB_CLK_DIVIDER_1                       =>     (6),
+        OOB_CLK_DIVIDER_1                       =>     (4),
         PLL_COM_CFG_1                           =>     (x"21680a"),
         PLL_CP_CFG_1                            =>     (x"00"),
-        PLL_RXDIVSEL_OUT_1                      =>     (4),
+        PLL_RXDIVSEL_OUT_1                      =>     (2),
         PLL_SATA_1                              =>     (FALSE),
         PLL_SOURCE_1                            =>     (TILE_PLL_SOURCE_1),
-        PLL_TXDIVSEL_OUT_1                      =>     (4),
+        PLL_TXDIVSEL_OUT_1                      =>     (2),
         PLLLKDET_CFG_1                          =>     ("111"),
         PMA_COM_CFG_EAST                        =>     (x"000008000"),
         PMA_COM_CFG_WEST                        =>     (x"00000a000"),
